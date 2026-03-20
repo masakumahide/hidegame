@@ -1,147 +1,235 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ヒデちゃん＆猫ちゃん BREAKOUT</title>
-    <style>
-        :root { --p: #ff69b4; --bg: #fff0f5; }
-        body { margin: 0; overflow: hidden; background: var(--bg); font-family: sans-serif; touch-action: none; }
-        canvas { display: block; }
-        #ui { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; color: var(--p); font-weight: bold; pointer-events: none; z-index: 5; }
-        #menu { position: absolute; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 20px; }
-        .char-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .char-btn { padding: 15px; border: 2px solid var(--p); border-radius: 15px; background: white; text-align: center; cursor: pointer; }
-        .char-btn span { font-size: 30px; }
-        .skill-info { font-size: 10px; color: #666; }
-        #skill-btn { position: absolute; bottom: 20px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: gold; border: 4px solid white; font-size: 30px; display: none; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ヒデちゃん&猫ちゃん BREAKOUT</title>
+<style>
+  :root {
+    --bg-pink: #f9dbe7;
+    --block-pink: #f56c9d;
+    --paddle-purple: #a467c9;
+    --text-maroon: #701d44;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    width: 100%; height: 100%; overflow: hidden; touch-action: none;
+    background-color: var(--bg-pink);
+    font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  #game-container {
+    position: relative; width: 100vw; height: 100dvh;
+    display: flex; flex-direction: column; align-items: center; padding-top: 40px;
+  }
+
+  h1 { color: var(--text-maroon); font-size: 28px; margin-bottom: 20px; font-weight: 900; }
+
+  #canvas-wrap {
+    position: relative; width: 90vw; height: 55vh;
+    background: #fff; border: 4px solid #f9cbdc; border-radius: 10px;
+    overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  canvas { display: block; width: 100%; height: 100%; }
+
+  /* 操作パネル */
+  #controls {
+    margin-top: 30px; display: flex; gap: 15px; align-items: center;
+  }
+
+  .btn {
+    border: none; border-radius: 12px; color: white; font-weight: 900;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+  }
+
+  .arrow-btn { width: 80px; height: 80px; background-color: #e37699; font-size: 24px; }
+  .start-btn { width: 100px; height: 80px; background-color: #a476e3; font-size: 16px; text-align: center; line-height: 1.2; }
+  .btn:active { transform: translateY(4px); box-shadow: none; }
+
+  #overlay {
+    position: absolute; inset: 0; background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+  }
+  #overlay.hidden { display: none; }
+</style>
 </head>
 <body>
-    <div id="ui">
-        <div>SCORE: <span id="score">0</span></div>
-        <div>LIFE: <span id="life">3</span></div>
-        <div id="char-display"></div>
-    </div>
-    <div id="menu">
-        <h2 style="color:var(--p)">キャラをえらんでね！</h2>
-        <div class="char-grid" id="charGrid"></div>
-    </div>
-    <button id="skill-btn">✨</button>
+
+<div id="game-container">
+  <h1>ヒデちゃん＆猫ちゃん</h1>
+
+  <div id="canvas-wrap">
     <canvas id="game"></canvas>
+    <div id="overlay">
+      </div>
+  </div>
+
+  <div id="controls">
+    <button class="btn arrow-btn" id="leftBtn">◀</button>
+    <button class="btn start-btn" id="startBtn">音楽＆<br>START!</button>
+    <button class="btn arrow-btn" id="rightBtn">▶</button>
+  </div>
+</div>
 
 <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const charGrid = document.getElementById("charGrid");
-    const skillBtn = document.getElementById("skill-btn");
+(() => {
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const startBtn = document.getElementById("startBtn");
+  const overlay = document.getElementById("overlay");
+
+  let w, h, dpr, ball, paddle, bricks, active = false, score = 0;
+  
+  // ブロックに書く言葉リスト
+  const WORDS = ["健康", "仕事", "旅行", "夢", "ご飯", "ダイエット", "ヒデ", "猫"];
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentNode.getBoundingClientRect();
+    w = rect.width;
+    h = rect.height;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
     
-    let w, h, score, life, ball, paddle, bricks, gameActive = false, selectedChar;
+    paddle = { w: 80, h: 12, x: w / 2 - 40, y: h - 30 };
+    resetBall();
+  }
 
-    const CHARS = [
-        { name: "ヒデ", icon: "😄", skill: "全消し", color: "#ffd700", action: () => { bricks.forEach(b => b.alive = false); score += 500; }},
-        { name: "ネコ", icon: "🐱", skill: "3個に増える", color: "#ffb6c1", action: () => { ball.vx = 5; balls.push({x:ball.x, y:ball.y, vx:-5, vy:ball.vy, r:ball.r}); }},
-        { name: "クマ", icon: "🐻", skill: "パドル巨大化", color: "#deb887", action: () => { paddle.w = 250; setTimeout(() => paddle.w = 100, 5000); }},
-        { name: "ウサ", icon: "🐰", skill: "スロー", color: "#98fb98", action: () => { ball.vx *= 0.5; ball.vy *= 0.5; setTimeout(() => {ball.vx *= 2; ball.vy *= 2;}, 5000); }}
-    ];
+  function resetBall() {
+    ball = { x: w / 2, y: h - 50, r: 8, vx: 3, vy: -3 };
+  }
 
-    let balls = [];
+  function buildBricks() {
+    bricks = [];
+    const rows = 5, cols = 4, gap = 8, margin = 10;
+    const bw = (w - margin * 2 - gap * (cols - 1)) / cols;
+    const bh = 22;
 
-    function init(charIndex) {
-        selectedChar = CHARS[charIndex];
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-        score = 0; life = 3;
-        paddle = { w: 100, h: 15, x: w / 2 - 50 };
-        ball = { x: w / 2, y: h / 2, vx: 5, vy: 5, r: 10 };
-        balls = [ball];
-        createBricks();
-        gameActive = true;
-        document.getElementById("menu").style.display = "none";
-        document.getElementById("char-display").innerText = selectedChar.icon;
-        skillBtn.style.display = "block";
-        updateUI();
-        draw();
-    }
-
-    function createBricks() {
-        bricks = [];
-        const rows = 4, cols = 6, gap = 5;
-        const bw = (w - (gap * (cols + 1))) / cols;
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                bricks.push({ x: gap + c * (bw + gap), y: 60 + r * (30 + gap), w: bw, h: 25, alive: true });
-            }
-        }
-    }
-
-    function updateUI() {
-        document.getElementById("score").innerText = score;
-        document.getElementById("life").innerText = life;
-    }
-
-    function draw() {
-        if (!gameActive) return;
-        ctx.clearRect(0, 0, w, h);
-
-        // パドル
-        ctx.fillStyle = selectedChar.color;
-        ctx.fillRect(paddle.x, h - 100, paddle.w, paddle.h);
-        ctx.fillText(selectedChar.icon, paddle.x + paddle.w/2 - 10, h - 110);
-
-        // ブロック
-        bricks.forEach(b => {
-            if (!b.alive) return;
-            ctx.fillStyle = "#ff69b4";
-            ctx.fillRect(b.x, b.y, b.w, b.h);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        bricks.push({
+          x: margin + c * (bw + gap),
+          y: 20 + r * (bh + gap),
+          w: bw, h: bh,
+          alive: true,
+          text: WORDS[Math.floor(Math.random() * WORDS.length)]
         });
-
-        // ボール移動と描画
-        balls.forEach((b, idx) => {
-            b.x += b.vx; b.y += b.vy;
-            if (b.x < 0 || b.x > w) b.vx *= -1;
-            if (b.y < 0) b.vy *= -1;
-
-            if (b.y > h - 100 && b.y < h - 85 && b.x > paddle.x && b.x < paddle.x + paddle.w) {
-                b.vy = -Math.abs(b.vy);
-            }
-
-            bricks.forEach(br => {
-                if (br.alive && b.x > br.x && b.x < br.x + br.w && b.y > br.y && b.y < br.y + br.h) {
-                    br.alive = false; b.vy *= -1; score += 10; updateUI();
-                }
-            });
-
-            ctx.fillStyle = "#4b2346";
-            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
-
-            if (b.y > h) balls.splice(idx, 1);
-        });
-
-        if (balls.length === 0) {
-            life--; updateUI();
-            if (life <= 0) { gameActive = false; location.reload(); }
-            else { ball = { x: w / 2, y: h / 2, vx: 5, vy: 5, r: 10 }; balls = [ball]; }
-        }
-
-        if (bricks.every(b => !b.alive)) { createBricks(); }
-
-        requestAnimationFrame(draw);
+      }
     }
+  }
 
-    // メニュー作成
-    CHARS.forEach((c, i) => {
-        const btn = document.createElement("div");
-        btn.className = "char-btn";
-        btn.innerHTML = `<span>${c.icon}</span><br>${c.name}<br><div class="skill-info">${c.skill}</div>`;
-        btn.onclick = () => init(i);
-        charGrid.appendChild(btn);
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+
+    // 背景画像的なもの（薄いピンク）
+    ctx.fillStyle = "#fff0f5";
+    ctx.fillRect(0,0,w,h);
+
+    // ブロック描画（画像通りのピンク）
+    bricks.forEach(b => {
+      if (!b.alive) return;
+      ctx.fillStyle = "#f56c9d"; // 画像のピンク
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      
+      ctx.fillStyle = "white";
+      ctx.font = "bold 10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(b.text, b.x + b.w / 2, b.y + 15);
     });
 
-    window.addEventListener("touchmove", e => { paddle.x = e.touches[0].clientX - paddle.w / 2; });
-    window.addEventListener("mousemove", e => { paddle.x = e.clientX - paddle.w / 2; });
-    skillBtn.onclick = () => { selectedChar.action(); skillBtn.style.opacity = 0.5; skillBtn.disabled = true; };
+    // パドル（画像通りの紫）
+    ctx.fillStyle = "#a467c9";
+    ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
 
+    // ボール
+    ctx.fillStyle = "#ffff00"; // ヒデちゃんカラーの黄色
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 8px sans-serif";
+    ctx.fillText("ヒデ", ball.x, ball.y + 3);
+
+    if (!active) return;
+
+    // 移動ロジック
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    if (ball.x < ball.r || ball.x > w - ball.r) ball.vx *= -1;
+    if (ball.y < ball.r) ball.vy *= -1;
+
+    // パドル衝突
+    if (ball.y + ball.r > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
+      ball.vy = -Math.abs(ball.vy);
+      ball.vx = (ball.x - (paddle.x + paddle.w / 2)) / 8;
+    }
+
+    // ブロック衝突
+    bricks.forEach(b => {
+      if (b.alive && ball.x > b.x && ball.x < b.x + b.w && ball.y > b.y && ball.y < b.y + b.h) {
+        b.alive = false;
+        ball.vy *= -1;
+        score += 10;
+      }
+    });
+
+    // 落下
+    if (ball.y > h) {
+      active = false;
+      overlay.classList.remove("hidden");
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // ボタン操作
+  let moveDir = 0;
+  const leftBtn = document.getElementById("leftBtn");
+  const rightBtn = document.getElementById("rightBtn");
+
+  const startMove = (dir) => moveDir = dir;
+  const stopMove = () => moveDir = 0;
+
+  leftBtn.addEventListener("touchstart", () => startMove(-5));
+  leftBtn.addEventListener("touchend", stopMove);
+  rightBtn.addEventListener("touchstart", () => startMove(5));
+  rightBtn.addEventListener("touchend", stopMove);
+
+  // PC用
+  leftBtn.addEventListener("mousedown", () => startMove(-5));
+  window.addEventListener("mouseup", stopMove);
+  rightBtn.addEventListener("mousedown", () => startMove(5));
+
+  function updatePaddle() {
+    if (moveDir !== 0) {
+      paddle.x += moveDir;
+      paddle.x = Math.max(0, Math.min(w - paddle.w, paddle.x));
+    }
+    requestAnimationFrame(updatePaddle);
+  }
+
+  startBtn.onclick = () => {
+    overlay.classList.add("hidden");
+    buildBricks();
+    resetBall();
+    active = true;
+    score = 0;
+    draw();
+  };
+
+  window.addEventListener("resize", resize);
+  resize();
+  updatePaddle();
+  draw(); // 初期表示
+
+})();
 </script>
 </body>
 </html>
