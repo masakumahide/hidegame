@@ -1,258 +1,147 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ヒデちゃん&猫ちゃん BREAKOUT Pink</title>
-<style>
-  :root{
-    --pink:#ff5aac;
-    --pink2:#ff8cc8;
-    --yellow:#ffd84d;
-    --mint:#7effd3;
-    --sky:#7de2ff;
-    --violet:#a98bff;
-    --ink:#4b2346;
-    --white:#fffdfd;
-    --shadow:0 12px 28px rgba(0,0,0,.22);
-  }
-
-  *{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    user-select:none;
-    -webkit-tap-highlight-color:transparent;
-  }
-
-  html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    touch-action:none;
-    font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
-    background: radial-gradient(circle at top, #ffd7ea 0%, #f6bfd8 40%, #ef9fc5 100%);
-    color:var(--white);
-  }
-
-  #app{ position:relative; width:100vw; height:100dvh; overflow:hidden; }
-  canvas{ display:block; width:100%; height:100%; }
-
-  #hud{
-    position:absolute; top:10px; left:10px; right:10px; z-index:20;
-    display:flex; justify-content:space-between; gap:10px; pointer-events:none;
-  }
-  .panel{
-    background:rgba(255,255,255,.45); border:1px solid rgba(255,255,255,.7);
-    border-radius:18px; padding:8px 12px; backdrop-filter:blur(8px); min-width:100px;
-  }
-  .label{ font-size:10px; color:#9b527d; font-weight:700; margin-bottom:2px; }
-  .value{ font-size:16px; font-weight:900; color:var(--ink); }
-
-  #catBadge{
-    position:absolute; right:12px; top:100px; width:68px; height:68px; z-index:22;
-    border-radius:50%; overflow:hidden; border:3px solid white; background:rgba(255,255,255,.2);
-  }
-  #catBadge img{ width:100%; height:100%; object-fit:cover; display:none; }
-  #catBadgeFallback{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px; }
-  #catTalk{ position:absolute; right:10px; top:175px; z-index:22; font-size:12px; font-weight:900; color:#fff8b0; text-shadow:0 2px 6px rgba(0,0,0,.3); }
-
-  #message{
-    position:absolute; top:35%; left:50%; transform:translateX(-50%); z-index:25;
-    font-size:42px; font-weight:900; color:var(--yellow); text-shadow:0 0 12px rgba(0,0,0,.3);
-    pointer-events:none; opacity:0; transition:opacity .2s;
-  }
-
-  #skillWrap{ position:absolute; left:14px; right:92px; bottom:20px; z-index:21; }
-  #skillBar{ height:14px; border-radius:10px; background:rgba(255,255,255,.3); border:1px solid white; overflow:hidden; }
-  #skillFill{ width:0%; height:100%; background:linear-gradient(90deg, #6de9ff, #ffe56b); transition:width .2s; }
-  
-  #skillBtn{
-    position:absolute; right:14px; bottom:14px; width:64px; height:64px; z-index:30;
-    border:none; border-radius:50%; font-size:28px; background:linear-gradient(180deg, #fff08e, #ffb833);
-    box-shadow:0 6px 0 #d98f00; cursor:pointer;
-  }
-  #skillBtn.disabled{ opacity:0.5; filter:grayscale(1); pointer-events:none; }
-
-  #overlay{
-    position:absolute; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
-    background:rgba(255,220,235,.85); backdrop-filter:blur(6px);
-  }
-  .card{ width:min(90vw, 400px); background:white; border-radius:24px; padding:24px; text-align:center; color:var(--ink); box-shadow:var(--shadow); }
-  .title{ font-size:28px; font-weight:900; color:var(--pink); margin-bottom:15px; }
-  .btn{ border:none; border-radius:99px; padding:12px 24px; font-size:20px; font-weight:900; background:linear-gradient(180deg, #ff60ae, #ff2c92); color:white; cursor:pointer; box-shadow:0 6px 0 #b81f69; }
-  .charGrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
-  .charBtn{ border:2px solid #eee; border-radius:15px; background:#f9f9f9; padding:10px; cursor:pointer; }
-  .charBtn.selected{ border-color:var(--pink); background:#fff0f6; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ヒデちゃん＆猫ちゃん BREAKOUT</title>
+    <style>
+        :root { --p: #ff69b4; --bg: #fff0f5; }
+        body { margin: 0; overflow: hidden; background: var(--bg); font-family: sans-serif; touch-action: none; }
+        canvas { display: block; }
+        #ui { position: absolute; top: 10px; width: 100%; display: flex; justify-content: space-around; color: var(--p); font-weight: bold; pointer-events: none; z-index: 5; }
+        #menu { position: absolute; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 20px; }
+        .char-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .char-btn { padding: 15px; border: 2px solid var(--p); border-radius: 15px; background: white; text-align: center; cursor: pointer; }
+        .char-btn span { font-size: 30px; }
+        .skill-info { font-size: 10px; color: #666; }
+        #skill-btn { position: absolute; bottom: 20px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: gold; border: 4px solid white; font-size: 30px; display: none; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    </style>
 </head>
 <body>
-<div id="app">
-  <canvas id="game"></canvas>
-  <div id="hud">
-    <div class="hud-col">
-      <div class="panel"><div class="label">SCORE</div><div class="value" id="scoreText">0</div></div>
-      <div class="panel" style="margin-top:5px"><div class="label">LIFE</div><div class="value" id="lifeText">3</div></div>
+    <div id="ui">
+        <div>SCORE: <span id="score">0</span></div>
+        <div>LIFE: <span id="life">3</span></div>
+        <div id="char-display"></div>
     </div>
-    <div class="hud-col">
-      <div class="panel"><div class="label">STAGE</div><div class="value" id="stageText">1</div></div>
-      <div class="panel" style="margin-top:5px"><div class="label">CHAR</div><div class="value" id="charText">🐱</div></div>
+    <div id="menu">
+        <h2 style="color:var(--p)">キャラをえらんでね！</h2>
+        <div class="char-grid" id="charGrid"></div>
     </div>
-  </div>
-  <div id="catBadge"><img id="catBadgeImg"><div id="catBadgeFallback">🐱</div></div>
-  <div id="catTalk">にゃっ</div>
-  <div id="message"></div>
-  <div id="skillWrap"><div id="skillBar"><div id="skillFill"></div></div></div>
-  <button id="skillBtn" class="disabled">✨</button>
-  <div id="overlay"></div>
-</div>
+    <button id="skill-btn">✨</button>
+    <canvas id="game"></canvas>
 
 <script>
-(() => {
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-  const overlay = document.getElementById("overlay");
-  const scoreText = document.getElementById("scoreText");
-  const lifeText = document.getElementById("lifeText");
-  const stageText = document.getElementById("stageText");
-  const charText = document.getElementById("charText");
-  const skillFill = document.getElementById("skillFill");
-  const skillBtn = document.getElementById("skillBtn");
-  const message = document.getElementById("message");
-  const catTalk = document.getElementById("catTalk");
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const charGrid = document.getElementById("charGrid");
+    const skillBtn = document.getElementById("skill-btn");
+    
+    let w, h, score, life, ball, paddle, bricks, gameActive = false, selectedChar;
 
-  let W, H, DPR, state = "title", score = 0, stage = 1, life = 3, skill = 0, touchX = 0;
-  let paddle = { x:0, y:0, w:100, h:18 }, balls = [], bricks = [], particles = [], stars = [];
-  let effects = { bigUntil: 0, slowUntil: 0 };
+    const CHARS = [
+        { name: "ヒデ", icon: "😄", skill: "全消し", color: "#ffd700", action: () => { bricks.forEach(b => b.alive = false); score += 500; }},
+        { name: "ネコ", icon: "🐱", skill: "3個に増える", color: "#ffb6c1", action: () => { ball.vx = 5; balls.push({x:ball.x, y:ball.y, vx:-5, vy:ball.vy, r:ball.r}); }},
+        { name: "クマ", icon: "🐻", skill: "パドル巨大化", color: "#deb887", action: () => { paddle.w = 250; setTimeout(() => paddle.w = 100, 5000); }},
+        { name: "ウサ", icon: "🐰", skill: "スロー", color: "#98fb98", action: () => { ball.vx *= 0.5; ball.vy *= 0.5; setTimeout(() => {ball.vx *= 2; ball.vy *= 2;}, 5000); }}
+    ];
 
-  const CHARACTERS = [
-    { name:"ヒデ", emoji:"😄", color:"#ffd84d", use:() => {
-      bricks.forEach(b => { if(b.alive){ b.alive=false; score+=20; burst(b.x+b.w/2, b.y+b.h/2, "✨"); }});
-      showMessage("ALL CLEAR!!", 1000);
-    }},
-    { name:"ネコ", emoji:"🐱", color:"#ff8ec7", use:() => {
-      if(balls.length > 0) {
-        const b = balls[0];
-        balls.push({x:b.x, y:b.y, vx:-b.vx, vy:b.vy, r:10}, {x:b.x, y:b.y, vx:b.vx*0.5, vy:-b.vy, r:10});
-      }
-      showMessage("MEOW x3!!", 1000);
-    }},
-    { name:"クマ", emoji:"🐻", color:"#a98bff", use:() => {
-      effects.bigUntil = performance.now() + 8000;
-      showMessage("BIG PADDLE!!", 1000);
-    }},
-    { name:"ウサ", emoji:"🐰", color:"#7effd3", use:() => {
-      effects.slowUntil = performance.now() + 5000;
-      showMessage("SLOW DOWN!!", 1000);
-    }}
-  ];
-  let selectedChar = CHARACTERS[1];
+    let balls = [];
 
-  function resize() {
-    W = window.innerWidth; H = window.innerHeight;
-    DPR = window.devicePixelRatio || 1;
-    canvas.width = W * DPR; canvas.height = H * DPR;
-    ctx.scale(DPR, DPR);
-    paddle.y = H - 100;
-    touchX = W / 2;
-    stars = Array.from({length:30}, () => ({x:Math.random()*W, y:Math.random()*H, r:Math.random()*2, a:Math.random()}));
-  }
-
-  function buildStage() {
-    bricks = [];
-    const cols = 6, rows = 3 + stage, gap = 6, margin = 15;
-    const bw = (W - margin*2 - gap*(cols-1)) / cols;
-    for(let r=0; r<rows; r++) {
-      for(let c=0; c<cols; c++) {
-        bricks.push({ x:margin+c*(bw+gap), y:85+r*(25+gap), w:bw, h:25, alive:true, emoji:["🐟","🧶","🐾"][r%3], hue:`hsl(${r*30+330}, 80%, 75%)` });
-      }
+    function init(charIndex) {
+        selectedChar = CHARS[charIndex];
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        score = 0; life = 3;
+        paddle = { w: 100, h: 15, x: w / 2 - 50 };
+        ball = { x: w / 2, y: h / 2, vx: 5, vy: 5, r: 10 };
+        balls = [ball];
+        createBricks();
+        gameActive = true;
+        document.getElementById("menu").style.display = "none";
+        document.getElementById("char-display").innerText = selectedChar.icon;
+        skillBtn.style.display = "block";
+        updateUI();
+        draw();
     }
-  }
 
-  function burst(x, y, emoji) {
-    for(let i=0; i<6; i++) particles.push({ x, y, vx:(Math.random()-0.5)*8, vy:(Math.random()-0.5)*8, life:1, emoji });
-  }
-
-  function showMessage(txt, ms) {
-    message.textContent = txt; message.style.opacity = 1;
-    setTimeout(() => message.style.opacity = 0, ms);
-  }
-
-  function update() {
-    if(state !== "playing") return;
-    const now = performance.now();
-    const spd = now < effects.slowUntil ? 0.6 : 1;
-    const targetW = now < effects.bigUntil ? 160 : 100;
-    paddle.w += (targetW - paddle.w) * 0.1;
-    paddle.x += (touchX - paddle.w/2 - paddle.x) * 0.15;
-    paddle.x = Math.max(0, Math.min(W - paddle.w, paddle.x));
-
-    balls.forEach(b => {
-      b.x += b.vx * spd; b.y += b.vy * spd;
-      if(b.x<b.r || b.x>W-b.r) b.vx *= -1;
-      if(b.y<b.r) b.vy *= -1;
-      if(b.y > paddle.y && b.y < paddle.y + paddle.h && b.x > paddle.x && b.x < paddle.x + paddle.w) {
-        b.vy = -Math.abs(b.vy); b.vx = (b.x - (paddle.x + paddle.w/2)) / (paddle.w/2) * 5;
-      }
-      bricks.forEach(br => {
-        if(br.alive && b.x>br.x && b.x<br.x+br.w && b.y>br.y && b.y<br.y+br.h) {
-          br.alive = false; b.vy *= -1; score += 10; skill = Math.min(100, skill + 4);
-          burst(br.x+br.w/2, br.y+br.h/2, br.emoji);
+    function createBricks() {
+        bricks = [];
+        const rows = 4, cols = 6, gap = 5;
+        const bw = (w - (gap * (cols + 1))) / cols;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                bricks.push({ x: gap + c * (bw + gap), y: 60 + r * (30 + gap), w: bw, h: 25, alive: true });
+            }
         }
-      });
-    });
-    balls = balls.filter(b => b.y < H);
-    if(balls.length === 0) { life--; if(life<=0) endGame(); else resetBall(); }
-    if(bricks.every(b => !b.alive)) { stage++; buildStage(); resetBall(); }
-    particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.02; });
-    particles = particles.filter(p => p.life > 0);
-    updateHud();
-  }
-
-  function resetBall() { balls = [{x:W/2, y:H-150, vx:4, vy:-4, r:10}]; }
-  function updateHud() {
-    scoreText.textContent = score; lifeText.textContent = life; stageText.textContent = stage;
-    charText.textContent = selectedChar.emoji; skillFill.style.width = skill + "%";
-    skillBtn.classList.toggle("disabled", skill < 100);
-  }
-
-  function endGame() { state = "gameover"; renderOverlay(); }
-
-  function draw() {
-    ctx.clearRect(0,0,W,H);
-    stars.forEach(s => { ctx.fillStyle=`rgba(255,255,255,${s.a})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill(); });
-    bricks.forEach(b => { if(b.alive){ ctx.fillStyle=b.hue; ctx.roundRect ? ctx.beginPath()||ctx.roundRect(b.x, b.y, b.w, b.h, 8)||ctx.fill() : ctx.fillRect(b.x, b.y, b.w, b.h); ctx.fillStyle="#4b2346"; ctx.fillText(b.emoji, b.x+b.w/2-8, b.y+18); }});
-    ctx.fillStyle="white"; ctx.roundRect ? ctx.beginPath()||ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 10)||ctx.fill() : ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
-    balls.forEach(b => { ctx.fillStyle=selectedChar.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); });
-    particles.forEach(p => { ctx.globalAlpha=p.life; ctx.fillText(p.emoji, p.x, p.y); ctx.globalAlpha=1; });
-  }
-
-  function renderOverlay() {
-    overlay.style.display = "flex";
-    if(state === "title") {
-      overlay.innerHTML = `<div class="card"><div class="title">にゃんにゃん<br>BREAKOUT</div><button class="btn" onclick="window.goSelect()">スタート</button></div>`;
-    } else if(state === "select") {
-      overlay.innerHTML = `<div class="card"><div class="title">キャラをえらぶ</div><div class="charGrid">${CHARACTERS.map((c,i)=>`<div class="charBtn" onclick="window.startGame(${i})">${c.emoji}<br>${c.name}</div>`).join("")}</div></div>`;
-    } else {
-      overlay.innerHTML = `<div class="card"><div class="title">GAME OVER</div><div style="font-size:24px;margin-bottom:20px">SCORE: ${score}</div><button class="btn" onclick="location.reload()">もういちど</button></div>`;
     }
-  }
 
-  window.goSelect = () => { state = "select"; renderOverlay(); };
-  window.startGame = (i) => {
-    selectedChar = CHARACTERS[i]; state = "playing"; overlay.style.display = "none";
-    score = 0; life = 3; stage = 1; skill = 0; buildStage(); resetBall();
-  };
+    function updateUI() {
+        document.getElementById("score").innerText = score;
+        document.getElementById("life").innerText = life;
+    }
 
-  canvas.addEventListener("touchmove", e => { touchX = e.touches[0].clientX; e.preventDefault(); }, {passive:false});
-  canvas.addEventListener("mousemove", e => { touchX = e.clientX; });
-  skillBtn.onclick = () => { if(skill>=100){ selectedChar.use(); skill=0; updateHud(); }};
+    function draw() {
+        if (!gameActive) return;
+        ctx.clearRect(0, 0, w, h);
 
-  window.addEventListener("resize", resize);
-  resize(); renderOverlay();
-  function loop() { update(); draw(); requestAnimationFrame(loop); }
-  loop();
-})();
+        // パドル
+        ctx.fillStyle = selectedChar.color;
+        ctx.fillRect(paddle.x, h - 100, paddle.w, paddle.h);
+        ctx.fillText(selectedChar.icon, paddle.x + paddle.w/2 - 10, h - 110);
+
+        // ブロック
+        bricks.forEach(b => {
+            if (!b.alive) return;
+            ctx.fillStyle = "#ff69b4";
+            ctx.fillRect(b.x, b.y, b.w, b.h);
+        });
+
+        // ボール移動と描画
+        balls.forEach((b, idx) => {
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < 0 || b.x > w) b.vx *= -1;
+            if (b.y < 0) b.vy *= -1;
+
+            if (b.y > h - 100 && b.y < h - 85 && b.x > paddle.x && b.x < paddle.x + paddle.w) {
+                b.vy = -Math.abs(b.vy);
+            }
+
+            bricks.forEach(br => {
+                if (br.alive && b.x > br.x && b.x < br.x + br.w && b.y > br.y && b.y < br.y + br.h) {
+                    br.alive = false; b.vy *= -1; score += 10; updateUI();
+                }
+            });
+
+            ctx.fillStyle = "#4b2346";
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+
+            if (b.y > h) balls.splice(idx, 1);
+        });
+
+        if (balls.length === 0) {
+            life--; updateUI();
+            if (life <= 0) { gameActive = false; location.reload(); }
+            else { ball = { x: w / 2, y: h / 2, vx: 5, vy: 5, r: 10 }; balls = [ball]; }
+        }
+
+        if (bricks.every(b => !b.alive)) { createBricks(); }
+
+        requestAnimationFrame(draw);
+    }
+
+    // メニュー作成
+    CHARS.forEach((c, i) => {
+        const btn = document.createElement("div");
+        btn.className = "char-btn";
+        btn.innerHTML = `<span>${c.icon}</span><br>${c.name}<br><div class="skill-info">${c.skill}</div>`;
+        btn.onclick = () => init(i);
+        charGrid.appendChild(btn);
+    });
+
+    window.addEventListener("touchmove", e => { paddle.x = e.touches[0].clientX - paddle.w / 2; });
+    window.addEventListener("mousemove", e => { paddle.x = e.clientX - paddle.w / 2; });
+    skillBtn.onclick = () => { selectedChar.action(); skillBtn.style.opacity = 0.5; skillBtn.disabled = true; };
+
 </script>
 </body>
 </html>
