@@ -1,939 +1,374 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ヒデちゃん&猫ちゃん</title>
-  <style>
-    :root{
-      --bg:#f2dfe5;
-      --ink:#7f0f57;
-      --pink:#f36aa0;
-      --pink-dark:#d94883;
-      --purple:#b667cf;
-      --purple-dark:#8c39b8;
-      --yellow:#ffef29;
-      --card:#f8eef2;
-      --white:#ffffff;
-      --shadow:0 10px 24px rgba(90, 20, 60, .15);
-      --soft-border:#efb7cb;
-    }
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-      user-select:none;
-    }
-    html,body{
-      margin:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:var(--bg);
-      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;
-      color:var(--ink);
-    }
-    body{
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-    }
-    .app{
-      width:min(100vw, 430px);
-      height:100dvh;
-      padding:22px 16px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-    .title{
-      text-align:center;
-      font-size:clamp(28px, 7vw, 40px);
-      font-weight:900;
-      letter-spacing:.02em;
-      margin-top:4px;
-      color:var(--ink);
-    }
-    .hud{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      font-weight:800;
-    }
-    .chip{
-      background:rgba(255,255,255,.5);
-      border:1px solid rgba(255,255,255,.65);
-      box-shadow:var(--shadow);
-      border-radius:16px;
-      padding:8px 12px;
-      min-width:0;
-      flex:1;
-      text-align:center;
-      font-size:13px;
-      color:#8a3761;
-    }
-    .chip b{
-      display:block;
-      margin-top:2px;
-      font-size:18px;
-      color:var(--ink);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ヒデちゃん大冒険：HYPER JUICE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800;900&display=swap');
+:root{--pk:#ff1493;--yw:#ffcc00;--cy:#00ffff;--bg:#0f0f1b;}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent;}
+body{
+  background:var(--bg);font-family:'M PLUS Rounded 1c',sans-serif;
+  color:#fff;display:flex;flex-direction:column;align-items:center;
+  height:100dvh;overflow:hidden;touch-action:none;
+}
+#game-wrap{position:relative;width:100vw;height:100dvh;max-width:450px;background:#000;overflow:hidden;box-shadow:0 0 50px rgba(255,20,147,0.3);}
+canvas{width:100%;height:100%;display:block;}
 
-    .board-wrap{
-      position:relative;
-      width:100%;
-      flex:1;
-      min-height:0;
-      background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.35));
-      border:4px solid var(--soft-border);
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-    canvas{
-      width:100%;
-      height:100%;
-      display:block;
-    }
+/* UI Layer */
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(15,15,27,0.9);z-index:200;}
+.hidden{display:none !important;}
+.title-logo{font-size:42px;color:var(--pk);text-align:center;line-height:1.1;margin-bottom:40px;text-shadow:0 0 20px var(--pk), 3px 3px 0 #fff;}
+.btn{background:linear-gradient(to bottom, var(--pk), #c2185b);color:#fff;border:none;padding:18px 45px;font-size:24px;border-radius:50px;font-weight:900;box-shadow:0 6px 0 #5e0a2f;cursor:pointer;transition:0.1s;}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #5e0a2f;}
 
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(248,238,242,.72);
-      backdrop-filter:blur(3px);
-      padding:18px;
-      z-index:4;
-    }
-    .overlay.hidden{
-      display:none;
-    }
-    .card{
-      width:100%;
-      max-width:320px;
-      background:rgba(255,255,255,.75);
-      border:1px solid rgba(255,255,255,.9);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:18px 16px;
-      text-align:center;
-      color:var(--ink);
-    }
-    .card .big{
-      font-size:48px;
-      line-height:1;
-      margin-bottom:8px;
-    }
-    .card h2{
-      margin:0 0 10px;
-      font-size:26px;
-      line-height:1.2;
-    }
-    .card p{
-      margin:0;
-      font-size:14px;
-      line-height:1.6;
-      color:#8a3761;
-    }
-    .card .best{
-      margin-top:12px;
-      font-weight:800;
-      font-size:14px;
-    }
+/* HUD */
+#hud{position:absolute;top:15px;left:0;width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:18px;font-weight:900;z-index:100;text-shadow:2px 2px 4px #000;}
+#hide-face{position:absolute;top:50px;right:20px;font-size:50px;z-index:100;transition:0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+#combo-ui{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:60px;color:var(--yw);font-weight:900;pointer-events:none;z-index:150;text-shadow:0 0 20px #ff0000;opacity:0;}
 
-    .controls{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:14px;
-      margin-top:4px;
-    }
-    button{
-      border:none;
-      outline:none;
-      font:inherit;
-      cursor:pointer;
-    }
-    .ctrl{
-      height:92px;
-      border-radius:20px;
-      font-weight:900;
-      color:white;
-      box-shadow:0 8px 0 rgba(0,0,0,.12);
-      transition:transform .08s ease, box-shadow .08s ease, opacity .12s ease;
-    }
-    .ctrl:active{
-      transform:translateY(4px);
-      box-shadow:0 4px 0 rgba(0,0,0,.12);
-    }
-    .ctrl-left,.ctrl-right{
-      background:linear-gradient(180deg, #ef6597, #e5538b);
-      font-size:34px;
-    }
-    .ctrl-main{
-      background:linear-gradient(180deg, #bf78d7, #ab5bcb);
-      font-size:18px;
-      line-height:1.3;
-      padding:8px;
-    }
-    .ctrl-main small{
-      display:block;
-      font-size:11px;
-      opacity:.9;
-      margin-top:4px;
-      font-weight:700;
-    }
-    .footer-note{
-      text-align:center;
-      font-size:11px;
-      color:#99657f;
-      margin-top:-4px;
-    }
-
-    .char-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:14px;
-    }
-    .char-btn{
-      background:rgba(255,255,255,.75);
-      border:2px solid #f0bdd2;
-      border-radius:18px;
-      padding:10px 8px;
-      box-shadow:var(--shadow);
-      color:var(--ink);
-    }
-    .char-btn .emo{
-      font-size:34px;
-      line-height:1.1;
-    }
-    .char-btn .name{
-      font-weight:900;
-      font-size:16px;
-      margin-top:4px;
-    }
-    .char-btn .desc{
-      font-size:11px;
-      line-height:1.4;
-      color:#8a3761;
-      margin-top:4px;
-    }
-  </style>
+/* Skill Bar */
+#skill-bar-container{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);width:70%;height:14px;background:rgba(255,255,255,0.1);border-radius:10px;border:2px solid rgba(255,255,255,0.3);overflow:hidden;}
+#skill-fill{width:0%;height:100%;background:linear-gradient(90deg, var(--cy), var(--pk));box-shadow:0 0 15px var(--cy);}
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="title">ヒデちゃん&猫ちゃん</div>
 
-    <div class="hud">
-      <div class="chip">SCORE<b id="scoreText">0</b></div>
-      <div class="chip">STAGE<b id="stageText">1</b></div>
-      <div class="chip">LIFE<b id="lifeText">3</b></div>
-    </div>
-
-    <div class="board-wrap" id="boardWrap">
-      <canvas id="game"></canvas>
-
-      <div class="overlay" id="overlay">
-        <div class="card" id="overlayCard"></div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button class="ctrl ctrl-left" id="leftBtn">◀</button>
-      <button class="ctrl ctrl-main" id="mainBtn">
-        音楽&<br>START!
-        <small id="mainBtnSub">タップで開始</small>
-      </button>
-      <button class="ctrl ctrl-right" id="rightBtn">▶</button>
-    </div>
-
-    <div class="footer-note">
-      画面ドラッグでも移動できます
-    </div>
+<div id="game-wrap">
+  <div id="hud">
+    <div id="score-val">SCORE: 0</div>
+    <div id="mode-name">BREAKOUT</div>
   </div>
+  <div id="hide-face">😄</div>
+  <div id="combo-ui">GREAT!</div>
+  
+  <canvas id="c"></canvas>
+  
+  <div id="skill-bar-container"><div id="skill-fill"></div></div>
 
-  <script>
-    (() => {
-      const canvas = document.getElementById('game');
-      const ctx = canvas.getContext('2d');
-      const boardWrap = document.getElementById('boardWrap');
-      const overlay = document.getElementById('overlay');
-      const overlayCard = document.getElementById('overlayCard');
+  <div id="screen-title" class="overlay">
+    <div class="title-logo">ヒデちゃん<br>超速大冒険！</div>
+    <div style="font-size:80px;margin-bottom:30px;animation: bounce 1s infinite alternate;">🚀</div>
+    <button class="btn" onclick="initGame()">あそぶ！</button>
+  </div>
+</div>
 
-      const scoreText = document.getElementById('scoreText');
-      const stageText = document.getElementById('stageText');
-      const lifeText = document.getElementById('lifeText');
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const faceEl = document.getElementById('hide-face');
+const comboEl = document.getElementById('combo-ui');
+const fillEl = document.getElementById('skill-fill');
 
-      const leftBtn = document.getElementById('leftBtn');
-      const rightBtn = document.getElementById('rightBtn');
-      const mainBtn = document.getElementById('mainBtn');
-      const mainBtnSub = document.getElementById('mainBtnSub');
+let W, H, scale;
+let gameMode = 'title'; 
+let score = 0, combo = 0, skill = 0, frame = 0, shake = 0;
+let touchX = 0, isTouching = false;
 
-      let W = 0;
-      let H = 0;
-      const DPR = Math.min(2, window.devicePixelRatio || 1);
+// Assets
+const CHARS = { normal: '😄', happy: '😆', wow: '😲', cool: '😎', panic: '😨' };
+let currentFace = CHARS.normal;
 
-      const TAGS = ['健康','仕事','旅行','猫','休み','笑顔','幸運','ごはん'];
-      const CHARACTERS = [
-        { id:'hide', emoji:'😄', name:'ヒデ', ballText:'ヒデ', color:'#ffef29' },
-        { id:'cat', emoji:'🐱', name:'猫ちゃん', ballText:'CAT', color:'#ffd966' }
-      ];
-      let selectedChar = CHARACTERS[0];
+// Audio
+let audioCtx;
+const playNote = (f, d, t='sine', v=0.1) => {
+  if(!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = t; o.frequency.value = f;
+  g.gain.setValueAtTime(v, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + d);
+};
 
-      let state = 'title'; // title, select, playing, paused, clear, gameover
-      let score = 0;
-      let stage = 1;
-      let life = 3;
+// Particles
+let particles = [];
+function createParts(x, y, color, count=10) {
+  for(let i=0; i<count; i++) {
+    particles.push({x, y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10, life:1, color});
+  }
+}
 
-      let paddle = { x: 0, y: 0, w: 82, h: 14 };
-      let ball = { x: 0, y: 0, vx: 3.8, vy: -5.6, r: 17 };
-      let bricks = [];
-      let particles = [];
-      let touchX = 0;
-      let holdLeft = false;
-      let holdRight = false;
-      let dragActive = false;
-      let lastTs = 0;
-      let toast = { text:'', until:0 };
+// Logic Objects
+let pad = { x: 140, w: 90 };
+let ball = { x: 0, y: 0, dx: 0, dy: 0 };
+let bricks = [];
+let tetris = { board: [], cur: null, timer: 0, speed: 25 };
+let car = { x: 180, obstacles: [] };
 
-      let catImg = new Image();
-      let catReady = false;
-      const catCandidates = ['./cat.png.JPG', './cat.jpg', './cat.jpeg', './cat.png'];
-      let catTry = 0;
+function resize() {
+  W = canvas.width = window.innerWidth > 450 ? 450 : window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  scale = W / 360;
+  pad.w = 90 * scale;
+}
+window.onresize = resize;
+resize();
 
-      function loadCatCandidate(i){
-        if (i >= catCandidates.length) return;
-        catImg = new Image();
-        catImg.onload = () => { catReady = true; };
-        catImg.onerror = () => loadCatCandidate(i + 1);
-        catImg.src = catCandidates[i];
+// Input
+canvas.addEventListener('touchstart', e => {
+  isTouching = true;
+  initAudio();
+  const p = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  touchX = p.clientX - rect.left;
+  if(gameMode === 'tetris' && (p.clientY - rect.top) < H * 0.3) hardDrop();
+});
+canvas.addEventListener('touchmove', e => {
+  const p = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const nx = p.clientX - rect.left;
+  if(gameMode === 'tetris' && Math.abs(nx - touchX) > 25) {
+    moveTetris(nx > touchX ? 1 : -1);
+    touchX = nx;
+  }
+  touchX = nx;
+});
+canvas.addEventListener('touchend', () => isTouching = false);
+
+function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function showCombo(txt) {
+  comboEl.innerText = txt;
+  comboEl.style.opacity = 1;
+  comboEl.style.transform = 'translate(-50%, -50%) scale(1.2)';
+  setTimeout(() => { comboEl.style.opacity = 0; comboEl.style.transform = 'translate(-50%, -50%) scale(1)'; }, 600);
+}
+
+function updateFace(f) {
+  faceEl.innerText = f;
+  faceEl.style.transform = 'scale(1.3)';
+  setTimeout(() => faceEl.style.transform = 'scale(1)', 200);
+}
+
+function initGame() {
+  document.getElementById('screen-title').classList.add('hidden');
+  startBreakout();
+}
+
+// STAGE 1: BREAKOUT
+function startBreakout() {
+  gameMode = 'breakout';
+  score = 0; skill = 0;
+  ball = { x: W/2, y: H-200, dx: 6*scale, dy: -6*scale, r: 10 };
+  bricks = [];
+  for(let i=0; i<24; i++) {
+    bricks.push({ x: (i%6)*(W/6)+4, y: Math.floor(i/6)*25 + 100, w: W/6-8, h: 18, active: true, color: `hsl(${i*15}, 80%, 60%)` });
+  }
+  updateFace(CHARS.normal);
+}
+
+// STAGE 2: TETRIS
+function startTetris() {
+  gameMode = 'tetris';
+  document.getElementById('mode-name').innerText = "TETRIS";
+  showCombo("TETRIS STAGE!");
+  tetris.board = Array.from({length: 20}, () => Array(10).fill(0));
+  spawnPiece();
+}
+
+// STAGE 3: RACING
+function startRacing() {
+  gameMode = 'racing';
+  document.getElementById('mode-name').innerText = "SUPER DRIVE";
+  showCombo("DRIVE STAGE!");
+  car.obstacles = [];
+  car.x = W/2;
+}
+
+// MAIN LOOP
+function update() {
+  frame++;
+  if(shake > 0) shake *= 0.9;
+  
+  // Particles
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+    if(p.life <= 0) particles.splice(i, 1);
+  });
+
+  if(gameMode === 'breakout') {
+    pad.x += (touchX - (pad.x + pad.w/2)) * 0.25;
+    ball.x += ball.dx; ball.y += ball.dy;
+    
+    if(ball.x < 10 || ball.x > W-10) { ball.dx *= -1; playNote(400, 0.05); createParts(ball.x, ball.y, '#fff', 3); }
+    if(ball.y < 10) { ball.dy *= -1; playNote(400, 0.05); }
+    
+    if(ball.y > H-100 && ball.x > pad.x && ball.x < pad.x+pad.w) {
+      ball.dy = -Math.abs(ball.dy);
+      ball.dx = (ball.x - (pad.x+pad.w/2)) * 0.2;
+      playNote(600, 0.05, 'square');
+      updateFace(CHARS.happy);
+    }
+
+    bricks.forEach(b => {
+      if(b.active && ball.x > b.x && ball.x < b.x+b.w && ball.y > b.y && ball.y < b.y+b.h) {
+        b.active = false; ball.dy *= -1;
+        score += 10; skill += 4;
+        shake = 8;
+        createParts(b.x+b.w/2, b.y+b.h/2, b.color, 15);
+        playNote(800 + score/10, 0.05, 'sine');
+        if(score % 50 === 0) showCombo("GREAT!");
       }
-      loadCatCandidate(0);
+    });
 
-      function resize(){
-        const rect = boardWrap.getBoundingClientRect();
-        W = rect.width;
-        H = rect.height;
-        canvas.width = Math.floor(W * DPR);
-        canvas.height = Math.floor(H * DPR);
-        canvas.style.width = W + 'px';
-        canvas.style.height = H + 'px';
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if(ball.y > H) { updateFace(CHARS.panic); ball.y = H/2; ball.dy = -6; shake = 15; }
+    if(bricks.every(b => !b.active)) startTetris();
+  }
 
-        paddle.y = H - 44;
-        if (!touchX) touchX = W / 2;
-        paddle.x = Math.min(Math.max(paddle.x || (W/2 - paddle.w/2), 16), W - paddle.w - 16);
+  if(gameMode === 'tetris') {
+    tetris.timer++;
+    if(tetris.timer > tetris.speed) {
+      if(!moveTetris(0, 1)) lockPiece();
+      tetris.timer = 0;
+    }
+  }
 
-        if (state !== 'playing' && state !== 'paused') {
-          resetBall();
-        }
-      }
-
-      function resetBall(){
-        ball.r = 17;
-        ball.x = W / 2;
-        ball.y = H - 120;
-        ball.vx = 3.8 * (Math.random() > 0.5 ? 1 : -1);
-        ball.vy = -5.6;
-      }
-
-      function resetPaddle(){
-        paddle.w = 82;
-        paddle.h = 14;
-        paddle.x = W / 2 - paddle.w / 2;
-        paddle.y = H - 44;
-      }
-
-      function buildStage(n){
-        bricks = [];
-        const cols = 4;
-        const rows = Math.min(4 + (n - 1), 6);
-        const gapX = 14;
-        const gapY = 12;
-        const marginX = 18;
-        const top = 36;
-        const bw = (W - marginX * 2 - gapX * (cols - 1)) / cols;
-        const bh = 30;
-
-        for(let r = 0; r < rows; r++){
-          for(let c = 0; c < cols; c++){
-            bricks.push({
-              x: marginX + c * (bw + gapX),
-              y: top + r * (bh + gapY),
-              w: bw,
-              h: bh,
-              alive: true,
-              hp: r >= 3 ? 2 : 1,
-              label: TAGS[(r * cols + c + n) % TAGS.length]
-            });
-          }
-        }
-      }
-
-      function setToast(text, ms = 900){
-        toast.text = text;
-        toast.until = performance.now() + ms;
-      }
-
-      function updateHud(){
-        scoreText.textContent = score;
-        stageText.textContent = stage;
-        lifeText.textContent = life;
-      }
-
-      function startGame(){
-        unlockAudio();
-        startBGM();
-
-        state = 'playing';
-        score = 0;
-        stage = 1;
-        life = 3;
-        selectedChar = selectedChar || CHARACTERS[0];
-        resetPaddle();
-        resetBall();
-        buildStage(stage);
-        particles = [];
-        setToast('GO!!', 900);
-        updateHud();
-        renderOverlay();
-        mainBtn.innerHTML = 'PAUSE<small id="mainBtnSub">一時停止</small>';
-      }
-
-      function nextStage(){
-        stage += 1;
-        if (stage > 3) {
-          state = 'clear';
-          stopBGM();
-          updateHud();
-          renderOverlay();
-          mainBtn.innerHTML = 'RESTART<small id="mainBtnSub">もう一回</small>';
-          saveBest();
-          return;
-        }
-        buildStage(stage);
-        resetBall();
-        resetPaddle();
-        setToast('STAGE ' + stage, 1000);
-        updateHud();
-      }
-
-      function loseLife(){
-        life -= 1;
-        updateHud();
-        if (life <= 0) {
-          state = 'gameover';
-          stopBGM();
-          renderOverlay();
-          mainBtn.innerHTML = 'RETRY<small id="mainBtnSub">やり直し</small>';
-          saveBest();
-          return;
-        }
-        resetBall();
-        resetPaddle();
-        setToast('もういっかい!', 900);
-      }
-
-      function saveBest(){
-        const key = 'hidecat_best_score_v2';
-        const best = Number(localStorage.getItem(key) || 0);
-        if (score > best) localStorage.setItem(key, String(score));
-      }
-
-      function getBest(){
-        return Number(localStorage.getItem('hidecat_best_score_v2') || 0);
-      }
-
-      function renderOverlay(){
-        if (state === 'title') {
-          overlay.classList.remove('hidden');
-          overlayCard.innerHTML = `
-            <div class="big">🐱</div>
-            <h2>ヒデちゃん&猫ちゃん</h2>
-            <p>
-              前の版は正直、猫がちゃんと出ていなかった。<br>
-              今回は <b>cat.png.JPG</b> を実際に読み込んで、<br>
-              背景にも丸アイコンにも出す作りに書き直しています。
-            </p>
-            <div class="best">BEST: ${getBest()}</div>
-          `;
-          return;
-        }
-
-        if (state === 'select') {
-          overlay.classList.remove('hidden');
-          overlayCard.innerHTML = `
-            <div class="big">🐱</div>
-            <h2>キャラをえらぶ</h2>
-            <p>猫画像は常時表示。ボール表示だけ選べます。</p>
-            <div class="char-grid">
-              ${CHARACTERS.map((c, i) => `
-                <button class="char-btn" data-i="${i}">
-                  <div class="emo">${c.emoji}</div>
-                  <div class="name">${c.name}</div>
-                  <div class="desc">${c.ballText} で表示</div>
-                </button>
-              `).join('')}
-            </div>
-          `;
-          overlayCard.querySelectorAll('.char-btn').forEach(btn => {
-            btn.onclick = () => {
-              selectedChar = CHARACTERS[Number(btn.dataset.i)];
-              startGame();
-            };
-          });
-          return;
-        }
-
-        if (state === 'paused') {
-          overlay.classList.remove('hidden');
-          overlayCard.innerHTML = `
-            <div class="big">⏸</div>
-            <h2>PAUSE</h2>
-            <p>中央ボタンでもう一度再開できます。</p>
-            <div class="best">SCORE: ${score}</div>
-          `;
-          return;
-        }
-
-        if (state === 'gameover') {
-          overlay.classList.remove('hidden');
-          overlayCard.innerHTML = `
-            <div class="big">🐱</div>
-            <h2>ざんねん…</h2>
-            <p>SCORE: <b>${score}</b><br>BEST: <b>${getBest()}</b></p>
-          `;
-          return;
-        }
-
-        if (state === 'clear') {
-          overlay.classList.remove('hidden');
-          overlayCard.innerHTML = `
-            <div class="big">🐱</div>
-            <h2>クリア！</h2>
-            <p>
-              SCORE: <b>${score}</b><br>
-              BEST: <b>${getBest()}</b><br><br>
-              これで猫画像はちゃんと出ます。
-            </p>
-          `;
-          return;
-        }
-
-        overlay.classList.add('hidden');
-      }
-
-      function spawnBurst(x, y, n = 8){
-        for(let i = 0; i < n; i++){
-          const a = Math.random() * Math.PI * 2;
-          const s = 1 + Math.random() * 2.5;
-          particles.push({
-            x, y,
-            vx: Math.cos(a) * s,
-            vy: Math.sin(a) * s - 0.4,
-            life: 1
-          });
-        }
-      }
-
-      function update(dt){
-        if (state !== 'playing') return;
-
-        let move = 0;
-        if (holdLeft) move -= 1;
-        if (holdRight) move += 1;
-
-        if (dragActive) {
-          paddle.x += ((touchX - paddle.w / 2) - paddle.x) * Math.min(1, 0.24 * dt * 60);
-        } else if (move !== 0) {
-          paddle.x += move * 6.8 * dt * 60;
-        }
-        paddle.x = Math.max(16, Math.min(W - paddle.w - 16, paddle.x));
-
-        ball.x += ball.vx * dt * 60;
-        ball.y += ball.vy * dt * 60;
-
-        if (ball.x < ball.r) {
-          ball.x = ball.r;
-          ball.vx *= -1;
-        }
-        if (ball.x > W - ball.r) {
-          ball.x = W - ball.r;
-          ball.vx *= -1;
-        }
-        if (ball.y < ball.r) {
-          ball.y = ball.r;
-          ball.vy *= -1;
-        }
-
-        if (
-          ball.y + ball.r > paddle.y &&
-          ball.y - ball.r < paddle.y + paddle.h &&
-          ball.x > paddle.x &&
-          ball.x < paddle.x + paddle.w &&
-          ball.vy > 0
-        ) {
-          const hit = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
-          ball.vx = hit * 5.8;
-          ball.vy = -Math.max(5.8, Math.abs(ball.vy));
-        }
-
-        for (const brick of bricks) {
-          if (!brick.alive) continue;
-          if (
-            ball.x + ball.r > brick.x &&
-            ball.x - ball.r < brick.x + brick.w &&
-            ball.y + ball.r > brick.y &&
-            ball.y - ball.r < brick.y + brick.h
-          ) {
-            brick.hp -= 1;
-            ball.vy *= -1;
-            score += brick.hp <= 0 ? 10 : 4;
-            if (brick.hp <= 0) {
-              brick.alive = false;
-              spawnBurst(brick.x + brick.w / 2, brick.y + brick.h / 2, 10);
-            }
-            updateHud();
-            break;
-          }
-        }
-
-        if (ball.y > H + 40) {
-          loseLife();
-        }
-
-        if (bricks.length && bricks.every(b => !b.alive)) {
-          nextStage();
-        }
-
-        for (let i = particles.length - 1; i >= 0; i--) {
-          const p = particles[i];
-          p.x += p.vx * dt * 60;
-          p.y += p.vy * dt * 60;
-          p.vy += 0.03 * dt * 60;
-          p.life -= 0.03 * dt * 60;
-          if (p.life <= 0) particles.splice(i, 1);
-        }
-      }
-
-      function roundRect(x, y, w, h, r, fill, stroke){
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.closePath();
-        if (fill) {
-          ctx.fillStyle = fill;
-          ctx.fill();
-        }
-        if (stroke) {
-          ctx.strokeStyle = stroke;
-          ctx.stroke();
-        }
-      }
-
-      function drawImageCover(img, x, y, w, h){
-        const ir = img.width / img.height;
-        const br = w / h;
-        let dw, dh, dx, dy;
-        if (ir > br) {
-          dh = h;
-          dw = h * ir;
-          dx = x - (dw - w) / 2;
-          dy = y;
+  if(gameMode === 'racing') {
+    car.x += (touchX - car.x) * 0.2;
+    if(frame % 30 === 0) {
+      car.obstacles.push({x: Math.random()*(W-40)+20, y: -50, type: Math.random()>0.2 ? '🚧' : '⭐'});
+    }
+    car.obstacles.forEach((o, i) => {
+      o.y += 10 + (score/100);
+      if(o.y > H) car.obstacles.splice(i, 1);
+      if(Math.abs(car.x - o.x) < 40 && Math.abs(H-150 - o.y) < 40) {
+        if(o.type === '⭐') {
+          score += 50; skill += 10; playNote(1200, 0.1); showCombo("NICE!"); updateFace(CHARS.cool);
         } else {
-          dw = w;
-          dh = w / ir;
-          dx = x;
-          dy = y - (dh - h) / 2;
+          shake = 20; playNote(100, 0.2, 'sawtooth'); updateFace(CHARS.wow);
         }
-        ctx.drawImage(img, dx, dy, dw, dh);
+        car.obstacles.splice(i, 1);
       }
+    });
+    if(score > 2000) { gameMode = 'result'; showCombo("ALL CLEAR!"); }
+  }
 
-      function drawBoardBackground(){
-        ctx.fillStyle = '#f6e8ed';
-        ctx.fillRect(0, 0, W, H);
+  fillEl.style.width = Math.min(100, skill) + "%";
+  document.getElementById('score-val').innerText = "SCORE: " + score;
+}
 
-        ctx.fillStyle = 'rgba(255,255,255,.6)';
-        ctx.fillRect(0, 0, W, H);
+function draw() {
+  ctx.fillStyle = '#0f0f1b';
+  ctx.fillRect(0,0,W,H);
+  
+  ctx.save();
+  if(shake > 1) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
 
-        const frameX = 12;
-        const frameY = 10;
-        const frameW = W - 24;
-        const frameH = H - 120;
+  // Bg Decoration
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  for(let i=0; i<W; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
 
-        roundRect(frameX, frameY, frameW, frameH, 18, 'rgba(255,255,255,.22)', 'rgba(244, 171, 200, .95)');
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 4, 4);
+  });
+  ctx.globalAlpha = 1;
 
-        if (catReady) {
-          ctx.save();
-          ctx.globalAlpha = 0.26;
-          roundRect(frameX + 2, frameY + 2, frameW - 4, frameH - 4, 16, null, null);
-          ctx.clip();
-          drawImageCover(catImg, frameX + 2, frameY + 2, frameW - 4, frameH - 4);
-          ctx.restore();
-          ctx.globalAlpha = 1;
-        }
+  if(gameMode === 'breakout') {
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.roundRect(pad.x, H-100, pad.w, 15, 10); ctx.fill();
+    ctx.fillStyle = varColor(frame*2);
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+    bricks.forEach(b => { if(b.active) { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.w, b.h); } });
+  }
 
-        const badgeSize = 54;
-        const badgeX = W - 18 - badgeSize;
-        const badgeY = H - 110;
+  if(gameMode === 'tetris') {
+    const sz = 28 * scale;
+    ctx.translate(W/2 - sz*5, 80);
+    // Ghost
+    if(tetris.cur) {
+      let gy = tetris.cur.y;
+      while(!collide(0, gy - tetris.cur.y + 1)) gy++;
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+        if(v) ctx.fillRect((tetris.cur.x+x)*sz, (gy+y)*sz, sz, sz);
+      }));
+    }
+    // Board
+    tetris.board.forEach((row, y) => row.forEach((v, x) => {
+      ctx.strokeStyle = '#222'; ctx.strokeRect(x*sz, y*sz, sz, sz);
+      if(v) { ctx.fillStyle = v; ctx.fillRect(x*sz, y*sz, sz, sz); ctx.strokeRect(x*sz, y*sz, sz, sz); }
+    }));
+    // Cur
+    if(tetris.cur) {
+      ctx.fillStyle = varColor(frame*5);
+      tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+        if(v) ctx.fillRect((tetris.cur.x+x)*sz, (tetris.cur.y+y)*sz, sz, sz);
+      }));
+    }
+  }
 
-        if (catReady) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(badgeX + badgeSize/2, badgeY + badgeSize/2, badgeSize/2, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(catImg, badgeX, badgeY, badgeSize, badgeSize);
-          ctx.restore();
+  if(gameMode === 'racing') {
+    ctx.textAlign = 'center'; ctx.font = '60px Arial';
+    ctx.fillText('🏎️', car.x, H-120);
+    car.obstacles.forEach(o => { ctx.fillText(o.type, o.x, o.y); });
+    // Speed lines
+    ctx.strokeStyle = 'rgba(0,255,255,0.2)';
+    for(let i=0; i<5; i++) {
+      let ly = (frame*20 + i*200) % H;
+      ctx.beginPath(); ctx.moveTo(W*0.2, ly); ctx.lineTo(W*0.2, ly+100); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W*0.8, ly); ctx.lineTo(W*0.8, ly+100); ctx.stroke();
+    }
+  }
 
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = 'rgba(255,255,255,.95)';
-          ctx.beginPath();
-          ctx.arc(badgeX + badgeSize/2, badgeY + badgeSize/2, badgeSize/2, 0, Math.PI * 2);
-          ctx.stroke();
-        } else {
-          ctx.font = '42px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('🐱', badgeX + badgeSize/2, badgeY + badgeSize/2);
-        }
-      }
+  ctx.restore();
+}
 
-      function drawBricks(){
-        for (const b of bricks) {
-          if (!b.alive) continue;
-          const grad = ctx.createLinearGradient(0, b.y, 0, b.y + b.h);
-          grad.addColorStop(0, '#fb89b4');
-          grad.addColorStop(1, '#f16c9f');
-          roundRect(b.x, b.y, b.w, b.h, 8, grad, 'rgba(255,255,255,.3)');
+// Helpers
+function varColor(h) { return `hsl(${h % 360}, 100%, 70%)`; }
 
-          ctx.fillStyle = '#fff';
-          ctx.font = 'bold 13px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 + 1);
-        }
-      }
+const SHAPES = {
+  I: [[1,1,1,1]], T: [[0,1,0],[1,1,1]], L: [[1,0],[1,0],[1,1]], O: [[1,1],[1,1]], S: [[0,1,1],[1,1,0]]
+};
+function spawnPiece() {
+  const keys = Object.keys(SHAPES);
+  tetris.cur = { x: 3, y: 0, shape: SHAPES[keys[Math.floor(Math.random()*keys.length)]] };
+  if(collide()) startBreakout();
+}
+function moveTetris(dx, dy=0) {
+  tetris.cur.x += dx; tetris.cur.y += dy;
+  if(collide()) { tetris.cur.x -= dx; tetris.cur.y -= dy; return false; }
+  return true;
+}
+function hardDrop() {
+  while(moveTetris(0,1)) {}
+  lockPiece();
+  shake = 15; createParts(W/2, H/2, '#fff', 20);
+}
+function collide(ox=0, oy=0) {
+  return tetris.cur.shape.some((row, y) => row.some((v, x) => {
+    if(!v) return false;
+    let nx = tetris.cur.x + x + ox, ny = tetris.cur.y + y + oy;
+    return nx<0 || nx>=10 || ny>=20 || (ny>=0 && tetris.board[ny][nx]);
+  }));
+}
+function lockPiece() {
+  tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+    if(v) tetris.board[tetris.cur.y+y][tetris.cur.x+x] = varColor(frame);
+  }));
+  let lines = 0;
+  for(let y=19; y>=0; y--) {
+    if(tetris.board[y].every(v => v)) {
+      tetris.board.splice(y, 1);
+      tetris.board.unshift(Array(10).fill(0));
+      lines++; y++;
+    }
+  }
+  if(lines > 0) { 
+    score += lines*100; shake = 25; playNote(1200, 0.2); 
+    showCombo(lines === 4 ? "PERFECT!!!" : "EXCELLENT!");
+    updateFace(CHARS.cool);
+    if(score > 1000) startRacing();
+  } else { playNote(200, 0.1, 'square'); }
+  spawnPiece();
+}
 
-      function drawPaddle(){
-        const grad = ctx.createLinearGradient(0, paddle.y, 0, paddle.y + paddle.h);
-        grad.addColorStop(0, '#c976da');
-        grad.addColorStop(1, '#a955c7');
-        roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 6, grad, null);
-      }
-
-      function drawBall(){
-        ctx.fillStyle = '#ffef29';
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#111';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(selectedChar.ballText, ball.x, ball.y + 0.5);
-      }
-
-      function drawParticles(){
-        for (const p of particles) {
-          ctx.globalAlpha = Math.max(0, p.life);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(p.x, p.y, 3, 3);
-        }
-        ctx.globalAlpha = 1;
-      }
-
-      function drawToast(){
-        if (performance.now() > toast.until || !toast.text) return;
-        ctx.save();
-        ctx.font = '900 28px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#ffd400';
-        ctx.strokeStyle = 'rgba(0,0,0,.25)';
-        ctx.lineWidth = 6;
-        ctx.strokeText(toast.text, W / 2, H * 0.58);
-        ctx.fillText(toast.text, W / 2, H * 0.58);
-        ctx.restore();
-      }
-
-      function draw(){
-        drawBoardBackground();
-        drawBricks();
-        drawBall();
-        drawPaddle();
-        drawParticles();
-        drawToast();
-      }
-
-      function tick(ts){
-        if (!lastTs) lastTs = ts;
-        const dt = Math.min(0.033, (ts - lastTs) / 1000);
-        lastTs = ts;
-        update(dt);
-        draw();
-        requestAnimationFrame(tick);
-      }
-
-      function pressLeft(on){ holdLeft = on; }
-      function pressRight(on){ holdRight = on; }
-
-      function bindHold(btn, onDown, onUp){
-        const up = () => onUp(false);
-        btn.addEventListener('pointerdown', e => { e.preventDefault(); onDown(true); });
-        btn.addEventListener('pointerup', up);
-        btn.addEventListener('pointercancel', up);
-        btn.addEventListener('pointerleave', up);
-      }
-
-      bindHold(leftBtn, pressLeft, pressLeft);
-      bindHold(rightBtn, pressRight, pressRight);
-
-      mainBtn.addEventListener('click', () => {
-        if (state === 'title') {
-          state = 'select';
-          renderOverlay();
-          mainBtn.innerHTML = 'CHOOSE<small id="mainBtnSub">キャラ選択</small>';
-          return;
-        }
-        if (state === 'select') return;
-
-        if (state === 'playing') {
-          state = 'paused';
-          renderOverlay();
-          stopBGM();
-          mainBtn.innerHTML = 'RESUME<small id="mainBtnSub">再開</small>';
-          return;
-        }
-        if (state === 'paused') {
-          unlockAudio();
-          startBGM();
-          state = 'playing';
-          renderOverlay();
-          mainBtn.innerHTML = 'PAUSE<small id="mainBtnSub">一時停止</small>';
-          return;
-        }
-        if (state === 'gameover' || state === 'clear') {
-          state = 'select';
-          renderOverlay();
-          mainBtn.innerHTML = 'CHOOSE<small id="mainBtnSub">キャラ選択</small>';
-        }
-      });
-
-      canvas.addEventListener('pointerdown', e => {
-        const rect = canvas.getBoundingClientRect();
-        touchX = e.clientX - rect.left;
-        dragActive = true;
-      });
-      canvas.addEventListener('pointermove', e => {
-        if (!dragActive) return;
-        const rect = canvas.getBoundingClientRect();
-        touchX = e.clientX - rect.left;
-      });
-      const endDrag = () => { dragActive = false; };
-      canvas.addEventListener('pointerup', endDrag);
-      canvas.addEventListener('pointercancel', endDrag);
-      canvas.addEventListener('pointerleave', endDrag);
-
-      window.addEventListener('resize', resize);
-
-      // ---- BGM ----
-      let audioCtx = null;
-      let bgmTimer = null;
-
-      function unlockAudio(){
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      }
-
-      function midiToFreq(m){
-        return 440 * Math.pow(2, (m - 69) / 12);
-      }
-
-      // D → A → Bm → F#m → G → D → G → A
-      const progression = [
-        [62, 66, 69],
-        [57, 61, 64],
-        [59, 62, 66],
-        [54, 57, 61],
-        [55, 59, 62],
-        [62, 66, 69],
-        [55, 59, 62],
-        [57, 61, 64]
-      ];
-
-      function playTone(time, freq, dur, type='triangle', vol=0.03){
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.0001, time);
-        gain.gain.linearRampToValueAtTime(vol, time + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(time);
-        osc.stop(time + dur + 0.04);
-      }
-
-      function scheduleBar(startTime, chordIndex){
-        const chord = progression[chordIndex % progression.length];
-        const beat = 60 / 104;
-
-        chord.forEach(n => {
-          playTone(startTime, midiToFreq(n), beat * 3.6, 'triangle', 0.018);
-        });
-
-        playTone(startTime, midiToFreq(chord[0] - 24), beat * 1.7, 'sine', 0.03);
-        playTone(startTime + beat * 2, midiToFreq(chord[0] - 24), beat * 1.5, 'sine', 0.026);
-
-        const melody = [chord[2] + 12, chord[1] + 12, chord[0] + 12, chord[1] + 12];
-        for (let i = 0; i < 4; i++) {
-          playTone(startTime + beat * i, midiToFreq(melody[i]), beat * 0.68, 'square', 0.010);
-        }
-      }
-
-      function stopBGM(){
-        if (bgmTimer) {
-          clearInterval(bgmTimer);
-          bgmTimer = null;
-        }
-      }
-
-      function startBGM(){
-        if (!audioCtx) return;
-        stopBGM();
-
-        let next = audioCtx.currentTime + 0.05;
-        let i = 0;
-
-        for (let k = 0; k < 4; k++) {
-          scheduleBar(next, i++);
-          next += (60 / 104) * 4;
-        }
-
-        bgmTimer = setInterval(() => {
-          if (!audioCtx || audioCtx.state !== 'running') return;
-          for (let k = 0; k < 2; k++) {
-            scheduleBar(next, i++);
-            next += (60 / 104) * 4;
-          }
-        }, 4000);
-      }
-
-      resize();
-      updateHud();
-      renderOverlay();
-      requestAnimationFrame(tick);
-    })();
-  </script>
+function loop() { update(); draw(); requestAnimationFrame(loop); }
+loop();
+</script>
 </body>
 </html>
