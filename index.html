@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ヒデちゃん&猫ちゃん BREAKOUT Pink</title>
+<title>ヒデちゃん&猫ちゃん BREAKOUT 338</title>
 <style>
   :root{
     --pink:#ff5aac;
@@ -223,6 +223,10 @@
     background:rgba(255,210,230,.36);
     backdrop-filter:blur(4px);
     padding:20px;
+  }
+
+  #overlay.hidden{
+    display:none;
   }
 
   .card{
@@ -776,6 +780,7 @@
     effects.bigPaddleUntil = 0;
     effects.slowUntil = 0;
     specialFx.active = false;
+    touchX = W / 2;
 
     resetPaddle();
     resetBalls();
@@ -831,6 +836,7 @@
 
   function renderOverlay(){
     if (state === "title") {
+      overlay.classList.remove("hidden");
       overlay.innerHTML = `
         <div class="card">
           <div class="bigCat">🐱</div>
@@ -854,6 +860,7 @@
     }
 
     if (state === "select") {
+      overlay.classList.remove("hidden");
       overlay.innerHTML = `
         <div class="card">
           <div class="bigCat">🐱</div>
@@ -882,6 +889,7 @@
     }
 
     if (state === "gameover") {
+      overlay.classList.remove("hidden");
       overlay.innerHTML = `
         <div class="card">
           <div class="bigCat">🐱</div>
@@ -902,6 +910,7 @@
 
     if (state === "clear") {
       const rank = score >= 900 ? "S" : score >= 650 ? "A" : score >= 450 ? "B" : "C";
+      overlay.classList.remove("hidden");
       overlay.innerHTML = `
         <div class="card">
           <div class="bigCat">🐱</div>
@@ -922,6 +931,7 @@
     }
 
     overlay.innerHTML = "";
+    overlay.classList.add("hidden");
   }
 
   function roundRectPath(x,y,w,h,r){
