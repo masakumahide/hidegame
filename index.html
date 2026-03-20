@@ -3,340 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ヒデちゃんブロック崩し</title>
+    <title>ヒデちゃん＆猫ちゃん爆走Ver</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            touch-action: none; /* スマホでのスワイプスクロール防止 */
-        }
-        h1 { margin: 10px 0; font-size: 20px; text-align: center; }
-        canvas {
-            background-color: #34495e;
-            border: 2px solid #bdc3c7;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            max-width: 100%;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-            width: 100%;
-            max-width: 400px;
-        }
-        .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            flex-grow: 1;
-            box-shadow: 0 4px #2980b9;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .btn:active {
-            box-shadow: 0 0 #2980b9;
-            transform: translateY(4px);
-        }
-        #btn-start { background-color: #e74c3c; box-shadow: 0 4px #c0392b; }
-        #btn-start:active { box-shadow: 0 0 #c0392b; }
+        body { margin: 0; background-color: #fce4ec; color: #880e4f; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; touch-action: none; }
+        #canvas-container { position: relative; width: 320px; height: 400px; border: 4px solid #f8bbd0; border-radius: 12px; overflow: hidden; }
+        canvas { background-color: rgba(255, 255, 255, 0.4); position: absolute; z-index: 2; }
+        #background-image { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.7; z-index: 1; }
+        .controls { display: flex; gap: 10px; margin-top: 15px; width: 320px; }
+        .btn { background: #f06292; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 10px; flex: 1; box-shadow: 0 4px #c2185b; }
+        #btn-start { background: #ba68c8; box-shadow: 0 4px #7b1fa2; }
     </style>
 </head>
 <body>
-
-    <h1>ヒデちゃんを弾け！まさパドル</h1>
-    <canvas id="gameCanvas" width="320" height="400"></canvas>
-
-    <div class="controls">
-        <button class="btn" id="btn-left">◀ 左</button>
-        <button class="btn" id="btn-start">START</button>
-        <button class="btn" id="btn-right">右 ▶</button>
+    <h1>ヒデちゃん＆猫ちゃん</h1>
+    <div id="canvas-container">
+        <img id="background-image" src="cat.png.JPG" alt="猫ちゃん待機中">
+        <canvas id="gameCanvas" width="320" height="400"></canvas>
     </div>
+    <div class="controls">
+        <button class="btn" id="btn-left">◀</button>
+        <button class="btn" id="btn-start">音楽＆START!</button>
+        <button class="btn" id="btn-right">▶</button>
+    </div>
+
+    <audio id="bgm" loop src="https://maoudamashii.jokersounds.com/music/bgm/mp3/bgm_maoudamashii_8bit18.mp3"></audio>
 
 <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
-    // --- ゲーム設定 ---
+    const bgm = document.getElementById("bgm");
     let isPlaying = false;
-    let isGameOver = false;
-    let isGameClear = false;
-    
-    // 【改造ポイント1】ヒデちゃんの画像を使いたい場合はここにURLを入れてください
-    // 例: const hideImage = new Image(); hideImage.src = 'hide.png';
-    const hideImage = null; 
-
-    // --- 効果音 (Web Audio API) ---
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-
-    function playSound(type) {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        if (type === 'bounce') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime); // ラの音
-            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        } else if (type === 'clear') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // ド
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2); // ミ
-            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.4); // ソ
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.8);
-        }
-    }
-
-    // --- オブジェクト設定 ---
-    const ball = {
-        x: canvas.width / 2, y: canvas.height - 50,
-        dx: 3, dy: -3, radius: 15
-    };
-
-    const paddle = {
-        width: 80, height: 15,
-        x: (canvas.width - 80) / 2, y: canvas.height - 20,
-        speed: 5, movingLeft: false, movingRight: false
-    };
-
-    // 【改造ポイント3】ブロックのテーマ
-    const themes = ["仕事", "健康", "旅行", "趣味", "貯金"];
-    const brickRowCount = 5;
-    const brickColumnCount = 4;
-    const brickWidth = 65;
-    const brickHeight = 25;
-    const brickPadding = 10;
-    const brickOffsetTop = 40;
-    const brickOffsetLeft = 15;
+    let score = 0;
+    let ball = { x: 160, y: 350, dx: 3, dy: -3, radius: 12 };
+    let paddle = { x: 120, width: 80, height: 15 };
     let bricks = [];
 
     function initBricks() {
-        bricks = [];
-        for (let c = 0; c < brickColumnCount; c++) {
+        for(let c=0; c<4; c++) {
             bricks[c] = [];
-            for (let r = 0; r < brickRowCount; r++) {
-                // ランダムにテーマを割り当て
-                let theme = themes[Math.floor(Math.random() * themes.length)];
-                let color = `hsl(${Math.random() * 360}, 70%, 60%)`; // カラフルに
-                bricks[c][r] = { x: 0, y: 0, status: 1, text: theme, color: color };
+            for(let r=0; r<5; r++) {
+                bricks[c][r] = { x:0, y:0, status:1, text:["健康","仕事","旅行"][Math.floor(Math.random()*3)] };
             }
         }
     }
 
-    // --- 描画処理 ---
-    function drawBall() {
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        if (hideImage && hideImage.complete) {
-            // 画像があれば画像を丸く切り抜いて描画（実装をシンプルにするため現状は枠のみ）
-            ctx.fillStyle = "#fff";
-            ctx.fill();
-            ctx.drawImage(hideImage, ball.x - ball.radius, ball.y - ball.radius, ball.radius*2, ball.radius*2);
-        } else {
-            // 画像がない場合は文字で「ヒデ」
-            ctx.fillStyle = "#f1c40f";
-            ctx.fill();
-            ctx.fillStyle = "#000";
-            ctx.font = "12px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText("ヒデ", ball.x, ball.y);
-        }
-        ctx.closePath();
-    }
-
-    function drawPaddle() {
-        ctx.beginPath();
-        ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
-        ctx.fillStyle = "#2ecc71";
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "12px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("まさパドル", paddle.x + paddle.width / 2, paddle.y + paddle.height / 2);
-        ctx.closePath();
-    }
-
-    function drawBricks() {
-        for (let c = 0; c < brickColumnCount; c++) {
-            for (let r = 0; r < brickRowCount; r++) {
-                if (bricks[c][r].status === 1) {
-                    let brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
-                    let brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
-                    bricks[c][r].x = brickX;
-                    bricks[c][r].y = brickY;
-                    
-                    ctx.beginPath();
-                    ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                    ctx.fillStyle = bricks[c][r].color;
-                    ctx.fill();
-                    
-                    // テーマの文字を描画
-                    ctx.fillStyle = "#fff";
-                    ctx.font = "12px Arial";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(bricks[c][r].text, brickX + brickWidth/2, brickY + brickHeight/2);
-                    ctx.closePath();
-                }
-            }
-        }
-    }
-
-    // --- 当たり判定 ---
-    function collisionDetection() {
-        let activeBricks = 0;
-        for (let c = 0; c < brickColumnCount; c++) {
-            for (let r = 0; r < brickRowCount; r++) {
-                let b = bricks[c][r];
-                if (b.status === 1) {
-                    activeBricks++;
-                    if (ball.x > b.x && ball.x < b.x + brickWidth && ball.y > b.y && ball.y < b.y + brickHeight) {
-                        ball.dy = -ball.dy;
-                        b.status = 0;
-                        playSound('bounce');
-                    }
-                }
-            }
-        }
-        // クリア判定
-        if (activeBricks === 0 && isPlaying) {
-            isGameClear = true;
-            isPlaying = false;
-            playSound('clear');
-        }
-    }
-
-    // --- メインループ ---
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        drawBricks();
-        drawBall();
-        drawPaddle();
-
-        if (isGameClear) {
-            ctx.fillStyle = "#f1c40f";
-            ctx.font = "30px Arial";
-            ctx.fillText("GAME CLEAR!!", canvas.width/2, canvas.height/2);
-            ctx.font = "16px Arial";
-            ctx.fillText("ヒデちゃんの悩みを全て打ち返した！", canvas.width/2, canvas.height/2 + 30);
-            return;
-        }
-
-        if (isGameOver) {
-            ctx.fillStyle = "#e74c3c";
-            ctx.font = "30px Arial";
-            ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
-            return;
-        }
-
-        if (isPlaying) {
-            collisionDetection();
-
-            // 壁との当たり判定
-            if (ball.x + ball.dx > canvas.width - ball.radius || ball.x + ball.dx < ball.radius) {
-                ball.dx = -ball.dx;
-                playSound('bounce');
+        ctx.clearRect(0,0,320,400);
+        bricks.forEach((col, c) => col.forEach((b, r) => {
+            if(b.status === 1) {
+                b.x = c*75+15; b.y = r*30+40;
+                ctx.fillStyle = "#ff80ab";
+                ctx.fillRect(b.x, b.y, 65, 20);
+                ctx.fillStyle = "white";
+                ctx.font = "bold 10px Arial";
+                ctx.fillText(b.text, b.x+10, b.y+15);
             }
-            if (ball.y + ball.dy < ball.radius) {
-                ball.dy = -ball.dy;
-                playSound('bounce');
-            } else if (ball.y + ball.dy > canvas.height - ball.radius) {
-                if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
-                    ball.dy = -ball.dy;
-                    // パドルの当たる位置で反射角を少し変える
-                    ball.dx = ball.dx + ((ball.x - (paddle.x + paddle.width/2)) * 0.05);
-                    playSound('bounce');
-                } else {
-                    isGameOver = true;
-                    isPlaying = false;
+        }));
+        ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+        ctx.fillStyle = "yellow"; ctx.fill();
+        ctx.fillStyle = "black"; ctx.font = "bold 12px Arial";
+        ctx.fillText("ヒデ", ball.x-10, ball.y+5);
+        ctx.fillStyle = "#ba68c8"; ctx.fillRect(paddle.x, 380, paddle.width, 15);
+
+        if(isPlaying) {
+            ball.x += ball.dx; ball.y += ball.dy;
+            if(ball.x<ball.radius || ball.x>320-ball.radius) ball.dx *= -1;
+            if(ball.y<ball.radius) ball.dy *= -1;
+            if(ball.y>370 && ball.x>paddle.x && ball.x<paddle.x+paddle.width) ball.dy *= -1;
+            if(ball.y>400) { isPlaying = false; bgm.pause(); alert("ゲームオーバー！猫ちゃんが待ってるよ"); }
+            
+            bricks.forEach(col => col.forEach(b => {
+                if(b.status === 1 && ball.x > b.x && ball.x < b.x+65 && ball.y > b.y && ball.y < b.y+20) {
+                    b.status = 0; ball.dy *= -1; score++;
+                    if(score % 3 === 0) { ball.dx *= 1.2; ball.dy *= 1.2; }
                 }
-            }
-
-            // パドル移動
-            if (paddle.movingRight && paddle.x < canvas.width - paddle.width) {
-                paddle.x += paddle.speed;
-            } else if (paddle.movingLeft && paddle.x > 0) {
-                paddle.x -= paddle.speed;
-            }
-
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-        } else {
-            // スタート前
-            ctx.fillStyle = "#fff";
-            ctx.font = "20px Arial";
-            ctx.fillText("STARTを押してね", canvas.width/2, canvas.height/2 + 50);
+            }));
         }
-
         requestAnimationFrame(draw);
     }
 
-    // --- 操作イベント ---
-    const btnLeft = document.getElementById("btn-left");
-    const btnRight = document.getElementById("btn-right");
-    const btnStart = document.getElementById("btn-start");
-
-    // スマホ用タッチイベント
-    btnLeft.addEventListener("touchstart", (e) => { e.preventDefault(); paddle.movingLeft = true; });
-    btnLeft.addEventListener("touchend", (e) => { e.preventDefault(); paddle.movingLeft = false; });
-    btnRight.addEventListener("touchstart", (e) => { e.preventDefault(); paddle.movingRight = true; });
-    btnRight.addEventListener("touchend", (e) => { e.preventDefault(); paddle.movingRight = false; });
-    
-    // PC用マウスイベント
-    btnLeft.addEventListener("mousedown", () => paddle.movingLeft = true);
-    btnLeft.addEventListener("mouseup", () => paddle.movingLeft = false);
-    btnLeft.addEventListener("mouseleave", () => paddle.movingLeft = false);
-    btnRight.addEventListener("mousedown", () => paddle.movingRight = true);
-    btnRight.addEventListener("mouseup", () => paddle.movingRight = false);
-    btnRight.addEventListener("mouseleave", () => paddle.movingRight = false);
-
-    btnStart.addEventListener("click", () => {
-        // AudioContextはユーザー操作時に初期化する必要がある
-        if (!audioCtx) audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        if (!isPlaying) {
-            initBricks();
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height - 50;
-            ball.dx = 3 * (Math.random() > 0.5 ? 1 : -1);
-            ball.dy = -3;
-            paddle.x = (canvas.width - paddle.width) / 2;
-            isPlaying = true;
-            isGameOver = false;
-            isGameClear = false;
-            draw(); // ループ再開
-        }
+    document.getElementById("btn-start").addEventListener("click", () => {
+        bgm.currentTime = 0;
+        bgm.play(); 
+        isPlaying = true; score = 0;
+        ball = { x: 160, y: 350, dx: 3, dy: -3, radius: 12 };
+        initBricks();
     });
 
-    // 初期描画
+    document.getElementById("btn-left").onpointerdown = (e) => { e.preventDefault(); if(paddle.x > 0) paddle.x -= 30; };
+    document.getElementById("btn-right").onpointerdown = (e) => { e.preventDefault(); if(paddle.x < 240) paddle.x += 30; };
+
     initBricks();
     draw();
-
 </script>
 </body>
 </html>
