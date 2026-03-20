@@ -3,33 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ヒデちゃん大冒険：HYPER DRIVE</title>
+<title>ヒデちゃん大冒険：HYPER JUICE</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800;900&display=swap');
-:root{--pk:#ff1493;--yw:#ffcc00;--cy:#00ffff;--bg:#0a0a14;}
+:root{--pk:#ff1493;--yw:#ffcc00;--cy:#00ffff;--bg:#0f0f1b;}
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent;}
-/* ピンチズームとスクロールを徹底排除 */
-html,body{overflow:hidden;touch-action:none;position:fixed;width:100%;height:100%;background:var(--bg);font-family:'M PLUS Rounded 1c',sans-serif;}
-
-#game-wrap{position:relative;width:100vw;height:100dvh;max-width:450px;margin:0 auto;background:#000;overflow:hidden;}
+body{
+  background:var(--bg);font-family:'M PLUS Rounded 1c',sans-serif;
+  color:#fff;display:flex;flex-direction:column;align-items:center;
+  height:100dvh;overflow:hidden;touch-action:none;
+}
+#game-wrap{position:relative;width:100vw;height:100dvh;max-width:450px;background:#000;overflow:hidden;box-shadow:0 0 50px rgba(255,20,147,0.3);}
 canvas{width:100%;height:100%;display:block;}
 
-.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,20,0.95);z-index:200;}
+/* UI Layer */
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(15,15,27,0.9);z-index:200;}
 .hidden{display:none !important;}
-.title-logo{font-size:32px;color:var(--pk);text-align:center;margin-bottom:20px;text-shadow:0 0 15px var(--pk), 2px 2px 0 #fff;}
+.title-logo{font-size:42px;color:var(--pk);text-align:center;line-height:1.1;margin-bottom:40px;text-shadow:0 0 20px var(--pk), 3px 3px 0 #fff;}
+.btn{background:linear-gradient(to bottom, var(--pk), #c2185b);color:#fff;border:none;padding:18px 45px;font-size:24px;border-radius:50px;font-weight:900;box-shadow:0 6px 0 #5e0a2f;cursor:pointer;transition:0.1s;}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #5e0a2f;}
 
-/* キャラクター選択ボタン */
-.chara-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:30px;}
-.ch-btn{background:#222;padding:15px;border-radius:15px;font-size:40px;cursor:pointer;border:4px solid transparent;transition:0.2s;}
-.ch-btn.selected{border-color:var(--cy);background:#333;transform:scale(1.1);}
+/* HUD */
+#hud{position:absolute;top:15px;left:0;width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:18px;font-weight:900;z-index:100;text-shadow:2px 2px 4px #000;}
+#hide-face{position:absolute;top:50px;right:20px;font-size:50px;z-index:100;transition:0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+#combo-ui{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:60px;color:var(--yw);font-weight:900;pointer-events:none;z-index:150;text-shadow:0 0 20px #ff0000;opacity:0;}
 
-.btn-start{background:var(--pk);color:#fff;border:none;padding:15px 50px;font-size:24px;border-radius:50px;font-weight:900;box-shadow:0 6px 0 #880e4f;cursor:pointer;}
-
-#hud{position:absolute;top:15px;width:100%;display:flex;justify-content:space-between;padding:0 20px;font-size:18px;font-weight:900;z-index:100;pointer-events:none;color:#fff;}
-#hide-face{position:absolute;top:50px;right:20px;font-size:50px;z-index:100;}
-#skill-wrap{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:70%;height:12px;background:rgba(255,255,255,0.1);border-radius:10px;border:2px solid rgba(255,255,255,0.3);overflow:hidden;}
-#skill-bar{width:0%;height:100%;background:linear-gradient(90deg, var(--cy), var(--pk));box-shadow:0 0 15px var(--cy);}
-#msg{position:absolute;top:40%;width:100%;text-align:center;font-size:50px;color:var(--yw);font-weight:900;text-shadow:0 0 20px #000;pointer-events:none;z-index:150;opacity:0;}
+/* Skill Bar */
+#skill-bar-container{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);width:70%;height:14px;background:rgba(255,255,255,0.1);border-radius:10px;border:2px solid rgba(255,255,255,0.3);overflow:hidden;}
+#skill-fill{width:0%;height:100%;background:linear-gradient(90deg, var(--cy), var(--pk));box-shadow:0 0 15px var(--cy);}
 </style>
 </head>
 <body>
@@ -40,20 +41,16 @@ canvas{width:100%;height:100%;display:block;}
     <div id="mode-name">BREAKOUT</div>
   </div>
   <div id="hide-face">😄</div>
-  <div id="msg">GREAT!</div>
+  <div id="combo-ui">GREAT!</div>
   
   <canvas id="c"></canvas>
-  <div id="skill-wrap"><div id="skill-bar"></div></div>
+  
+  <div id="skill-bar-container"><div id="skill-fill"></div></div>
 
-  <div id="screen-start" class="overlay">
-    <div class="title-logo">ヒデちゃん大冒険<br>HYPER DRIVE</div>
-    <p style="margin-bottom:10px; color:var(--cy)">キャラクターを選んでね！</p>
-    <div class="chara-box">
-        <div onclick="selectChara(0, this)" class="ch-btn selected">😄</div>
-        <div onclick="selectChara(1, this)" class="ch-btn">🐱</div>
-        <div onclick="selectChara(2, this)" class="ch-btn">🐰</div>
-    </div>
-    <button class="btn-start" onclick="gameStart()">冒険をはじめる！</button>
+  <div id="screen-title" class="overlay">
+    <div class="title-logo">ヒデちゃん<br>超速大冒険！</div>
+    <div style="font-size:80px;margin-bottom:30px;animation: bounce 1s infinite alternate;">🚀</div>
+    <button class="btn" onclick="initGame()">あそぶ！</button>
   </div>
 </div>
 
@@ -61,20 +58,21 @@ canvas{width:100%;height:100%;display:block;}
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 const faceEl = document.getElementById('hide-face');
-const skillEl = document.getElementById('skill-bar');
-const msgEl = document.getElementById('msg');
+const comboEl = document.getElementById('combo-ui');
+const fillEl = document.getElementById('skill-fill');
 
 let W, H, scale;
 let gameMode = 'title'; 
-let score = 0, skill = 0, frame = 0, shake = 0, fever = 0;
-let touchX = 180;
-const FACES = { normal: '😄', happy: '😆', wow: '😲', cool: '😎', panic: '😨', giant: '😡', boss: '😈' };
-let myFace = FACES.normal;
+let score = 0, combo = 0, skill = 0, frame = 0, shake = 0;
+let touchX = 0, isTouching = false;
 
-// --- Audio Engine ---
+// Assets
+const CHARS = { normal: '😄', happy: '😆', wow: '😲', cool: '😎', panic: '😨' };
+let currentFace = CHARS.normal;
+
+// Audio
 let audioCtx;
-let bgmTimer = 0;
-const play = (f, d, t='sine', v=0.05) => {
+const playNote = (f, d, t='sine', v=0.1) => {
   if(!audioCtx) return;
   const o = audioCtx.createOscillator();
   const g = audioCtx.createGain();
@@ -85,217 +83,288 @@ const play = (f, d, t='sine', v=0.05) => {
   o.start(); o.stop(audioCtx.currentTime + d);
 };
 
-// 簡易BGMシーケンサー
-function updateBGM() {
-    if(!audioCtx || gameMode === 'title') return;
-    if(frame % 15 === 0) {
-        const notes = [261, 329, 392, 523, 440, 349, 392, 329];
-        const n = notes[bgmTimer % notes.length];
-        play(n, 0.2, 'square', 0.02);
-        bgmTimer++;
-    }
+// Particles
+let particles = [];
+function createParts(x, y, color, count=10) {
+  for(let i=0; i<count; i++) {
+    particles.push({x, y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10, life:1, color});
+  }
 }
 
-// --- Logic Objects ---
+// Logic Objects
 let pad = { x: 140, w: 90 };
-let ball = { x: 0, y: 0, dx: 0, dy: 0, r: 10 };
+let ball = { x: 0, y: 0, dx: 0, dy: 0 };
 let bricks = [];
-let tetris = { board: [], cur: null, timer: 0, speed: 20 };
-let road = { carX: 180, obs: [] };
-let boss = { hp: 100, x: 0, active: false };
+let tetris = { board: [], cur: null, timer: 0, speed: 25 };
+let car = { x: 180, obstacles: [] };
 
 function resize() {
-  W = canvas.width = Math.min(window.innerWidth, 450);
+  W = canvas.width = window.innerWidth > 450 ? 450 : window.innerWidth;
   H = canvas.height = window.innerHeight;
   scale = W / 360;
-  pad.w = 100 * scale;
+  pad.w = 90 * scale;
 }
 window.onresize = resize;
 resize();
 
-// --- Input (端っこガード) ---
-const handleInput = (e) => {
-  if(gameMode === 'title') return;
-  const p = e.touches ? e.touches[0] : e;
+// Input
+canvas.addEventListener('touchstart', e => {
+  isTouching = true;
+  initAudio();
+  const p = e.touches[0];
   const rect = canvas.getBoundingClientRect();
-  touchX = Math.max(0, Math.min(W, p.clientX - rect.left));
-  if(gameMode === 'tetris' && e.type === 'touchstart' && (p.clientY - rect.top) < H*0.3) hardDrop();
-};
-canvas.addEventListener('touchstart', handleInput);
-canvas.addEventListener('touchmove', (e) => { e.preventDefault(); handleInput(e); }, {passive:false});
-
-function showMsg(t) {
-  msgEl.innerText = t; msgEl.style.opacity = 1;
-  setTimeout(() => msgEl.style.opacity = 0, 1000);
-}
-
-// --- UI Functions ---
-function selectChara(i, el) {
-    const list = [FACES.normal, '🐱', '🐰'];
-    myFace = list[i];
-    document.querySelectorAll('.ch-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    play(440, 0.1);
-}
-
-function gameStart() {
-    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    document.getElementById('screen-start').classList.add('hidden');
-    startBreakout();
-}
-
-// --- Stage Management ---
-function startBreakout() {
-  gameMode = 'breakout'; score = 0; skill = 0; fever = 0;
-  ball = { x: W/2, y: H-200, dx: 7*scale, dy: -7*scale, r: 10 };
-  bricks = [];
-  for(let i=0; i<18; i++) {
-    bricks.push({ x: (i%6)*(W/6)+4, y: Math.floor(i/6)*30 + 100, w: W/6-8, h: 22, active: true, c: `hsl(${i*40}, 80%, 60%)` });
+  touchX = p.clientX - rect.left;
+  if(gameMode === 'tetris' && (p.clientY - rect.top) < H * 0.3) hardDrop();
+});
+canvas.addEventListener('touchmove', e => {
+  const p = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const nx = p.clientX - rect.left;
+  if(gameMode === 'tetris' && Math.abs(nx - touchX) > 25) {
+    moveTetris(nx > touchX ? 1 : -1);
+    touchX = nx;
   }
+  touchX = nx;
+});
+canvas.addEventListener('touchend', () => isTouching = false);
+
+function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+function showCombo(txt) {
+  comboEl.innerText = txt;
+  comboEl.style.opacity = 1;
+  comboEl.style.transform = 'translate(-50%, -50%) scale(1.2)';
+  setTimeout(() => { comboEl.style.opacity = 0; comboEl.style.transform = 'translate(-50%, -50%) scale(1)'; }, 600);
 }
 
+function updateFace(f) {
+  faceEl.innerText = f;
+  faceEl.style.transform = 'scale(1.3)';
+  setTimeout(() => faceEl.style.transform = 'scale(1)', 200);
+}
+
+function initGame() {
+  document.getElementById('screen-title').classList.add('hidden');
+  startBreakout();
+}
+
+// STAGE 1: BREAKOUT
+function startBreakout() {
+  gameMode = 'breakout';
+  score = 0; skill = 0;
+  ball = { x: W/2, y: H-200, dx: 6*scale, dy: -6*scale, r: 10 };
+  bricks = [];
+  for(let i=0; i<24; i++) {
+    bricks.push({ x: (i%6)*(W/6)+4, y: Math.floor(i/6)*25 + 100, w: W/6-8, h: 18, active: true, color: `hsl(${i*15}, 80%, 60%)` });
+  }
+  updateFace(CHARS.normal);
+}
+
+// STAGE 2: TETRIS
 function startTetris() {
-  gameMode = 'tetris'; document.getElementById('mode-name').innerText = "TETRIS";
-  showMsg("TETRIS STAGE!");
+  gameMode = 'tetris';
+  document.getElementById('mode-name').innerText = "TETRIS";
+  showCombo("TETRIS STAGE!");
   tetris.board = Array.from({length: 20}, () => Array(10).fill(0));
-  spawnTetris();
+  spawnPiece();
 }
 
+// STAGE 3: RACING
 function startRacing() {
-  gameMode = 'racing'; document.getElementById('mode-name').innerText = "DRIVE";
-  showMsg("GO DRIVE!");
-  road.obs = []; road.carX = W/2;
+  gameMode = 'racing';
+  document.getElementById('mode-name').innerText = "SUPER DRIVE";
+  showCombo("DRIVE STAGE!");
+  car.obstacles = [];
+  car.x = W/2;
 }
 
-function startBoss() {
-  gameMode = 'boss'; document.getElementById('mode-name').innerText = "FINAL BOSS";
-  boss.active = true; boss.hp = 100;
-  ball = { x: W/2, y: H-200, dx: 8*scale, dy: -8*scale, r: 12 };
-}
-
-// --- Core Loops ---
+// MAIN LOOP
 function update() {
   frame++;
-  updateBGM();
-  if(shake > 0) shake *= 0.8;
-  if(fever > 0) fever--;
+  if(shake > 0) shake *= 0.9;
+  
+  // Particles
+  particles.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+    if(p.life <= 0) particles.splice(i, 1);
+  });
 
   if(gameMode === 'breakout') {
-    pad.x = Math.max(0, Math.min(W - pad.w, touchX - pad.w/2));
+    pad.x += (touchX - (pad.x + pad.w/2)) * 0.25;
     ball.x += ball.dx; ball.y += ball.dy;
-    if(ball.x < ball.r || ball.x > W-ball.r) ball.dx *= -1, play(400,0.05);
-    if(ball.y < 0) ball.dy *= -1, play(400,0.05);
+    
+    if(ball.x < 10 || ball.x > W-10) { ball.dx *= -1; playNote(400, 0.05); createParts(ball.x, ball.y, '#fff', 3); }
+    if(ball.y < 10) { ball.dy *= -1; playNote(400, 0.05); }
+    
     if(ball.y > H-100 && ball.x > pad.x && ball.x < pad.x+pad.w) {
-        ball.dy = -Math.abs(ball.dy); ball.dx = (ball.x - (pad.x+pad.w/2)) * 0.2;
-        play(600, 0.05);
-        if(skill >= 100) { fever = 300; skill = 0; showMsg("FEVER!!"); play(800, 0.4, 'sawtooth'); }
+      ball.dy = -Math.abs(ball.dy);
+      ball.dx = (ball.x - (pad.x+pad.w/2)) * 0.2;
+      playNote(600, 0.05, 'square');
+      updateFace(CHARS.happy);
     }
+
     bricks.forEach(b => {
-      if(b.active && ball.x+ball.r > b.x && ball.x-ball.r < b.x+b.w && ball.y+ball.r > b.y && ball.y-ball.r < b.y+b.h) {
-        b.active = false; if(fever <= 0) ball.dy *= -1;
-        score += 10; skill += 12; // 必殺技チャージ爆速化
-        shake = 10; play(800+score, 0.05);
+      if(b.active && ball.x > b.x && ball.x < b.x+b.w && ball.y > b.y && ball.y < b.y+b.h) {
+        b.active = false; ball.dy *= -1;
+        score += 10; skill += 4;
+        shake = 8;
+        createParts(b.x+b.w/2, b.y+b.h/2, b.color, 15);
+        playNote(800 + score/10, 0.05, 'sine');
+        if(score % 50 === 0) showCombo("GREAT!");
       }
     });
-    if(ball.y > H) ball.y = H/2, ball.dy = -7;
+
+    if(ball.y > H) { updateFace(CHARS.panic); ball.y = H/2; ball.dy = -6; shake = 15; }
     if(bricks.every(b => !b.active)) startTetris();
   }
 
   if(gameMode === 'tetris') {
     tetris.timer++;
-    if(tetris.timer > tetris.speed) { if(!moveTet(0,1)) lockTet(); tetris.timer = 0; }
-    let tx = Math.floor(touchX / (W/10));
-    if(tetris.cur && tx !== tetris.cur.x) moveTet(tx - tetris.cur.x, 0);
+    if(tetris.timer > tetris.speed) {
+      if(!moveTetris(0, 1)) lockPiece();
+      tetris.timer = 0;
+    }
   }
 
   if(gameMode === 'racing') {
-    road.carX += (touchX - road.carX) * 0.2;
-    if(frame % 30 === 0) road.obs.push({x: Math.random()*(W-60)+30, y: -50, t: Math.random()>0.8?'🏎️':'🚧'});
-    road.obs.forEach((o, i) => {
-        o.y += 10;
-        if(o.y > H) { road.obs.splice(i,1); score += 10; if(score > 1200) startBoss(); }
-        if(Math.abs(road.carX - o.x) < 40 && Math.abs(H-150 - o.y) < 40) {
-            shake = 20; play(100, 0.2, 'sawtooth'); road.obs.splice(i,1);
-        }
-    });
-  }
-
-  if(gameMode === 'boss') {
-    pad.x = Math.max(0, Math.min(W - pad.w, touchX - pad.w/2));
-    ball.x += ball.dx; ball.y += ball.dy;
-    boss.x = W/2 + Math.sin(frame/20) * (W/3);
-    if(ball.x < ball.r || ball.x > W-ball.r) ball.dx *= -1;
-    if(ball.y < 0) ball.dy *= -1;
-    if(ball.y > H-100 && ball.x > pad.x && ball.x < pad.x+pad.w) ball.dy = -Math.abs(ball.dy);
-    if(ball.y < 150 && Math.abs(ball.x - boss.x) < 50) {
-        ball.dy *= -1; boss.hp -= 4; shake = 15; play(1000, 0.1, 'square');
+    car.x += (touchX - car.x) * 0.2;
+    if(frame % 30 === 0) {
+      car.obstacles.push({x: Math.random()*(W-40)+20, y: -50, type: Math.random()>0.2 ? '🚧' : '⭐'});
     }
-    if(boss.hp <= 0) { gameMode = 'clear'; showMsg("VICTORY!!"); }
-    if(ball.y > H) ball.y = H/2;
+    car.obstacles.forEach((o, i) => {
+      o.y += 10 + (score/100);
+      if(o.y > H) car.obstacles.splice(i, 1);
+      if(Math.abs(car.x - o.x) < 40 && Math.abs(H-150 - o.y) < 40) {
+        if(o.type === '⭐') {
+          score += 50; skill += 10; playNote(1200, 0.1); showCombo("NICE!"); updateFace(CHARS.cool);
+        } else {
+          shake = 20; playNote(100, 0.2, 'sawtooth'); updateFace(CHARS.wow);
+        }
+        car.obstacles.splice(i, 1);
+      }
+    });
+    if(score > 2000) { gameMode = 'result'; showCombo("ALL CLEAR!"); }
   }
 
-  skillEl.style.width = Math.min(100, skill) + "%";
+  fillEl.style.width = Math.min(100, skill) + "%";
   document.getElementById('score-val').innerText = "SCORE: " + score;
-  faceEl.innerText = fever > 0 ? FACES.giant : (gameMode === 'boss' ? FACES.boss : (shake > 5 ? FACES.wow : myFace));
 }
 
 function draw() {
-  ctx.fillStyle = '#0a0a14'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#0f0f1b';
+  ctx.fillRect(0,0,W,H);
+  
   ctx.save();
   if(shake > 1) ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
 
-  if(gameMode === 'breakout' || gameMode === 'boss') {
-    ctx.fillStyle = fever > 0 ? `hsl(${frame*10}, 100%, 70%)` : '#fff';
+  // Bg Decoration
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  for(let i=0; i<W; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
+
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 4, 4);
+  });
+  ctx.globalAlpha = 1;
+
+  if(gameMode === 'breakout') {
+    ctx.fillStyle = '#fff';
     ctx.beginPath(); ctx.roundRect(pad.x, H-100, pad.w, 15, 10); ctx.fill();
-    ctx.beginPath(); ctx.arc(ball.x, ball.y, fever > 0 ? 30 : 10, 0, Math.PI*2); ctx.fill();
-    if(gameMode === 'breakout') bricks.forEach(b => { if(b.active) { ctx.fillStyle = b.c; ctx.fillRect(b.x, b.y, b.w, b.h); } });
-    if(gameMode === 'boss') {
-        ctx.font = '80px Arial'; ctx.textAlign = 'center'; ctx.fillText('😈', boss.x, 120);
-        ctx.fillStyle = 'red'; ctx.fillRect(boss.x-50, 40, boss.hp, 8);
-    }
+    ctx.fillStyle = varColor(frame*2);
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+    bricks.forEach(b => { if(b.active) { ctx.fillStyle = b.color; ctx.fillRect(b.x, b.y, b.w, b.h); } });
   }
 
   if(gameMode === 'tetris') {
-    const sz = 30 * scale; ctx.translate(W/2 - sz*5, 80);
-    tetris.board.forEach((row, y) => row.forEach((v, x) => {
-        ctx.strokeStyle = '#222'; ctx.strokeRect(x*sz, y*sz, sz, sz);
-        if(v) { ctx.fillStyle = v; ctx.fillRect(x*sz, y*sz, sz, sz); }
-    }));
+    const sz = 28 * scale;
+    ctx.translate(W/2 - sz*5, 80);
+    // Ghost
     if(tetris.cur) {
-        ctx.fillStyle = `hsl(${frame*5}, 100%, 70%)`;
-        tetris.cur.s.forEach((row, y) => row.forEach((v, x) => {
-            if(v) ctx.fillRect((tetris.cur.x+x)*sz, (tetris.cur.y+y)*sz, sz, sz);
-        }));
+      let gy = tetris.cur.y;
+      while(!collide(0, gy - tetris.cur.y + 1)) gy++;
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+        if(v) ctx.fillRect((tetris.cur.x+x)*sz, (gy+y)*sz, sz, sz);
+      }));
+    }
+    // Board
+    tetris.board.forEach((row, y) => row.forEach((v, x) => {
+      ctx.strokeStyle = '#222'; ctx.strokeRect(x*sz, y*sz, sz, sz);
+      if(v) { ctx.fillStyle = v; ctx.fillRect(x*sz, y*sz, sz, sz); ctx.strokeRect(x*sz, y*sz, sz, sz); }
+    }));
+    // Cur
+    if(tetris.cur) {
+      ctx.fillStyle = varColor(frame*5);
+      tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+        if(v) ctx.fillRect((tetris.cur.x+x)*sz, (tetris.cur.y+y)*sz, sz, sz);
+      }));
     }
   }
 
   if(gameMode === 'racing') {
     ctx.textAlign = 'center'; ctx.font = '60px Arial';
-    ctx.fillText(myFace === FACES.normal ? '🏎️' : myFace, road.carX, H-120);
-    road.obs.forEach(o => ctx.fillText(o.t, o.x, o.y));
+    ctx.fillText('🏎️', car.x, H-120);
+    car.obstacles.forEach(o => { ctx.fillText(o.type, o.x, o.y); });
+    // Speed lines
+    ctx.strokeStyle = 'rgba(0,255,255,0.2)';
+    for(let i=0; i<5; i++) {
+      let ly = (frame*20 + i*200) % H;
+      ctx.beginPath(); ctx.moveTo(W*0.2, ly); ctx.lineTo(W*0.2, ly+100); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W*0.8, ly); ctx.lineTo(W*0.8, ly+100); ctx.stroke();
+    }
   }
+
   ctx.restore();
 }
 
-// Tetris Helpers
-const SHAPES = [[[1,1,1,1]], [[1,1],[1,1]], [[0,1,0],[1,1,1]], [[1,1,0],[0,1,1]]];
-function spawnTetris() { tetris.cur = { x: 4, y: 0, s: SHAPES[Math.floor(Math.random()*SHAPES.length)] }; if(collide(0,0)) startBreakout(); }
-function moveTet(dx, dy) { if(!collide(dx, dy)) { tetris.cur.x += dx; tetris.cur.y += dy; return true; } return false; }
-function hardDrop() { while(moveTet(0,1)); lockTet(); }
-function collide(dx, dy) {
-  return tetris.cur.s.some((row, y) => row.some((v, x) => {
+// Helpers
+function varColor(h) { return `hsl(${h % 360}, 100%, 70%)`; }
+
+const SHAPES = {
+  I: [[1,1,1,1]], T: [[0,1,0],[1,1,1]], L: [[1,0],[1,0],[1,1]], O: [[1,1],[1,1]], S: [[0,1,1],[1,1,0]]
+};
+function spawnPiece() {
+  const keys = Object.keys(SHAPES);
+  tetris.cur = { x: 3, y: 0, shape: SHAPES[keys[Math.floor(Math.random()*keys.length)]] };
+  if(collide()) startBreakout();
+}
+function moveTetris(dx, dy=0) {
+  tetris.cur.x += dx; tetris.cur.y += dy;
+  if(collide()) { tetris.cur.x -= dx; tetris.cur.y -= dy; return false; }
+  return true;
+}
+function hardDrop() {
+  while(moveTetris(0,1)) {}
+  lockPiece();
+  shake = 15; createParts(W/2, H/2, '#fff', 20);
+}
+function collide(ox=0, oy=0) {
+  return tetris.cur.shape.some((row, y) => row.some((v, x) => {
     if(!v) return false;
-    let nx = tetris.cur.x + x + dx, ny = tetris.cur.y + y + dy;
+    let nx = tetris.cur.x + x + ox, ny = tetris.cur.y + y + oy;
     return nx<0 || nx>=10 || ny>=20 || (ny>=0 && tetris.board[ny][nx]);
   }));
 }
-function lockTet() {
-  tetris.cur.s.forEach((row, y) => row.forEach((v, x) => { if(v) tetris.board[tetris.cur.y+y][tetris.cur.x+x] = '#ff1493'; }));
+function lockPiece() {
+  tetris.cur.shape.forEach((row, y) => row.forEach((v, x) => {
+    if(v) tetris.board[tetris.cur.y+y][tetris.cur.x+x] = varColor(frame);
+  }));
   let lines = 0;
-  for(let y=19; y>=0; y--) { if(tetris.board[y].every(v => v)) { tetris.board.splice(y, 1); tetris.board.unshift(Array(10).fill(0)); lines++; y++; } }
-  if(lines > 0) { score += lines*200; play(1000, 0.2); if(score > 600) startRacing(); }
-  spawnTetris();
+  for(let y=19; y>=0; y--) {
+    if(tetris.board[y].every(v => v)) {
+      tetris.board.splice(y, 1);
+      tetris.board.unshift(Array(10).fill(0));
+      lines++; y++;
+    }
+  }
+  if(lines > 0) { 
+    score += lines*100; shake = 25; playNote(1200, 0.2); 
+    showCombo(lines === 4 ? "PERFECT!!!" : "EXCELLENT!");
+    updateFace(CHARS.cool);
+    if(score > 1000) startRacing();
+  } else { playNote(200, 0.1, 'square'); }
+  spawnPiece();
 }
 
 function loop() { update(); draw(); requestAnimationFrame(loop); }
