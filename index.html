@@ -1,146 +1,153 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ヒデちゃん：突然のバードウォーク</title>
-<style>
-  :root { --bg-pink: #f9dbe7; --block-pink: #f56c9d; --paddle-purple: #a467c9; }
-  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-  body { width: 100%; height: 100%; overflow: hidden; touch-action: none; background-color: var(--bg-pink); font-family: monospace; }
-  #game-container { position: relative; width: 100vw; height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-  #canvas-wrap { position: relative; width: 90vw; height: 70vh; background: #fff; border: 4px solid #f9cbdc; border-radius: 10px; overflow: hidden; }
-  canvas { display: block; width: 100%; height: 100%; }
-  #controls { margin-top: 20px; display: flex; gap: 10px; }
-  .btn { border: none; border-radius: 12px; color: white; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #a476e3; padding: 15px 30px; box-shadow: 0 4px 0 #7e4db0; }
-  #msg { position: absolute; top: 50%; width: 100%; text-align: center; font-size: 24px; color: yellow; font-weight: bold; text-shadow: 2px 2px #000; display: none; z-index: 100; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ヒデちゃん＆猫ちゃん：転生モード</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #f9dbe7; font-family: sans-serif; touch-action: none; }
+        canvas { display: block; background: #fff; margin: 0 auto; border: 4px solid #f9cbdc; }
+        #ui { position: absolute; top: 10px; width: 100%; text-align: center; color: #701d44; font-weight: bold; pointer-events: none; }
+        #msg { position: absolute; top: 40%; width: 100%; text-align: center; font-size: 30px; color: #ff0; text-shadow: 2px 2px #000; display: none; z-index: 10; }
+        #btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 15px 40px; background: #a476e3; color: white; border: none; border-radius: 50px; font-size: 20px; cursor: pointer; }
+    </style>
 </head>
 <body>
-
-<div id="game-container">
-  <div id="msg">!!! BIRD WALK MODE !!!</div>
-  <div id="canvas-wrap"><canvas id="game"></canvas></div>
-  <div id="controls"><button class="btn" id="startBtn">START!</button></div>
-</div>
+    <div id="ui">壊した数: <span id="count">0</span></div>
+    <div id="msg">BIRD WALK!!</div>
+    <button id="btn">音楽＆START!</button>
+    <canvas id="game"></canvas>
 
 <script>
-(() => {
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
-  const startBtn = document.getElementById("startBtn");
-  const msg = document.getElementById("msg");
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const msg = document.getElementById("msg");
+    const btn = document.getElementById("btn");
+    const countEl = document.getElementById("count");
 
-  let w, h, ball, paddle, bricks, mode = "breakout", active = false;
-  let score = 0, birdY, birdV = 0, pipes = [], frame = 0;
-  const WORDS = ["仕事", "夢", "ダイエット", "ご飯", "健康"];
+    let w, h, ball, paddle, bricks, active = false, mode = "breakout";
+    let score = 0, birdY, birdV = 0, pipes = [], frame = 0;
+    const WORDS = ["仕事", "ダイエット", "夢", "ご飯", "健康", "旅行"];
 
-  function init() {
-    const rect = canvas.parentNode.getBoundingClientRect();
-    w = canvas.width = rect.width;
-    h = canvas.height = rect.height;
-    mode = "breakout";
-    score = 0;
-    pipes = [];
-    paddle = { w: 80, h: 12, x: w/2 - 40, y: h - 40 };
-    ball = { x: w/2, y: h/2, r: 10, vx: 3, vy: 3 };
-    buildBricks();
-  }
-
-  function buildBricks() {
-    bricks = [];
-    for (let r = 0; r < 5; r++) {
-      for (let c = 0; c < 4; c++) {
-        bricks.push({ x: 15+c*(w/4), y: 30+r*30, w: w/4-10, h: 20, alive: true, text: WORDS[Math.floor(Math.random()*WORDS.length)] });
-      }
+    function init() {
+        w = canvas.width = window.innerWidth * 0.95;
+        h = canvas.height = window.innerHeight * 0.7;
+        score = 0;
+        mode = "breakout";
+        pipes = [];
+        frame = 0;
+        paddle = { w: 100, h: 15, x: w / 2 - 50 };
+        ball = { x: w / 2, y: h - 60, vx: 4, vy: -4, r: 10 };
+        buildBricks();
+        countEl.innerText = score;
     }
-  }
 
-  function switchMode() {
-    active = false;
-    msg.style.display = "block";
-    setTimeout(() => {
-      msg.style.display = "none";
-      mode = "bird";
-      birdY = h / 2;
-      birdV = 0;
-      active = true;
-    }, 1500);
-  }
-
-  function update() {
-    if (!active) return;
-
-    if (mode === "breakout") {
-      ball.x += ball.vx; ball.y += ball.vy;
-      if (ball.x < 0 || ball.x > w) ball.vx *= -1;
-      if (ball.y < 0) ball.vy *= -1;
-      if (ball.y > paddle.y && ball.x > paddle.x && ball.x < paddle.x + paddle.w) ball.vy = -Math.abs(ball.vy);
-      
-      bricks.forEach(b => {
-        if (b.alive && ball.x > b.x && ball.x < b.x + b.w && ball.y > b.y && ball.y < b.y + b.h) {
-          b.alive = false; ball.vy *= -1; score++;
-          if (score >= 10) switchMode(); // 10個壊すとモードチェンジ！
+    function buildBricks() {
+        bricks = [];
+        const rows = 5, cols = 4;
+        const bw = (w - 30) / cols;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                bricks.push({ x: 15 + c * bw, y: 40 + r * 30, w: bw - 5, h: 25, alive: true, text: WORDS[Math.floor(Math.random() * WORDS.length)] });
+            }
         }
-      });
-      if (ball.y > h) init();
-    } else {
-      // バードウォークモード
-      birdV += 0.4; birdY += birdV;
-      if (frame % 90 === 0) {
-        let gap = 100;
-        let pos = Math.random() * (h - 200) + 50;
-        pipes.push({ x: w, top: pos, bot: pos + gap });
-      }
-      pipes.forEach(p => {
-        p.x -= 3;
-        if (p.x < 40 && p.x > 0 && (birdY < p.top || birdY > p.bot)) init();
-      });
-      if (birdY > h || birdY < 0) init();
-      frame++;
     }
-  }
 
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    if (mode === "breakout") {
-      ctx.fillStyle = "#fff0f5"; ctx.fillRect(0,0,w,h);
-      bricks.forEach(b => {
-        if (!b.alive) return;
-        ctx.fillStyle = "#f56c9d"; ctx.fillRect(b.x, b.y, b.w, b.h);
-        ctx.fillStyle = "white"; ctx.font = "10px sans-serif"; ctx.fillText(b.text, b.x+5, b.y+15);
-      });
-      ctx.fillStyle = "#a467c9"; ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
-      ctx.fillStyle = "yellow"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, 7); ctx.fill();
-    } else {
-      // バード背景（黒）
-      ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = "#0f0"; // 緑の土管
-      pipes.forEach(p => {
-        ctx.fillRect(p.x, 0, 40, p.top);
-        ctx.fillRect(p.x, p.bot, 40, h - p.bot);
-      });
-      ctx.fillStyle = "yellow"; // ヒデ鳥
-      ctx.font = "30px serif"; ctx.fillText("🐤", 20, birdY);
+    function loop() {
+        if (!active) return;
+        ctx.clearRect(0, 0, w, h);
+
+        if (mode === "breakout") {
+            // 背景
+            ctx.fillStyle = "#fff0f5"; ctx.fillRect(0,0,w,h);
+            
+            // パドル描画
+            ctx.fillStyle = "#a467c9";
+            ctx.fillRect(paddle.x, h - 30, paddle.w, paddle.h);
+
+            // ボール（ヒデちゃん）
+            ball.x += ball.vx; ball.y += ball.vy;
+            if (ball.x < 0 || ball.x > w) ball.vx *= -1;
+            if (ball.y < 0) ball.vy *= -1;
+            if (ball.y > h - 30 && ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
+                ball.vy = -Math.abs(ball.vy);
+            }
+            ctx.fillStyle = "yellow"; ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "black"; ctx.font = "10px sans-serif"; ctx.fillText("ヒデ", ball.x-10, ball.y+3);
+
+            // ブロック
+            bricks.forEach(b => {
+                if (!b.alive) return;
+                ctx.fillStyle = "#f56c9d"; ctx.fillRect(b.x, b.y, b.w, b.h);
+                ctx.fillStyle = "white"; ctx.font = "12px sans-serif"; ctx.fillText(b.text, b.x + 5, b.y + 18);
+
+                if (ball.x > b.x && ball.x < b.x + b.w && ball.y > b.y && ball.y < b.y + b.h) {
+                    b.alive = false; ball.vy *= -1; score++;
+                    countEl.innerText = score;
+                    if (score >= 10) { 
+                        mode = "transition"; 
+                        msg.style.display = "block";
+                        setTimeout(() => { mode = "bird"; birdY = h/2; msg.style.display = "none"; }, 1500);
+                    }
+                }
+            });
+            if (ball.y > h) init();
+
+        } else if (mode === "bird") {
+            // ファミコン背景
+            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h);
+            
+            birdV += 0.5; birdY += birdV;
+            if (frame % 80 === 0) {
+                let gap = 120;
+                let pos = Math.random() * (h - 200) + 50;
+                pipes.push({ x: w, top: pos, bot: pos + gap });
+            }
+            pipes.forEach((p, i) => {
+                p.x -= 3;
+                ctx.fillStyle = "#0f0";
+                ctx.fillRect(p.x, 0, 50, p.top);
+                ctx.fillRect(p.x, p.bot, 50, h - p.bot);
+                if (p.x < 50 && p.x > 0 && (birdY < p.top || birdY > p.bot)) init();
+            });
+            ctx.fillStyle = "yellow"; ctx.font = "30px serif"; ctx.fillText("🐤", 30, birdY);
+            if (birdY > h || birdY < 0) init();
+            frame++;
+        }
+        requestAnimationFrame(loop);
     }
-    update();
-    requestAnimationFrame(draw);
-  }
 
-  // 操作
-  const handleAction = () => {
-    if (mode === "breakout") return; // ブロック崩し中は自動追従かマウス移動
-    birdV = -6; // バードジャンプ！
-  };
-  canvas.addEventListener("touchstart", (e) => { e.preventDefault(); handleAction(); });
-  canvas.addEventListener("mousedown", handleAction);
-  window.addEventListener("mousemove", (e) => {
-    if (mode === "breakout") paddle.x = e.clientX - canvas.offsetLeft - paddle.w/2;
-  });
+    // 操作
+    const movePaddle = (clientX) => {
+        let rect = canvas.getBoundingClientRect();
+        let x = (clientX - rect.left);
+        paddle.x = x - paddle.w / 2;
+    };
 
-  startBtn.onclick = () => { init(); active = true; draw(); startBtn.style.display="none";};
-  init(); draw();
-})();
+    window.addEventListener("touchmove", (e) => {
+        if (mode === "breakout") movePaddle(e.touches[0].clientX);
+        e.preventDefault();
+    }, {passive: false});
+
+    window.addEventListener("mousemove", (e) => {
+        if (mode === "breakout") movePaddle(e.clientX);
+    });
+
+    window.addEventListener("touchstart", () => {
+        if (mode === "bird") birdV = -8;
+    });
+    window.addEventListener("mousedown", () => {
+        if (mode === "bird") birdV = -8;
+    });
+
+    btn.onclick = () => {
+        btn.style.display = "none";
+        active = true;
+        init();
+        loop();
+    };
+
+    init();
 </script>
 </body>
 </html>
