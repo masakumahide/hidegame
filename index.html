@@ -7,7 +7,7 @@
 <style>
   :root{
     --bg1:#ffd9ea;
-    --bg2:#f5bfd8;
+    --bg2:#f6bfd8;
     --bg3:#ee9fc5;
     --ink:#6f2858;
     --white:#fffdfd;
@@ -70,11 +70,11 @@
   }
 
   .panel{
-    min-width:110px;
+    min-width:112px;
     padding:10px 14px;
     border-radius:18px;
     background:rgba(255,255,255,.5);
-    border:1px solid rgba(255,255,255,.8);
+    border:1px solid rgba(255,255,255,.82);
     box-shadow:var(--shadow);
     backdrop-filter:blur(6px);
   }
@@ -319,7 +319,7 @@
   <div id="message"></div>
 
   <div id="skillWrap">
-    <div id="skillLabel">✨ おたすけゲージ</div>
+    <div id="skillLabel">✨ ねこラッシュゲージ</div>
     <div id="skillBar"><div id="skillFill"></div></div>
   </div>
   <button id="skillBtn" class="disabled">✨</button>
@@ -329,13 +329,13 @@
       <div class="bigCat">🐱</div>
       <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し</div>
       <div class="sub">
-        夢・仕事・健康・旅行のブロックを崩す、<br>
-        シンプルなピンク版です。
+        猫背景で、テンポ良く、<br>
+        必殺技ありのシンプル版です。
       </div>
       <button class="btn" id="startBtn">スタート！</button>
       <div class="tiny">
         操作：画面を左右ドラッグ<br>
-        右下の ✨ はゲージ満タンで使えます
+        右下の ✨ は満タンで発動
       </div>
     </div>
   </div>
@@ -355,7 +355,6 @@
   const message = document.getElementById("message");
   const catTalk = document.getElementById("catTalk");
   const overlay = document.getElementById("overlay");
-  const startBtn = document.getElementById("startBtn");
   const catBadgeImg = document.getElementById("catBadgeImg");
   const catBadgeFallback = document.getElementById("catBadgeFallback");
 
@@ -367,30 +366,30 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_simple_best") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best") || 0);
 
   let touchX = 0;
   let shake = 0;
   let damageFlash = 0;
   let lastTime = 0;
 
-  let paddle = { x:0, y:0, w:108, h:18 };
-  let ball = { x:0, y:0, vx:4.2, vy:-6.2, r:10 };
+  let paddle = { x:0, y:0, w:112, h:18 };
+  let balls = [];
   let blocks = [];
   let particles = [];
   let stars = [];
+  let dashFx = { active:false, x:-120, until:0 };
 
-  const LABELS = [
+  const WORDS = [
     "夢","仕事","健康","旅行",
-    "仕事","健康","旅行","夢",
+    "仕事","夢","旅行","健康",
     "健康","旅行","夢","仕事",
-    "旅行","夢","仕事","健康",
-    "夢","仕事","旅行","健康"
+    "旅行","仕事","健康","夢",
+    "夢","健康","旅行","仕事"
   ];
 
   const COLORS = [
-    "#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff",
-    "#ffd4e5","#fff0b8"
+    "#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff","#ffd4e5","#fff0b8"
   ];
 
   let catImg = new Image();
@@ -458,12 +457,12 @@
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(660, now);
-    osc.frequency.exponentialRampToValueAtTime(420, now + 0.18);
-    osc.frequency.exponentialRampToValueAtTime(520, now + 0.32);
+    osc.frequency.setValueAtTime(680, now);
+    osc.frequency.exponentialRampToValueAtTime(430, now + 0.16);
+    osc.frequency.exponentialRampToValueAtTime(520, now + 0.3);
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.linearRampToValueAtTime(0.04, now + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.33);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start(now);
@@ -483,14 +482,14 @@
 
     if(beat === 0){
       chord.forEach(n => playTone(t, midiToFreq(n), 0.42, "triangle", 0.014));
-      playTone(t, midiToFreq(chord[0] - 24), 0.25, "sine", 0.04);
+      playTone(t, midiToFreq(chord[0] - 24), 0.24, "sine", 0.04);
     }
     if(beat === 2){
-      playTone(t, midiToFreq(chord[0] - 24), 0.20, "sine", 0.03);
+      playTone(t, midiToFreq(chord[0] - 24), 0.18, "sine", 0.03);
     }
 
     const melody = [chord[2]+12, chord[1]+12, chord[0]+12, chord[1]+12];
-    playTone(t, midiToFreq(melody[beat]), 0.14, "square", 0.012);
+    playTone(t, midiToFreq(melody[beat]), 0.12, "square", 0.012);
 
     musicStep++;
   }
@@ -500,7 +499,7 @@
     stopMusic();
     musicStep = 0;
     tickMusic();
-    musicTimer = setInterval(tickMusic, 340);
+    musicTimer = setInterval(tickMusic, 300);
   }
 
   function stopMusic(){
@@ -510,7 +509,7 @@
     }
   }
 
-  function showMessage(text, ms=700){
+  function showMessage(text, ms=650){
     message.textContent = text;
     message.style.opacity = "1";
     clearTimeout(showMessage._timer);
@@ -530,7 +529,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_simple_best", String(best));
+      localStorage.setItem("hidecat_fun_best", String(best));
     }
   }
 
@@ -539,16 +538,23 @@
     lifeText.textContent = lives;
     modeText.textContent = "BREAKOUT";
     bestText.textContent = best;
-    skillFill.style.width = Math.max(0, Math.min(100, skill)) + "%";
+    skillFill.style.width = `${Math.max(0, Math.min(100, skill))}%`;
     skillBtn.classList.toggle("disabled", !(state === "playing" && skill >= 100));
   }
 
-  function createBall(){
-    ball.x = W / 2;
-    ball.y = H - 150;
-    ball.vx = (Math.random() > 0.5 ? 4.2 : -4.2);
-    ball.vy = -6.2;
-    ball.r = 10;
+  function createBall(vx = null){
+    return {
+      x: W / 2,
+      y: H - 150,
+      vx: vx ?? (Math.random() > 0.5 ? 4.2 : -4.2),
+      vy: -6.2,
+      r: 10,
+      trail:[]
+    };
+  }
+
+  function resetBalls(){
+    balls = [createBall()];
   }
 
   function createBlocks(){
@@ -570,7 +576,7 @@
           y: top + r * (bh + gapY),
           w: bw,
           h: bh,
-          label: LABELS[idx % LABELS.length],
+          label: WORDS[idx % WORDS.length],
           color: COLORS[idx % COLORS.length],
           alive: true
         });
@@ -608,18 +614,24 @@
   function useSkill(){
     if(state !== "playing" || skill < 100) return;
     skill = 0;
-    let removed = 0;
-    for(const b of blocks){
-      if(b.alive && removed < 5){
-        b.alive = false;
-        removed++;
-        burst(b.x + b.w/2, b.y + b.h/2, "🐱", 8);
-      }
-    }
-    score += removed * 12;
     playMeow();
     say("にゃーー!");
-    showMessage("おたすけ!", 800);
+    showMessage("ねこラッシュ!", 750);
+    dashFx.active = true;
+    dashFx.x = -120;
+    dashFx.until = performance.now() + 700;
+
+    const alive = blocks.filter(b => b.alive).slice(0, 6);
+    alive.forEach(b => {
+      b.alive = false;
+      burst(b.x + b.w/2, b.y + b.h/2, "🐱", 8);
+      score += 12;
+    });
+
+    while(balls.length < 3){
+      balls.push(createBall(balls.length === 1 ? -5 : 5));
+    }
+
     updateHud();
   }
 
@@ -634,15 +646,18 @@
     shake = 0;
     damageFlash = 0;
     particles = [];
-    paddle.w = 110;
+    dashFx.active = false;
+
+    paddle.w = 112;
     paddle.h = 18;
     paddle.x = W / 2 - paddle.w / 2;
     paddle.y = H - 110;
-    createBall();
+
+    resetBalls();
     createBlocks();
     updateHud();
     overlay.classList.add("hidden");
-    showMessage("スタート!", 800);
+    showMessage("スタート!", 700);
   }
 
   function endGame(clear){
@@ -662,9 +677,7 @@
         <button class="btn" id="restartBtn">もういっかい！</button>
       </div>
     `;
-    document.getElementById("restartBtn").onclick = () => {
-      renderTitle();
-    };
+    document.getElementById("restartBtn").onclick = renderTitle;
   }
 
   function renderTitle(){
@@ -675,13 +688,13 @@
         <div class="bigCat">🐱</div>
         <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し</div>
         <div class="sub">
-          夢・仕事・健康・旅行のブロックを崩す、<br>
-          シンプルなピンク版です。
+          猫背景で、テンポ良く、<br>
+          必殺技ありのシンプル版です。
         </div>
         <button class="btn" id="startBtn2">スタート！</button>
         <div class="tiny">
           操作：画面を左右ドラッグ<br>
-          右下の ✨ はゲージ満タンで使えます
+          右下の ✨ は満タンで発動
         </div>
       </div>
     `;
@@ -693,8 +706,8 @@
     H = window.innerHeight;
     canvas.width = Math.floor(W * DPR);
     canvas.height = Math.floor(H * DPR);
-    canvas.style.width = W + "px";
-    canvas.style.height = H + "px";
+    canvas.style.width = `${W}px`;
+    canvas.style.height = `${H}px`;
     ctx.setTransform(DPR,0,0,DPR,0,0);
 
     paddle.y = H - 110;
@@ -781,7 +794,7 @@
       ctx.strokeStyle = "rgba(255,255,255,.45)";
       ctx.stroke();
 
-      ctx.fillStyle = INK;
+      ctx.fillStyle = "#6f2858";
       ctx.font = "bold 16px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -797,23 +810,35 @@
     ctx.fillStyle = g;
     ctx.fill();
 
-    ctx.fillStyle = INK;
+    ctx.fillStyle = "#6f2858";
     ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("😄", paddle.x + paddle.w/2, paddle.y - 8);
   }
 
-  function drawBall(){
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-    ctx.fill();
+  function drawBalls(){
+    for(const ball of balls){
+      for(let i=0; i<ball.trail.length; i++){
+        const t = ball.trail[i];
+        ctx.globalAlpha = (i + 1) / ball.trail.length * 0.16;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, ball.r * (i + 1) / ball.trail.length, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
 
-    ctx.fillStyle = "#9fd7ff";
-    ctx.beginPath();
-    ctx.arc(ball.x - 2, ball.y - 2, ball.r * 0.55, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#9fd7ff";
+      ctx.beginPath();
+      ctx.arc(ball.x - 2, ball.y - 2, ball.r * 0.55, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   function drawParticles(){
@@ -827,65 +852,109 @@
     ctx.globalAlpha = 1;
   }
 
+  function drawDashFx(){
+    if(!dashFx.active) return;
+    ctx.save();
+    ctx.fillStyle = "rgba(255,255,255,.10)";
+    ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle = "#ffd84d";
+    ctx.font = "900 34px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("ねこラッシュ!", W/2, H * 0.34);
+
+    if(catReady){
+      const s = 88;
+      const y = H * 0.5;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(dashFx.x + s/2, y, s/2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(catImg, dashFx.x, y - s/2, s, s);
+      ctx.restore();
+    } else {
+      ctx.font = "72px sans-serif";
+      ctx.fillText("🐱", dashFx.x + 40, H * 0.5);
+    }
+    ctx.restore();
+  }
+
   function update(dt){
     if(state !== "playing") return;
 
-    paddle.x += ((touchX - paddle.w/2) - paddle.x) * Math.min(1, 0.18 * dt * 60);
+    paddle.x += ((touchX - paddle.w/2) - paddle.x) * Math.min(1, 0.22 * dt * 60);
     paddle.x = Math.max(8, Math.min(W - paddle.w - 8, paddle.x));
 
-    ball.x += ball.vx * dt * 60;
-    ball.y += ball.vy * dt * 60;
+    for(let i=balls.length - 1; i>=0; i--){
+      const ball = balls[i];
 
-    if(ball.x < ball.r){
-      ball.x = ball.r;
-      ball.vx *= -1;
-      playTap(360);
-    }
-    if(ball.x > W - ball.r){
-      ball.x = W - ball.r;
-      ball.vx *= -1;
-      playTap(360);
-    }
-    if(ball.y < ball.r + 8){
-      ball.y = ball.r + 8;
-      ball.vy *= -1;
-      playTap(420);
-    }
+      ball.trail.push({ x:ball.x, y:ball.y });
+      if(ball.trail.length > 6) ball.trail.shift();
 
-    if(
-      ball.y + ball.r > paddle.y &&
-      ball.y - ball.r < paddle.y + paddle.h &&
-      ball.x > paddle.x &&
-      ball.x < paddle.x + paddle.w &&
-      ball.vy > 0
-    ){
-      const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
-      ball.vx = hit * 6.2;
-      ball.vy = -Math.max(6.0, Math.abs(ball.vy));
-      burst(ball.x, paddle.y, "🐾", 5);
-      playTap(620);
-    }
+      ball.x += ball.vx * dt * 60;
+      ball.y += ball.vy * dt * 60;
 
-    for(const b of blocks){
-      if(!b.alive) continue;
-      if(
-        ball.x + ball.r > b.x &&
-        ball.x - ball.r < b.x + b.w &&
-        ball.y + ball.r > b.y &&
-        ball.y - ball.r < b.y + b.h
-      ){
-        b.alive = false;
-        score += 10;
-        skill = Math.min(100, skill + 8);
+      if(ball.x < ball.r){
+        ball.x = ball.r;
+        ball.vx *= -1;
+        playTap(360);
+      }
+      if(ball.x > W - ball.r){
+        ball.x = W - ball.r;
+        ball.vx *= -1;
+        playTap(360);
+      }
+      if(ball.y < ball.r + 8){
+        ball.y = ball.r + 8;
         ball.vy *= -1;
-        burst(b.x + b.w/2, b.y + b.h/2, "✨", 7);
-        playTap(860);
-        updateHud();
-        break;
+        playTap(420);
+      }
+
+      if(
+        ball.y + ball.r > paddle.y &&
+        ball.y - ball.r < paddle.y + paddle.h &&
+        ball.x > paddle.x &&
+        ball.x < paddle.x + paddle.w &&
+        ball.vy > 0
+      ){
+        const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
+        ball.vx = hit * 6.4;
+        ball.vy = -Math.max(6.0, Math.abs(ball.vy));
+        burst(ball.x, paddle.y, "🐾", 5);
+        playTap(620);
+      }
+
+      for(const b of blocks){
+        if(!b.alive) continue;
+        if(
+          ball.x + ball.r > b.x &&
+          ball.x - ball.r < b.x + b.w &&
+          ball.y + ball.r > b.y &&
+          ball.y - ball.r < b.y + b.h
+        ){
+          b.alive = false;
+          score += 10;
+          skill = Math.min(100, skill + 8);
+          ball.vy *= -1;
+          burst(b.x + b.w/2, b.y + b.h/2, "✨", 7);
+          playTap(860);
+
+          if(score % 50 === 0){
+            showMessage("GREAT!", 550);
+          }
+
+          updateHud();
+          break;
+        }
+      }
+
+      if(ball.y > H + 40){
+        balls.splice(i, 1);
       }
     }
 
-    if(ball.y > H + 40){
+    if(balls.length === 0){
       lives--;
       damageFlash = 1;
       shake = 12;
@@ -897,7 +966,7 @@
         return;
       }
 
-      createBall();
+      balls = [createBall()];
       showMessage("もういっかい!", 700);
     }
 
@@ -915,6 +984,13 @@
       if(p.life <= 0) particles.splice(i, 1);
     }
 
+    if(dashFx.active){
+      dashFx.x += 20 * dt * 60;
+      if(performance.now() > dashFx.until){
+        dashFx.active = false;
+      }
+    }
+
     if(shake > 0.08) shake *= 0.88;
     else shake = 0;
 
@@ -930,9 +1006,10 @@
     drawBackground();
     drawBlocks();
     drawPaddle();
-    drawBall();
+    drawBalls();
     drawParticles();
     ctx.restore();
+    drawDashFx();
   }
 
   function loop(ts){
@@ -951,7 +1028,6 @@
   }
 
   canvas.addEventListener("touchstart", e => {
-    touchActive = true;
     unlockAudio();
     setTouchFromEvent(e);
   }, { passive:true });
@@ -960,10 +1036,6 @@
     e.preventDefault();
     setTouchFromEvent(e);
   }, { passive:false });
-
-  canvas.addEventListener("touchend", () => {
-    touchActive = false;
-  });
 
   canvas.addEventListener("mousemove", e => {
     if(window.innerWidth > 700){
