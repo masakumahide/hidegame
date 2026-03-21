@@ -442,7 +442,7 @@
       </div>
       <div id="skillReady">RANDOM</div>
     </button>
-    <div id="skillLabel">必殺技は満タンになるたびランダム</div>
+    <div id="skillLabel">タップで吸着球を再発射 / SKILLで必殺技</div>
     <div id="skillBar"><div id="skillFill"></div></div>
   </div>
 
@@ -485,10 +485,10 @@
   const COLORS = ["#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff","#ffd4e5","#fff0b8"];
 
   const CHARACTERS = [
-    { id:"hide", emoji:"😄", name:"ヒデ", perk:"パドル少し広め" },
-    { id:"cat", emoji:"🐱", name:"ネコ", perk:"ゲージ少し早い" },
-    { id:"bear", emoji:"🐻", name:"クマ", perk:"ビッグ長め" },
-    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"球が少しやさしい" }
+    { id:"hide", emoji:"😄", name:"ヒデ", perk:"金色パドル / 少し広め" },
+    { id:"cat", emoji:"🐱", name:"ネコ", perk:"ピンクパドル / ゲージ少し早い" },
+    { id:"bear", emoji:"🐻", name:"クマ", perk:"青パドル / ビッグ長め" },
+    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑パドル / 球が少しやさしい" }
   ];
   let selectedChar = CHARACTERS[1];
 
@@ -502,7 +502,9 @@
     { type:"gauge", emoji:"⚡", label:"ゲージ" },
     { type:"score", emoji:"💎", label:"スコア" },
     { type:"heal", emoji:"💖", label:"ライフ" },
-    { type:"big", emoji:"⬌", label:"BIG" }
+    { type:"big", emoji:"⬌", label:"BIG" },
+    { type:"rapid", emoji:"🔫", label:"連射" },
+    { type:"clone", emoji:"🪞", label:"分身" }
   ];
 
   const CANON = [
@@ -521,12 +523,14 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v8") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v9") || 0);
   let stageMode = "breakout";
+  let stageVariant = 0;
 
   let pointerX = 0;
   let shake = 0;
   let damageFlash = 0;
+  let worldFlash = 0;
   let lastTime = 0;
   let sayLockUntil = 0;
   let speechLockUntil = 0;
@@ -534,15 +538,18 @@
   let paddle = { x:0, y:0, w:116, h:18 };
   let balls = [];
   let blocks = [];
-  let invaders = null;
   let items = [];
   let particles = [];
   let stars = [];
+  let rings = [];
+  let playerShots = [];
   let boss = null;
 
   let paddleBoostUntil = 0;
   let magnetUntil = 0;
   let magnetCharges = 0;
+  let rapidUntil = 0;
+  let rapidShotCooldown = 0;
 
   let catDash = {
     active:false,
@@ -560,8 +567,33 @@
   let musicStep = 0;
   let musicAccum = 0;
 
+  function rand(min, max){
+    return Math.random() * (max - min) + min;
+  }
+
+  function randInt(min, max){
+    return Math.floor(rand(min, max + 1));
+  }
+
+  function clamp(v, min, max){
+    return Math.max(min, Math.min(max, v));
+  }
+
   function getStageBaseSpeed(){
-    return Math.min(5.8, 4.15 + (stage - 1) * 0.09);
+    return Math.min(5.9, 4.12 + (stage - 1) * 0.09);
+  }
+
+  function paddleTheme(){
+    if(selectedChar.id === "hide"){
+      return { top:"#fff3a5", bottom:"#ffbd52", accent:"#ffdf63" };
+    }
+    if(selectedChar.id === "cat"){
+      return { top:"#ffd4ea", bottom:"#ff7fb6", accent:"#ff63ad" };
+    }
+    if(selectedChar.id === "bear"){
+      return { top:"#d7ebff", bottom:"#72b6ff", accent:"#7ca9ff" };
+    }
+    return { top:"#dbffd9", bottom:"#7de188", accent:"#7fe38f" };
   }
 
   function currentPerks(){
@@ -759,10 +791,15 @@
     musicAccum = 0;
   }
 
-  function showMessage(text, ms=650){
+  function showMessage(text, ms=700){
     message.textContent = text;
     message.style.opacity = "1";
+    message.style.transform = "translateX(-50%) scale(1.12)";
     clearTimeout(showMessage._timer);
+    clearTimeout(showMessage._timer2);
+    showMessage._timer2 = setTimeout(() => {
+      message.style.transform = "translateX(-50%) scale(1)";
+    }, 80);
     showMessage._timer = setTimeout(() => {
       message.style.opacity = "0";
     }, ms);
@@ -775,6 +812,29 @@
     say._timer = setTimeout(() => {
       catTalk.textContent = "にゃっ";
     }, ms);
+  }
+
+  function addRing(x, y, color="#fff", maxR=44, line=4){
+    rings.push({ x, y, r:8, maxR, line, life:1, color });
+  }
+
+  function sparkle(x, y, emoji="✨", count=10){
+    for(let i=0; i<count; i++){
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.random() * 3.6 + 1.2;
+      particles.push({
+        x, y,
+        vx: Math.cos(a) * s,
+        vy: Math.sin(a) * s - 0.5,
+        life: 1,
+        emoji
+      });
+    }
+  }
+
+  function burst(x, y, emoji="✨", count=8){
+    sparkle(x, y, emoji, count);
+    addRing(x, y, "rgba(255,255,255,.9)", 34 + count * 2, 3);
   }
 
   function updateCatReaction(){
@@ -814,7 +874,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v8", String(best));
+      localStorage.setItem("hidecat_fun_best_v9", String(best));
     }
   }
 
@@ -843,11 +903,12 @@
   function addSkill(amount){
     const before = skill;
     const gain = amount * currentPerks().skillGainMult;
-    skill = Math.max(0, Math.min(100, skill + gain));
+    skill = clamp(skill + gain, 0, 100);
     if(before < 100 && skill >= 100 && !currentSkill){
       pickRandomSkill();
-      showMessage(currentSkill.name + "!", 600);
+      showMessage(currentSkill.name + "!", 620);
       say("きたにゃ!", 650);
+      worldFlash = Math.max(worldFlash, 0.14);
     }
   }
 
@@ -856,8 +917,12 @@
     lifeText.textContent = lives;
     stageText.textContent = `${stage} / ${MAX_STAGE}`;
     bestText.textContent = best;
-    skillFill.style.width = `${Math.max(0, Math.min(100, skill))}%`;
-    const activeSkillVisual = catDash.active || performance.now() < magnetUntil || performance.now() < paddleBoostUntil;
+    skillFill.style.width = `${clamp(skill, 0, 100)}%`;
+    const activeSkillVisual =
+      catDash.active ||
+      performance.now() < magnetUntil ||
+      performance.now() < paddleBoostUntil ||
+      performance.now() < rapidUntil;
     catSkillBadge.classList.toggle("show", activeSkillVisual);
     updateCatReaction();
     updateSkillUI();
@@ -898,6 +963,40 @@
     };
   }
 
+  function cloneBalls(){
+    if(stageMode === "boss"){
+      if(boss){
+        boss.hp = Math.max(0, boss.hp - 2);
+        boss.flash = 1;
+        burst(boss.x + boss.w/2, boss.y + boss.h/2, "⭐", 12);
+        if(boss.hp <= 0){
+          score += 120;
+          boss = null;
+          goNextStage();
+        }
+      }
+      return;
+    }
+
+    const active = balls.filter(b => !b.stuck);
+    if(!active.length) return;
+    const base = active[0];
+    while(balls.length < 3){
+      const angle = balls.length === 1 ? -0.72 : 0.72;
+      const speed = Math.max(currentPerks().launchSpeed, Math.hypot(base.vx, base.vy));
+      balls.push({
+        x: base.x,
+        y: base.y,
+        vx: Math.sin(angle) * speed,
+        vy: -Math.cos(angle) * speed,
+        r: 9,
+        trail:[],
+        stuck:false,
+        stuckOffsetX:0
+      });
+    }
+  }
+
   function resetBalls(single=false){
     balls = [createBall()];
     if(single){
@@ -907,19 +1006,18 @@
     }
   }
 
-  function stagePattern(stageNum, r, c, rows, cols){
-    const p = (stageNum - 1) % 8;
+  function stagePattern(variant, r, c, rows, cols){
     const centerR = (rows - 1) / 2;
     const centerC = (cols - 1) / 2;
     const dr = Math.abs(r - centerR);
     const dc = Math.abs(c - centerC);
 
-    switch(p){
+    switch(variant){
       case 0: return true;
       case 1: return (r + c) % 2 === 0 || r < 2;
       case 2: return !(r >= 1 && r <= rows - 2 && c === Math.floor(cols/2));
       case 3: return c <= (r % cols);
-      case 4: return dr + dc <= 2.5;
+      case 4: return dr + dc <= 2.6;
       case 5: return (r % 2 === 0 ? c < cols - 1 : c > 0);
       case 6: return r === 0 || r === rows - 1 || c === 0 || c === cols - 1 || (dr <= 0.5 && dc <= 1.5);
       case 7: return c !== Math.floor(cols/2) || r === 0 || r === rows - 1;
@@ -929,11 +1027,13 @@
 
   function createStageBlocks(stageNum){
     boss = null;
-    invaders = null;
     blocks = [];
+    items = [];
+    playerShots = [];
+    stageVariant = randInt(0, 7);
 
     const cols = 4;
-    const rows = 6;
+    const rows = randInt(5, 6);
     const gapX = 10;
     const gapY = 9;
     const innerPad = 12;
@@ -948,7 +1048,7 @@
     let idx = 0;
     for(let r=0; r<rows; r++){
       for(let c=0; c<cols; c++){
-        if(stagePattern(stageNum, r, c, rows, cols)) candidateIndices.push(idx);
+        if(stagePattern(stageVariant, r, c, rows, cols)) candidateIndices.push(idx);
         idx++;
       }
     }
@@ -963,17 +1063,18 @@
     const strong2Set = new Set(candidateIndices.slice(wallCount + strong3Count, wallCount + strong3Count + strong2Count));
 
     idx = 0;
-    let wordShift = stageNum * 5;
+    const wordShift = stageNum * 5 + randInt(0, WORDS.length - 1);
+
     for(let r=0; r<rows; r++){
       for(let c=0; c<cols; c++){
-        if(!stagePattern(stageNum, r, c, rows, cols)){
+        if(!stagePattern(stageVariant, r, c, rows, cols)){
           idx++;
           continue;
         }
 
         let hp = 1;
         let label = WORDS[(idx + wordShift) % WORDS.length];
-        let color = COLORS[(idx + stageNum) % COLORS.length];
+        let color = COLORS[(idx + stageNum + stageVariant) % COLORS.length];
 
         if(wallSet.has(idx)){
           hp = Infinity;
@@ -1002,52 +1103,10 @@
     }
   }
 
-  function createInvaderStage(stageNum){
-    boss = null;
-    blocks = [];
-    items = [];
-
-    const cols = 5;
-    const rows = 4;
-    const gapX = 10;
-    const gapY = 10;
-    const iw = Math.min(54, (field.w - 40 - gapX * (cols - 1)) / cols);
-    const ih = 28;
-
-    let enemies = [];
-    for(let r=0; r<rows; r++){
-      for(let c=0; c<cols; c++){
-        const hp = r === 0 && stageNum >= 7 ? 2 : 1;
-        enemies.push({
-          ox:c * (iw + gapX),
-          oy:r * (ih + gapY),
-          w:iw,
-          h:ih,
-          hp,
-          maxHp:hp,
-          alive:true,
-          label: r % 2 === 0 ? "👾" : "🛸",
-          color: COLORS[(r + c + stageNum) % COLORS.length]
-        });
-      }
-    }
-
-    invaders = {
-      x: field.x + 20,
-      y: field.y + 18,
-      w: cols * iw + gapX * (cols - 1),
-      h: rows * ih + gapY * (rows - 1),
-      dir:1,
-      speed:1.25 + stageNum * 0.05,
-      drop:16,
-      enemies
-    };
-  }
-
   function createBoss(stageNum){
     blocks = [];
-    invaders = null;
     items = [];
+    playerShots = [];
     const maxHp = 12 + stageNum * 2;
     boss = {
       x: field.x + field.w/2 - 52,
@@ -1077,20 +1136,6 @@
     }
   }
 
-  function burst(x, y, emoji="✨", count=8){
-    for(let i=0; i<count; i++){
-      const a = Math.random() * Math.PI * 2;
-      const s = Math.random() * 3 + 1;
-      particles.push({
-        x, y,
-        vx: Math.cos(a) * s,
-        vy: Math.sin(a) * s - 0.5,
-        life: 1,
-        emoji
-      });
-    }
-  }
-
   function startCatDash(){
     const now = performance.now();
     catDash.active = true;
@@ -1102,8 +1147,14 @@
   }
 
   function spawnItem(x, y){
-    if(Math.random() > 0.34) return;
-    const data = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+    if(Math.random() > 0.48) return;
+
+    let pool = [
+      "gauge","score","heal","big","rapid","clone"
+    ];
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const data = ITEM_TYPES.find(v => v.type === pick);
+
     items.push({
       x, y,
       vx:(Math.random() - 0.5) * 1.1,
@@ -1111,12 +1162,13 @@
       r:14,
       type:data.type,
       emoji:data.emoji,
-      label:data.label,
-      life:1
+      label:data.label
     });
   }
 
   function applyItem(type){
+    worldFlash = Math.max(worldFlash, 0.12);
+
     if(type === "gauge"){
       addSkill(26);
       showMessage("ゲージUP!", 480);
@@ -1128,11 +1180,26 @@
     if(type === "heal"){
       lives = Math.min(5, lives + 1);
       say("たすかったにゃ", 520);
+      showMessage("LIFE+", 440);
     }
     if(type === "big"){
       paddleBoostUntil = performance.now() + 5200 * currentPerks().bigDurationMult;
       showMessage("BIG!", 450);
     }
+    if(type === "rapid"){
+      rapidUntil = performance.now() + 6200;
+      rapidShotCooldown = 0;
+      showMessage("RAPID!", 500);
+      say("どどどっ!", 500);
+    }
+    if(type === "clone"){
+      cloneBalls();
+      showMessage("分身!", 500);
+      say("ふえたにゃ!", 520);
+    }
+
+    burst(paddle.x + paddle.w/2, paddle.y - 8, "✨", 14);
+    addRing(paddle.x + paddle.w/2, paddle.y - 8, "rgba(255,255,190,.9)", 56, 4);
     updateHud();
   }
 
@@ -1148,12 +1215,14 @@
       playMeow();
       say("にゃーー!", 600);
       showMessage("猫ラッシュ!", 800);
+      worldFlash = Math.max(worldFlash, 0.18);
 
       if(stageMode === "boss"){
         if(boss){
           boss.hp = Math.max(0, boss.hp - 5);
           boss.flash = 1;
-          burst(boss.x + boss.w/2, boss.y + boss.h/2, "🐾", 14);
+          burst(boss.x + boss.w/2, boss.y + boss.h/2, "🐾", 18);
+          addRing(boss.x + boss.w/2, boss.y + boss.h/2, "rgba(255,230,160,.95)", 78, 5);
           if(boss.hp <= 0){
             score += 120;
             boss = null;
@@ -1180,6 +1249,7 @@
       playTap(700);
       say("ぺたっ!", 520);
       showMessage("3回まで吸着!", 700);
+      addRing(paddle.x + paddle.w/2, paddle.y - 6, "rgba(160,160,255,.95)", 60, 5);
     }
 
     if(type === "big"){
@@ -1187,6 +1257,7 @@
       playTap(300);
       say("どーん!", 520);
       showMessage("BIG PAD!", 700);
+      addRing(paddle.x + paddle.w/2, paddle.y - 6, "rgba(255,214,112,.95)", 68, 5);
     }
 
     updateHud();
@@ -1194,14 +1265,17 @@
 
   function stageKind(stageNum){
     if(stageNum % 5 === 0) return "boss";
-    return Math.random() < 0.38 ? "invader" : "breakout";
+    return "breakout";
   }
 
   function loadStage(s){
     catDash.active = false;
     magnetUntil = 0;
     magnetCharges = 0;
+    rapidUntil = 0;
+    rapidShotCooldown = 0;
     items = [];
+    playerShots = [];
 
     stageMode = stageKind(s);
     if(stageMode === "boss"){
@@ -1209,15 +1283,11 @@
       createBoss(s);
       showMessage(`BOSS ${s}`, 850);
       say("ボスにゃ!", 700);
-    } else if(stageMode === "invader"){
-      resetBalls();
-      createInvaderStage(s);
-      showMessage(`INVADER ${s}`, 850);
-      say("インベーダーにゃ", 700);
     } else {
       resetBalls();
       createStageBlocks(s);
       showMessage(`STAGE ${s}`, 700);
+      say(s === 1 ? "ランダムにゃ!" : "いくにゃ!", 520);
     }
 
     paddle.x = field.x + field.w / 2 - paddle.w / 2;
@@ -1238,12 +1308,17 @@
     pointerX = field.x + field.w / 2;
     shake = 0;
     damageFlash = 0;
+    worldFlash = 0;
     particles = [];
     items = [];
+    playerShots = [];
+    rings = [];
     catDash.active = false;
     paddleBoostUntil = 0;
     magnetUntil = 0;
     magnetCharges = 0;
+    rapidUntil = 0;
+    rapidShotCooldown = 0;
 
     paddle.w = currentPerks().basePaddle;
     paddle.h = 18;
@@ -1277,6 +1352,7 @@
     }
 
     resetBalls(stageMode === "boss");
+    playerShots = [];
     if(boss) boss.beam = null;
     showMessage("もういっかい!", 700);
     say("ふにゃ…", 520);
@@ -1411,6 +1487,11 @@
     roundRectPath(field.x, field.y, field.w, field.h, 26);
     ctx.stroke();
 
+    if(worldFlash > 0){
+      ctx.fillStyle = `rgba(255,255,255,${worldFlash * 0.22})`;
+      ctx.fillRect(0,0,W,H);
+    }
+
     if(damageFlash > 0){
       ctx.fillStyle = `rgba(255,80,90,${0.22 * damageFlash})`;
       ctx.fillRect(0,0,W,H);
@@ -1443,30 +1524,6 @@
         ctx.fillStyle = "#fff";
         ctx.font = "bold 10px sans-serif";
         ctx.fillText("∞", b.x + b.w - 10, b.y + 10);
-      }
-    }
-  }
-
-  function drawInvaders(){
-    if(!invaders) return;
-    for(const e of invaders.enemies){
-      if(!e.alive) continue;
-      const x = invaders.x + e.ox;
-      const y = invaders.y + e.oy;
-      roundRectPath(x, y, e.w, e.h, 10);
-      ctx.fillStyle = e.color;
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.45)";
-      ctx.stroke();
-      ctx.fillStyle = "#6f2858";
-      ctx.font = "bold 18px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(e.label, x + e.w/2, y + e.h/2 + 1);
-      if(e.hp > 1){
-        ctx.fillStyle = "#7c2b59";
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillText(String(e.hp), x + e.w - 10, y + 10);
       }
     }
   }
@@ -1576,12 +1633,21 @@
   }
 
   function drawPaddle(){
+    const theme = paddleTheme();
     const g = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.h);
-    g.addColorStop(0, "#fff3a5");
-    g.addColorStop(1, "#ffbd52");
+    g.addColorStop(0, theme.top);
+    g.addColorStop(1, theme.bottom);
     roundRectPath(paddle.x, paddle.y, paddle.w, paddle.h, 12);
     ctx.fillStyle = g;
     ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.7)";
+    ctx.stroke();
+
+    ctx.fillStyle = theme.accent;
+    ctx.globalAlpha = 0.26;
+    roundRectPath(paddle.x + 8, paddle.y + 3, paddle.w - 16, 5, 8);
+    ctx.fill();
+    ctx.globalAlpha = 1;
 
     ctx.fillStyle = "#6f2858";
     ctx.font = "22px sans-serif";
@@ -1618,7 +1684,7 @@
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for(const item of items){
-      ctx.fillStyle = "rgba(255,255,255,.9)";
+      ctx.fillStyle = "rgba(255,255,255,.92)";
       ctx.beginPath();
       ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
       ctx.fill();
@@ -1627,6 +1693,32 @@
       ctx.font = "18px sans-serif";
       ctx.fillText(item.emoji, item.x, item.y + 1);
     }
+  }
+
+  function drawPlayerShots(){
+    for(const s of playerShots){
+      const grad = ctx.createLinearGradient(s.x, s.y, s.x, s.y + 20);
+      grad.addColorStop(0, "rgba(255,255,255,.95)");
+      grad.addColorStop(1, "rgba(255,122,190,.05)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(s.x - 2.8, s.y - 16, 5.6, 20);
+      ctx.fillStyle = "#fff2a3";
+      ctx.beginPath();
+      ctx.arc(s.x, s.y - 16, 3.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawRings(){
+    for(const r of rings){
+      ctx.globalAlpha = r.life;
+      ctx.strokeStyle = r.color;
+      ctx.lineWidth = r.line;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
   }
 
   function drawParticles(){
@@ -1704,22 +1796,6 @@
     ctx.restore();
   }
 
-  function updateInvaders(dt){
-    if(!invaders) return;
-    invaders.x += invaders.dir * invaders.speed * dt * 60;
-    const left = invaders.x;
-    const right = invaders.x + invaders.w;
-    if(left < field.x + 10 || right > field.x + field.w - 10){
-      invaders.dir *= -1;
-      invaders.x = Math.max(field.x + 10, Math.min(field.x + field.w - invaders.w - 10, invaders.x));
-      invaders.y += invaders.drop;
-    }
-    if(invaders.y + invaders.h > paddle.y - 26){
-      lives = 0;
-      endGame(false);
-    }
-  }
-
   function updateBoss(dt){
     if(!boss) return;
 
@@ -1756,7 +1832,8 @@
         const paddleHit = bx >= paddle.x && bx <= paddle.x + paddle.w;
         if(paddleHit && !boss.beam.hit){
           boss.beam.hit = true;
-          burst(bx, paddle.y, "💥", 7);
+          burst(bx, paddle.y, "💥", 10);
+          addRing(bx, paddle.y, "rgba(255,120,160,.95)", 70, 5);
           loseLife();
           return;
         }
@@ -1768,11 +1845,14 @@
     playTap(620);
     playPaddleNyah();
     say("ニヤッ!", 360);
+    worldFlash = Math.max(worldFlash, 0.08);
+    shake = Math.max(shake, 3.5);
 
     if(magnetCharges > 0 && now < magnetUntil){
       ball.stuck = true;
       ball.stuckOffsetX = Math.max(ball.r, Math.min(paddle.w - ball.r, ball.x - paddle.x));
       magnetCharges--;
+      burst(ball.x, paddle.y, "🧲", 9);
       updateHud();
       return true;
     }
@@ -1785,7 +1865,8 @@
     ball.vx = hit * nextSpeed * 0.92;
     ball.vy = -Math.sqrt(Math.max(minSpeed * minSpeed * 0.9, nextSpeed * nextSpeed - ball.vx * ball.vx));
 
-    burst(ball.x, paddle.y, "🐾", 5);
+    burst(ball.x, paddle.y, "🐾", 9);
+    addRing(ball.x, paddle.y, "rgba(255,240,180,.95)", 48, 4);
     return false;
   }
 
@@ -1820,9 +1901,78 @@
       }
       const got = it.x + it.r > paddle.x && it.x - it.r < paddle.x + paddle.w && it.y + it.r > paddle.y && it.y - it.r < paddle.y + paddle.h;
       if(got){
-        burst(it.x, it.y, it.emoji, 6);
+        burst(it.x, it.y, it.emoji, 10);
         applyItem(it.type);
         items.splice(i, 1);
+      }
+    }
+  }
+
+  function spawnPlayerShot(){
+    const theme = paddleTheme();
+    const px = paddle.x + paddle.w/2 + rand(-paddle.w * 0.24, paddle.w * 0.24);
+    playerShots.push({ x:px, y:paddle.y - 4, vy:-10.5, col:theme.accent });
+    playTap(980);
+  }
+
+  function updatePlayerShots(dt){
+    for(let i=playerShots.length - 1; i>=0; i--){
+      const s = playerShots[i];
+      s.y += s.vy * dt * 60;
+
+      if(s.y < field.y - 26){
+        playerShots.splice(i, 1);
+        continue;
+      }
+
+      if(stageMode === "boss" && boss){
+        const rect = { x:boss.x, y:boss.y, w:boss.w, h:boss.h };
+        if(s.x > rect.x && s.x < rect.x + rect.w && s.y > rect.y && s.y < rect.y + rect.h){
+          boss.hp -= 1;
+          boss.flash = 1;
+          score += 4;
+          addSkill(2);
+          burst(s.x, s.y, "💥", 8);
+          worldFlash = Math.max(worldFlash, 0.08);
+          playerShots.splice(i, 1);
+
+          if(boss.hp <= 0){
+            score += 120;
+            boss = null;
+            goNextStage();
+            return;
+          }
+          continue;
+        }
+      } else {
+        let hit = false;
+        for(const b of blocks){
+          if(!b.alive) continue;
+          if(s.x < b.x || s.x > b.x + b.w || s.y < b.y || s.y > b.y + b.h) continue;
+
+          if(!Number.isFinite(b.hp)){
+            burst(s.x, s.y, "💥", 5);
+            playerShots.splice(i, 1);
+            hit = true;
+            break;
+          }
+
+          b.hp -= 1;
+          score += b.maxHp >= 3 ? 8 : b.maxHp === 2 ? 6 : 5;
+          addSkill(2);
+          burst(s.x, s.y, "✨", 8);
+          worldFlash = Math.max(worldFlash, 0.06);
+
+          if(b.hp <= 0){
+            b.alive = false;
+            spawnItem(b.x + b.w/2, b.y + b.h/2);
+          }
+
+          playerShots.splice(i, 1);
+          hit = true;
+          break;
+        }
+        if(hit) continue;
       }
     }
   }
@@ -1835,6 +1985,15 @@
       p.vy += 0.03 * dt * 60;
       p.life -= 0.03 * dt * 60;
       if(p.life <= 0) particles.splice(i, 1);
+    }
+  }
+
+  function updateRings(dt){
+    for(let i=rings.length - 1; i>=0; i--){
+      const r = rings[i];
+      r.r += (r.maxR - r.r) * 0.18;
+      r.life -= dt * 2.1;
+      if(r.life <= 0) rings.splice(i, 1);
     }
   }
 
@@ -1865,9 +2024,18 @@
       }
     }
 
-    if(stageMode === "invader") updateInvaders(dt);
-    if(state !== "playing") return;
     if(stageMode === "boss") updateBoss(dt);
+    if(state !== "playing") return;
+
+    if(now < rapidUntil){
+      rapidShotCooldown -= dt;
+      while(rapidShotCooldown <= 0){
+        rapidShotCooldown += 0.16;
+        spawnPlayerShot();
+      }
+    }
+
+    updatePlayerShots(dt);
     if(state !== "playing") return;
 
     for(let i=balls.length - 1; i>=0; i--){
@@ -1919,7 +2087,9 @@
           boss.flash = 1;
           score += 16;
           addSkill(6);
-          burst(ball.x, ball.y, "⭐", 7);
+          burst(ball.x, ball.y, "⭐", 12);
+          worldFlash = Math.max(worldFlash, 0.08);
+          shake = Math.max(shake, 4.8);
           playTap(920);
           reflectBall(ball, rect);
           if(boss.hp <= 0){
@@ -1936,28 +2106,8 @@
           if(ball.x + ball.r > bx - 7 && ball.x - ball.r < bx + 7 && ball.y > boss.y + boss.h - 8){
             ball.vy *= -1;
             ball.vx *= 0.96;
+            burst(ball.x, ball.y, "⚡", 7);
           }
-        }
-      } else if(stageMode === "invader" && invaders){
-        for(const e of invaders.enemies){
-          if(!e.alive) continue;
-          const rect = { x: invaders.x + e.ox, y: invaders.y + e.oy, w:e.w, h:e.h };
-          if(!hitRect(ball, rect)) continue;
-
-          e.hp -= 1;
-          score += e.maxHp > 1 ? 14 : 11;
-          addSkill(6);
-          burst(rect.x + rect.w/2, rect.y + rect.h/2, "✨", 7);
-          if(e.hp <= 0){
-            e.alive = false;
-            playTap(860);
-            spawnItem(rect.x + rect.w/2, rect.y + rect.h/2);
-          } else {
-            playTap(560);
-          }
-          reflectBall(ball, rect);
-          updateHud();
-          break;
         }
       } else {
         for(const b of blocks){
@@ -1966,7 +2116,8 @@
 
           if(!Number.isFinite(b.hp)){
             reflectBall(ball, b);
-            burst(b.x + b.w/2, b.y + b.h/2, "💥", 4);
+            burst(b.x + b.w/2, b.y + b.h/2, "💥", 6);
+            shake = Math.max(shake, 2.6);
             playTap(280);
             break;
           }
@@ -1974,12 +2125,15 @@
           b.hp -= 1;
           score += b.maxHp >= 3 ? 14 : b.maxHp === 2 ? 12 : 10;
           addSkill(6);
-          burst(b.x + b.w/2, b.y + b.h/2, "✨", 7);
+          burst(b.x + b.w/2, b.y + b.h/2, "✨", 10);
+          worldFlash = Math.max(worldFlash, 0.06);
+          shake = Math.max(shake, 2.8);
 
           if(b.hp <= 0){
             b.alive = false;
             playTap(860);
             spawnItem(b.x + b.w/2, b.y + b.h/2);
+            burst(b.x + b.w/2, b.y + b.h/2, "💫", 12);
           } else {
             playTap(560);
           }
@@ -2013,22 +2167,18 @@
       }
     }
 
-    if(stageMode === "invader" && invaders){
-      const remaining = invaders.enemies.some(e => e.alive);
-      if(!remaining){
-        goNextStage();
-        return;
-      }
-    }
-
     updateItems(dt);
     updateParticles(dt);
+    updateRings(dt);
 
     if(shake > 0.08) shake *= 0.88;
     else shake = 0;
 
     if(damageFlash > 0.02) damageFlash *= 0.88;
     else damageFlash = 0;
+
+    if(worldFlash > 0.01) worldFlash *= 0.86;
+    else worldFlash = 0;
 
     updateMusic(dt);
     updateHud();
@@ -2041,11 +2191,12 @@
     }
     drawBackground();
     if(stageMode === "boss") drawBoss();
-    else if(stageMode === "invader") drawInvaders();
     else drawBlocks();
     drawItems();
+    drawPlayerShots();
     drawPaddle();
     drawBalls();
+    drawRings();
     drawParticles();
     ctx.restore();
     drawCatDash();
