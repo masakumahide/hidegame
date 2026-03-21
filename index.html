@@ -70,11 +70,11 @@
   }
 
   .panel{
-    min-width:118px;
+    min-width:108px;
     padding:10px 14px;
     border-radius:18px;
-    background:rgba(255,255,255,.52);
-    border:1px solid rgba(255,255,255,.85);
+    background:rgba(255,255,255,.54);
+    border:1px solid rgba(255,255,255,.88);
     box-shadow:var(--shadow);
     backdrop-filter:blur(6px);
   }
@@ -95,16 +95,17 @@
 
   #catBadge{
     position:absolute;
-    right:12px;
-    top:108px;
-    width:76px;
-    height:76px;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    width:86px;
+    height:86px;
     border-radius:50%;
     overflow:hidden;
-    border:3px solid rgba(255,255,255,.95);
+    border:4px solid rgba(255,255,255,.95);
     background:rgba(255,255,255,.25);
-    box-shadow:var(--shadow);
-    z-index:21;
+    box-shadow:0 10px 24px rgba(255,90,165,.25);
+    z-index:25;
   }
 
   #catBadge img{
@@ -120,7 +121,20 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:36px;
+    font-size:40px;
+  }
+
+  #catTalk{
+    position:absolute;
+    top:100px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:26;
+    font-size:13px;
+    font-weight:900;
+    color:#fff6a8;
+    text-shadow:0 2px 8px rgba(0,0,0,.25);
+    white-space:nowrap;
   }
 
   #catSkillBadge{
@@ -162,20 +176,9 @@
     font-size:30px;
   }
 
-  #catTalk{
-    position:absolute;
-    right:10px;
-    top:188px;
-    z-index:21;
-    font-size:13px;
-    font-weight:900;
-    color:#fff6a8;
-    text-shadow:0 2px 8px rgba(0,0,0,.25);
-  }
-
   #message{
     position:absolute;
-    top:34%;
+    top:35%;
     left:50%;
     transform:translateX(-50%);
     z-index:25;
@@ -348,13 +351,6 @@
     color:#8f5377;
     margin-top:4px;
   }
-
-  .tiny{
-    font-size:11px;
-    line-height:1.5;
-    color:#8f5377;
-    margin-top:10px;
-  }
 </style>
 </head>
 <body>
@@ -421,6 +417,7 @@
   const message = document.getElementById("message");
   const catTalk = document.getElementById("catTalk");
   const overlay = document.getElementById("overlay");
+  const catBadge = document.getElementById("catBadge");
   const catBadgeImg = document.getElementById("catBadgeImg");
   const catSkillImg = document.getElementById("catSkillImg");
   const catBadgeFallback = document.getElementById("catBadgeFallback");
@@ -528,13 +525,15 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v3") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v4") || 0);
 
   let touchX = 0;
   let shake = 0;
   let damageFlash = 0;
   let lastTime = 0;
-  let lastPaddleMeow = 0;
+  let lastPaddleVoice = 0;
+  let paddleVoiceFlip = false;
+  let sayLockUntil = 0;
 
   let paddle = { x:0, y:0, w:116, h:18 };
   let balls = [];
@@ -629,7 +628,7 @@
     osc.stop(now + 0.35);
   }
 
-  function playPaddleMeow(){
+  function playPaddleNyah(){
     if(!audioCtx) return;
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
@@ -646,6 +645,23 @@
     osc.stop(now + 0.14);
   }
 
+  function playPaddleAooon(){
+    if(!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(260, now + 0.18);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.03, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.24);
+  }
+
   const CANON = [
     [62,66,69],[57,61,64],[59,62,66],[54,57,61],
     [55,59,62],[62,66,69],[55,59,62],[57,61,64]
@@ -654,22 +670,25 @@
   function tickMusic(){
     if(!audioCtx || state !== "playing") return;
 
-    // 16分っぽいトランス感
     const chord = CANON[Math.floor(musicStep / 8) % CANON.length];
     const stepInChord = musicStep % 8;
     const t = audioCtx.currentTime + 0.01;
 
     const arpPattern = [0,1,2,1,2,1,0,1];
     const arpNote = chord[arpPattern[stepInChord]] + 12;
-    playTone(t, midiToFreq(arpNote), 0.10, "square", 0.012);
-
-    if(stepInChord === 1 || stepInChord === 3 || stepInChord === 5 || stepInChord === 7){
-      playTone(t, 4200, 0.03, "square", 0.006);
-    }
+    playTone(t, midiToFreq(arpNote), 0.09, "square", 0.011);
 
     if(stepInChord === 0 || stepInChord === 4){
-      playTone(t, midiToFreq(chord[0] - 24), 0.18, "sine", 0.045);
-      playTone(t, midiToFreq(chord[0] - 12), 0.10, "triangle", 0.012);
+      playTone(t, midiToFreq(chord[0] - 24), 0.20, "sine", 0.042);
+      playTone(t, midiToFreq(chord[0] - 12), 0.08, "triangle", 0.010);
+    }
+
+    if(stepInChord === 2 || stepInChord === 6){
+      playTone(t, 4200, 0.025, "square", 0.006);
+    }
+
+    if(stepInChord === 7){
+      playTone(t, midiToFreq(chord[2] + 19), 0.08, "triangle", 0.008);
     }
 
     musicStep++;
@@ -680,7 +699,7 @@
     stopMusic();
     musicStep = 0;
     tickMusic();
-    musicTimer = setInterval(tickMusic, 110);
+    musicTimer = setInterval(tickMusic, 105);
   }
 
   function stopMusic(){
@@ -699,18 +718,54 @@
     }, ms);
   }
 
-  function say(text){
+  function say(text, ms=850){
     catTalk.textContent = text;
+    sayLockUntil = performance.now() + ms;
     clearTimeout(say._timer);
     say._timer = setTimeout(() => {
       catTalk.textContent = "にゃっ";
-    }, 800);
+    }, ms);
+  }
+
+  function updateCatReaction(){
+    if(performance.now() < sayLockUntil) return;
+
+    let text = "にゃっ";
+    let glow = "0 10px 24px rgba(255,90,165,.25)";
+    let scale = 1;
+
+    if(state === "title"){
+      text = "まってるにゃ";
+    } else if(state !== "playing"){
+      text = "おつかれにゃ";
+    } else if(performance.now() < catRushUntil){
+      text = "ラッシュ!";
+      glow = "0 12px 28px rgba(255,216,77,.55)";
+      scale = 1.08;
+    } else if(score >= 1800){
+      text = "伝説にゃ";
+      glow = "0 12px 28px rgba(255,216,77,.55)";
+      scale = 1.08;
+    } else if(score >= 1000){
+      text = "強いにゃ!";
+      glow = "0 12px 26px rgba(126,255,211,.55)";
+      scale = 1.04;
+    } else if(score >= 500){
+      text = "いい感じにゃ";
+      glow = "0 10px 24px rgba(126,255,211,.4)";
+    } else if(score >= 150){
+      text = "やるにゃ";
+    }
+
+    catTalk.textContent = text;
+    catBadge.style.boxShadow = glow;
+    catBadge.style.transform = `translateX(-50%) scale(${scale})`;
   }
 
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v3", String(best));
+      localStorage.setItem("hidecat_fun_best_v4", String(best));
     }
   }
 
@@ -722,6 +777,7 @@
     skillFill.style.width = `${Math.max(0, Math.min(100, skill))}%`;
     skillBtn.classList.toggle("disabled", !(state === "playing" && skill >= 100));
     catSkillBadge.classList.toggle("show", performance.now() < catRushUntil || dashFx.active);
+    updateCatReaction();
   }
 
   function createBall(vx = null){
@@ -760,14 +816,14 @@
     const dc = Math.abs(c - centerC);
 
     switch(p){
-      case 0: return true; // full
-      case 1: return (r + c) % 2 === 0 || r < 2; // checker
-      case 2: return !(r >= 1 && r <= rows - 2 && c === Math.floor(cols/2)); // tunnel
-      case 3: return c <= (r % cols); // stairs
-      case 4: return dr + dc <= 2.5; // diamond
-      case 5: return (r % 2 === 0 ? c < cols - 1 : c > 0); // zigzag walls
-      case 6: return r === 0 || r === rows - 1 || c === 0 || c === cols - 1 || (dr <= 0.5 && dc <= 1.5); // fortress
-      case 7: return c !== Math.floor(cols/2) || r === 0 || r === rows - 1; // split
+      case 0: return true;
+      case 1: return (r + c) % 2 === 0 || r < 2;
+      case 2: return !(r >= 1 && r <= rows - 2 && c === Math.floor(cols/2));
+      case 3: return c <= (r % cols);
+      case 4: return dr + dc <= 2.5;
+      case 5: return (r % 2 === 0 ? c < cols - 1 : c > 0);
+      case 6: return r === 0 || r === rows - 1 || c === 0 || c === cols - 1 || (dr <= 0.5 && dc <= 1.5);
+      case 7: return c !== Math.floor(cols/2) || r === 0 || r === rows - 1;
       default: return true;
     }
   }
@@ -775,18 +831,18 @@
   function createStageBlocks(stageNum){
     boss = null;
     blocks = [];
-    const cols = 5;
-    const rows = 6;
-    const marginX = 16;
-    const gapX = 10;
+    const cols = 4;
+    const rows = 7;
+    const marginX = 18;
+    const gapX = 12;
     const gapY = 10;
-    const top = 120;
+    const top = 140;
     const bw = (W - marginX * 2 - gapX * (cols - 1)) / cols;
-    const bh = 30;
+    const bh = 28;
 
-    const strong2Count = Math.min(2 + Math.floor(stageNum / 2), 8);
-    const strong3Count = Math.min(Math.floor(stageNum / 4), 6);
-    const wallCount = stageNum >= 3 ? Math.min(1 + Math.floor((stageNum - 3) / 3), 4) : 0;
+    const strong2Count = Math.min(2 + Math.floor(stageNum / 2), 10);
+    const strong3Count = Math.min(Math.floor(stageNum / 4), 8);
+    const wallCount = stageNum >= 3 ? Math.min(1 + Math.floor((stageNum - 3) / 3), 5) : 0;
 
     let candidateIndices = [];
     let idx = 0;
@@ -809,7 +865,7 @@
     const strong2Set = new Set(candidateIndices.slice(wallCount + strong3Count, wallCount + strong3Count + strong2Count));
 
     idx = 0;
-    let wordShift = stageNum * 3;
+    let wordShift = stageNum * 5;
 
     for(let r=0; r<rows; r++){
       for(let c=0; c<cols; c++){
@@ -859,7 +915,7 @@
     const maxHp = 18 + stageNum * 3;
     boss = {
       x: W/2 - 52,
-      y: 130,
+      y: 150,
       w: 104,
       h: 74,
       hp: maxHp,
@@ -874,7 +930,7 @@
 
   function buildStars(){
     stars = [];
-    for(let i=0; i<36; i++){
+    for(let i=0; i<44; i++){
       stars.push({
         x: Math.random() * W,
         y: Math.random() * H,
@@ -1090,21 +1146,21 @@
     ctx.globalAlpha = 1;
 
     if(catReady){
-      const frameX = 18;
-      const frameY = 120;
-      const frameW = W - 36;
-      const frameH = H * 0.46;
+      const frameX = 20;
+      const frameY = 132;
+      const frameW = W - 40;
+      const frameH = H * 0.56;
 
       ctx.save();
       ctx.globalAlpha = 0.34;
-      roundRectPath(frameX, frameY, frameW, frameH, 24);
+      roundRectPath(frameX, frameY, frameW, frameH, 26);
       ctx.clip();
       drawImageCover(catImg, frameX, frameY, frameW, frameH);
       ctx.restore();
 
       ctx.strokeStyle = "rgba(255,255,255,.58)";
       ctx.lineWidth = 2;
-      roundRectPath(frameX, frameY, frameW, frameH, 24);
+      roundRectPath(frameX, frameY, frameW, frameH, 26);
       ctx.stroke();
     }
 
@@ -1163,10 +1219,10 @@
     ctx.fillText("😾", boss.x + boss.w/2, boss.y + boss.h/2 + 2);
 
     const barW = W - 60;
-    roundRectPath(30, 90, barW, 12, 8);
+    roundRectPath(30, 130, barW, 12, 8);
     ctx.fillStyle = "rgba(255,255,255,.3)";
     ctx.fill();
-    roundRectPath(30, 90, barW * Math.max(0, boss.hp / boss.maxHp), 12, 8);
+    roundRectPath(30, 130, barW * Math.max(0, boss.hp / boss.maxHp), 12, 8);
     ctx.fillStyle = "#ff5d86";
     ctx.fill();
   }
@@ -1245,7 +1301,7 @@
 
     if(catReady){
       const s = 88;
-      const y = H * 0.5;
+      const y = H * 0.54;
       ctx.save();
       ctx.beginPath();
       ctx.arc(dashFx.x + s/2, y, s/2, 0, Math.PI * 2);
@@ -1254,7 +1310,7 @@
       ctx.restore();
     } else {
       ctx.font = "72px sans-serif";
-      ctx.fillText("🐱", dashFx.x + 40, H * 0.5);
+      ctx.fillText("🐱", dashFx.x + 40, H * 0.54);
     }
     ctx.restore();
   }
@@ -1352,10 +1408,16 @@
         burst(ball.x, paddle.y, "🐾", 5);
         playTap(620);
 
-        if(now - lastPaddleMeow > 130){
-          playPaddleMeow();
-          say("ニャッ!");
-          lastPaddleMeow = now;
+        if(now - lastPaddleVoice > 130){
+          if(paddleVoiceFlip){
+            playPaddleAooon();
+            say("アオーン!", 500);
+          } else {
+            playPaddleNyah();
+            say("ニャッ!", 420);
+          }
+          paddleVoiceFlip = !paddleVoiceFlip;
+          lastPaddleVoice = now;
         }
       }
 
