@@ -70,7 +70,7 @@
   }
 
   .panel{
-    min-width:112px;
+    min-width:118px;
     padding:10px 14px;
     border-radius:18px;
     background:rgba(255,255,255,.52);
@@ -123,28 +123,37 @@
     font-size:36px;
   }
 
-  #catMini{
+  #catSkillBadge{
     position:absolute;
     left:14px;
     bottom:98px;
-    width:60px;
-    height:60px;
+    width:64px;
+    height:64px;
     border-radius:50%;
     overflow:hidden;
     border:3px solid rgba(255,255,255,.95);
-    background:rgba(255,255,255,.28);
+    background:rgba(255,255,255,.25);
     box-shadow:var(--shadow);
     z-index:21;
+    opacity:0;
+    transform:scale(.8);
+    transition:opacity .18s ease, transform .18s ease;
+    pointer-events:none;
   }
 
-  #catMini img{
+  #catSkillBadge.show{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  #catSkillBadge img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:none;
   }
 
-  #catMiniFallback{
+  #catSkillFallback{
     width:100%;
     height:100%;
     display:flex;
@@ -304,6 +313,42 @@
     box-shadow:0 4px 0 #b81f69, 0 8px 12px rgba(0,0,0,.14);
   }
 
+  .charGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin:16px 0 12px;
+  }
+
+  .charBtn{
+    border:none;
+    border-radius:20px;
+    padding:14px 10px;
+    background:rgba(255,255,255,.48);
+    border:2px solid rgba(255,255,255,.7);
+    color:var(--ink);
+    box-shadow:var(--shadow);
+    font:inherit;
+  }
+
+  .charBtn .emoji{
+    font-size:40px;
+    line-height:1.1;
+  }
+
+  .charBtn .name{
+    font-size:17px;
+    font-weight:900;
+    margin-top:4px;
+  }
+
+  .charBtn .skill{
+    font-size:11px;
+    line-height:1.45;
+    color:#8f5377;
+    margin-top:4px;
+  }
+
   .tiny{
     font-size:11px;
     line-height:1.5;
@@ -331,7 +376,7 @@
     <div class="col">
       <div class="panel">
         <div class="label">STAGE</div>
-        <div class="value" id="stageText">1 / 10</div>
+        <div class="value" id="stageText">1 / 20</div>
       </div>
       <div class="panel">
         <div class="label">BEST</div>
@@ -345,9 +390,9 @@
     <div id="catBadgeFallback">🐱</div>
   </div>
 
-  <div id="catMini">
-    <img id="catMiniImg" alt="cat">
-    <div id="catMiniFallback">🐱</div>
+  <div id="catSkillBadge">
+    <img id="catSkillImg" alt="cat">
+    <div id="catSkillFallback">🐱</div>
   </div>
 
   <div id="catTalk">にゃっ</div>
@@ -359,21 +404,7 @@
   </div>
   <button id="skillBtn" class="disabled">✨</button>
 
-  <div id="overlay">
-    <div class="card">
-      <div class="bigCat">🐱</div>
-      <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し DX</div>
-      <div class="sub">
-        猫背景、テンポ良し、必殺技あり。<br>
-        10面まであります。
-      </div>
-      <button class="btn" id="startBtn">スタート！</button>
-      <div class="tiny">
-        操作：画面を左右ドラッグ<br>
-        右下の ✨ は満タンで発動
-      </div>
-    </div>
-  </div>
+  <div id="overlay"></div>
 </div>
 
 <script>
@@ -391,20 +422,102 @@
   const catTalk = document.getElementById("catTalk");
   const overlay = document.getElementById("overlay");
   const catBadgeImg = document.getElementById("catBadgeImg");
-  const catMiniImg = document.getElementById("catMiniImg");
+  const catSkillImg = document.getElementById("catSkillImg");
   const catBadgeFallback = document.getElementById("catBadgeFallback");
-  const catMiniFallback = document.getElementById("catMiniFallback");
+  const catSkillFallback = document.getElementById("catSkillFallback");
+  const catSkillBadge = document.getElementById("catSkillBadge");
 
   const INK = "#6f2858";
-  const MAX_STAGE = 10;
+  const MAX_STAGE = 20;
   const WORDS = [
     "夢","仕事","健康","旅行","ダイエット","ポテチ","睡眠","散歩",
     "筋トレ","ラーメン","貯金","ごほうび","野菜","チョコ","読書","有休",
-    "温泉","締切","休日","猫"
+    "温泉","締切","休日","猫","会議","サボり","水","お菓子"
   ];
   const COLORS = [
     "#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff","#ffd4e5","#fff0b8"
   ];
+
+  const CHARACTERS = [
+    {
+      id:"hide",
+      emoji:"😄",
+      name:"ヒデ",
+      skillName:"キラキラ",
+      desc:"全ブロックに1ダメージ",
+      use(){
+        let hits = 0;
+        for (const b of blocks) {
+          if (!b.alive || !Number.isFinite(b.hp)) continue;
+          b.hp -= 1;
+          hits++;
+          burst(b.x + b.w/2, b.y + b.h/2, "✨", 5);
+          if (b.hp <= 0) {
+            b.alive = false;
+            score += 10;
+          }
+        }
+        if (hits > 0) {
+          say("キラッ");
+          showMessage("キラキラ!", 700);
+        }
+      }
+    },
+    {
+      id:"cat",
+      emoji:"🐱",
+      name:"ネコ",
+      skillName:"ねこラッシュ",
+      desc:"5秒強化 + 3ボール",
+      use(){
+        catRushUntil = performance.now() + 5000;
+        dashFx.active = true;
+        dashFx.x = -120;
+        dashFx.until = performance.now() + 700;
+
+        playMeow();
+        say("にゃーー!");
+        showMessage("ねこラッシュ!", 750);
+
+        for (const ball of balls) {
+          ball.pierceUntil = catRushUntil;
+          ball.vx *= 1.12;
+          ball.vy *= 1.12;
+        }
+        while (balls.length < 3) {
+          const extra = createBall(balls.length === 1 ? -5 : 5);
+          extra.pierceUntil = catRushUntil;
+          balls.push(extra);
+        }
+      }
+    },
+    {
+      id:"bear",
+      emoji:"🐻",
+      name:"クマ",
+      skillName:"どっしり",
+      desc:"パドル巨大化 8秒",
+      use(){
+        paddleBoostUntil = performance.now() + 8000;
+        say("どーん");
+        showMessage("BIG PAD!", 700);
+      }
+    },
+    {
+      id:"rabbit",
+      emoji:"🐰",
+      name:"ウサ",
+      skillName:"ぴょんスロー",
+      desc:"ゆっくり 5秒",
+      use(){
+        slowUntil = performance.now() + 5000;
+        say("ぴょん!");
+        showMessage("SLOW!", 700);
+      }
+    }
+  ];
+
+  let selectedChar = CHARACTERS[1];
 
   let W = 0;
   let H = 0;
@@ -415,19 +528,25 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v2") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v3") || 0);
 
   let touchX = 0;
   let shake = 0;
   let damageFlash = 0;
   let lastTime = 0;
+  let lastPaddleMeow = 0;
 
   let paddle = { x:0, y:0, w:116, h:18 };
   let balls = [];
   let blocks = [];
   let particles = [];
   let stars = [];
+  let boss = null;
+  let bossStages = new Set();
+
   let catRushUntil = 0;
+  let paddleBoostUntil = 0;
+  let slowUntil = 0;
   let dashFx = { active:false, x:-120, until:0 };
 
   let catImg = new Image();
@@ -444,13 +563,13 @@
     catImg.onload = () => {
       catReady = true;
       catBadgeImg.src = catImg.src;
-      catMiniImg.src = catImg.src;
+      catSkillImg.src = catImg.src;
       catBadgeImg.style.display = "block";
-      catMiniImg.style.display = "block";
+      catSkillImg.style.display = "block";
       catBadgeFallback.style.display = "none";
-      catMiniFallback.style.display = "none";
+      catSkillFallback.style.display = "none";
     };
-    catImg.onerror = () => loadCat(i+1);
+    catImg.onerror = () => loadCat(i + 1);
     catImg.src = CAT_CANDIDATES[i];
   }
 
@@ -472,12 +591,12 @@
     osc.type = type;
     osc.frequency.setValueAtTime(freq, time);
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.02);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start(time);
-    osc.stop(time + dur + 0.04);
+    osc.stop(time + dur + 0.03);
   }
 
   function playTap(freq=520){
@@ -500,7 +619,7 @@
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(680, now);
     osc.frequency.exponentialRampToValueAtTime(430, now + 0.16);
-    osc.frequency.exponentialRampToValueAtTime(520, now + 0.3);
+    osc.frequency.exponentialRampToValueAtTime(520, now + 0.30);
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.linearRampToValueAtTime(0.04, now + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.33);
@@ -510,6 +629,23 @@
     osc.stop(now + 0.35);
   }
 
+  function playPaddleMeow(){
+    if(!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(760, now);
+    osc.frequency.exponentialRampToValueAtTime(560, now + 0.08);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.028, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.14);
+  }
+
   const CANON = [
     [62,66,69],[57,61,64],[59,62,66],[54,57,61],
     [55,59,62],[62,66,69],[55,59,62],[57,61,64]
@@ -517,20 +653,24 @@
 
   function tickMusic(){
     if(!audioCtx || state !== "playing") return;
-    const chord = CANON[Math.floor(musicStep / 4) % CANON.length];
-    const beat = musicStep % 4;
+
+    // 16分っぽいトランス感
+    const chord = CANON[Math.floor(musicStep / 8) % CANON.length];
+    const stepInChord = musicStep % 8;
     const t = audioCtx.currentTime + 0.01;
 
-    if(beat === 0){
-      chord.forEach(n => playTone(t, midiToFreq(n), 0.42, "triangle", 0.014));
-      playTone(t, midiToFreq(chord[0] - 24), 0.24, "sine", 0.04);
-    }
-    if(beat === 2){
-      playTone(t, midiToFreq(chord[0] - 24), 0.18, "sine", 0.03);
+    const arpPattern = [0,1,2,1,2,1,0,1];
+    const arpNote = chord[arpPattern[stepInChord]] + 12;
+    playTone(t, midiToFreq(arpNote), 0.10, "square", 0.012);
+
+    if(stepInChord === 1 || stepInChord === 3 || stepInChord === 5 || stepInChord === 7){
+      playTone(t, 4200, 0.03, "square", 0.006);
     }
 
-    const melody = [chord[2]+12, chord[1]+12, chord[0]+12, chord[1]+12];
-    playTone(t, midiToFreq(melody[beat]), 0.12, "square", 0.012);
+    if(stepInChord === 0 || stepInChord === 4){
+      playTone(t, midiToFreq(chord[0] - 24), 0.18, "sine", 0.045);
+      playTone(t, midiToFreq(chord[0] - 12), 0.10, "triangle", 0.012);
+    }
 
     musicStep++;
   }
@@ -540,7 +680,7 @@
     stopMusic();
     musicStep = 0;
     tickMusic();
-    musicTimer = setInterval(tickMusic, 300);
+    musicTimer = setInterval(tickMusic, 110);
   }
 
   function stopMusic(){
@@ -564,13 +704,13 @@
     clearTimeout(say._timer);
     say._timer = setTimeout(() => {
       catTalk.textContent = "にゃっ";
-    }, 900);
+    }, 800);
   }
 
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v2", String(best));
+      localStorage.setItem("hidecat_fun_best_v3", String(best));
     }
   }
 
@@ -581,6 +721,7 @@
     bestText.textContent = best;
     skillFill.style.width = `${Math.max(0, Math.min(100, skill))}%`;
     skillBtn.classList.toggle("disabled", !(state === "playing" && skill >= 100));
+    catSkillBadge.classList.toggle("show", performance.now() < catRushUntil || dashFx.active);
   }
 
   function createBall(vx = null){
@@ -599,46 +740,100 @@
     balls = [createBall()];
   }
 
+  function generateBossStages(){
+    const candidates = [];
+    for(let s=4; s<MAX_STAGE; s++){
+      candidates.push(s);
+    }
+    for(let i=candidates.length - 1; i>0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    bossStages = new Set(candidates.slice(0, 4));
+  }
+
+  function stagePattern(stageNum, r, c, rows, cols){
+    const p = (stageNum - 1) % 8;
+    const centerR = (rows - 1) / 2;
+    const centerC = (cols - 1) / 2;
+    const dr = Math.abs(r - centerR);
+    const dc = Math.abs(c - centerC);
+
+    switch(p){
+      case 0: return true; // full
+      case 1: return (r + c) % 2 === 0 || r < 2; // checker
+      case 2: return !(r >= 1 && r <= rows - 2 && c === Math.floor(cols/2)); // tunnel
+      case 3: return c <= (r % cols); // stairs
+      case 4: return dr + dc <= 2.5; // diamond
+      case 5: return (r % 2 === 0 ? c < cols - 1 : c > 0); // zigzag walls
+      case 6: return r === 0 || r === rows - 1 || c === 0 || c === cols - 1 || (dr <= 0.5 && dc <= 1.5); // fortress
+      case 7: return c !== Math.floor(cols/2) || r === 0 || r === rows - 1; // split
+      default: return true;
+    }
+  }
+
   function createStageBlocks(stageNum){
+    boss = null;
     blocks = [];
-    const cols = 4;
-    const rows = 5;
+    const cols = 5;
+    const rows = 6;
     const marginX = 16;
-    const gapX = 12;
-    const gapY = 12;
+    const gapX = 10;
+    const gapY = 10;
     const top = 120;
     const bw = (W - marginX * 2 - gapX * (cols - 1)) / cols;
-    const bh = 34;
+    const bh = 30;
 
-    const strongCount = Math.min(2 + Math.floor(stageNum / 2), 6);
-    const harderCount = Math.min(Math.floor(stageNum / 3), 4);
-    const wallCount = stageNum >= 3 ? Math.min(1 + Math.floor((stageNum - 3) / 3), 3) : 0;
+    const strong2Count = Math.min(2 + Math.floor(stageNum / 2), 8);
+    const strong3Count = Math.min(Math.floor(stageNum / 4), 6);
+    const wallCount = stageNum >= 3 ? Math.min(1 + Math.floor((stageNum - 3) / 3), 4) : 0;
 
-    const typePool = [];
-    for(let i=0;i<20;i++) typePool.push("normal");
-    for(let i=0;i<strongCount;i++) typePool[i] = "strong2";
-    for(let i=0;i<harderCount;i++) typePool[strongCount + i] = "strong3";
-    for(let i=0;i<wallCount;i++) typePool[strongCount + harderCount + i] = "wall";
-
-    for(let i=typePool.length - 1; i>0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [typePool[i], typePool[j]] = [typePool[j], typePool[i]];
-    }
-
+    let candidateIndices = [];
     let idx = 0;
     for(let r=0; r<rows; r++){
       for(let c=0; c<cols; c++){
-        const type = typePool[idx];
+        if(stagePattern(stageNum, r, c, rows, cols)){
+          candidateIndices.push(idx);
+        }
+        idx++;
+      }
+    }
+
+    for(let i=candidateIndices.length - 1; i>0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidateIndices[i], candidateIndices[j]] = [candidateIndices[j], candidateIndices[i]];
+    }
+
+    const wallSet = new Set(candidateIndices.slice(0, wallCount));
+    const strong3Set = new Set(candidateIndices.slice(wallCount, wallCount + strong3Count));
+    const strong2Set = new Set(candidateIndices.slice(wallCount + strong3Count, wallCount + strong3Count + strong2Count));
+
+    idx = 0;
+    let wordShift = stageNum * 3;
+
+    for(let r=0; r<rows; r++){
+      for(let c=0; c<cols; c++){
+        if(!stagePattern(stageNum, r, c, rows, cols)){
+          idx++;
+          continue;
+        }
+
         let hp = 1;
-        let label = WORDS[(idx + stageNum * 3) % WORDS.length];
+        let type = "normal";
+        let label = WORDS[(idx + wordShift) % WORDS.length];
         let color = COLORS[(idx + stageNum) % COLORS.length];
 
-        if(type === "strong2") hp = 2;
-        if(type === "strong3") hp = 3;
-        if(type === "wall"){
+        if(wallSet.has(idx)){
           hp = Infinity;
+          type = "wall";
           label = "壁";
           color = "#b88aa3";
+        } else if(strong3Set.has(idx)){
+          hp = 3;
+          type = "strong3";
+        } else if(strong2Set.has(idx)){
+          hp = 2;
+          type = "strong2";
         }
 
         blocks.push({
@@ -653,9 +848,28 @@
           alive:true,
           type
         });
+
         idx++;
       }
     }
+  }
+
+  function createBoss(stageNum){
+    blocks = [];
+    const maxHp = 18 + stageNum * 3;
+    boss = {
+      x: W/2 - 52,
+      y: 130,
+      w: 104,
+      h: 74,
+      hp: maxHp,
+      maxHp,
+      vx: 2.4 + stageNum * 0.05,
+      bullets: [],
+      shotTimer: 0,
+      flash: 0,
+      phase: 1
+    };
   }
 
   function buildStars(){
@@ -684,31 +898,24 @@
     }
   }
 
-  function useSkill(){
-    if(state !== "playing" || skill < 100) return;
+  function isBossStage(s){
+    return bossStages.has(s);
+  }
 
-    skill = 0;
-    catRushUntil = performance.now() + 5000;
-    dashFx.active = true;
-    dashFx.x = -120;
-    dashFx.until = performance.now() + 700;
-
-    playMeow();
-    say("にゃーー!");
-    showMessage("ねこラッシュ!", 750);
-
-    for(const ball of balls){
-      ball.pierceUntil = catRushUntil;
-      ball.vx *= 1.12;
-      ball.vy *= 1.12;
+  function loadStage(s){
+    catRushUntil = 0;
+    dashFx.active = false;
+    resetBalls();
+    if(isBossStage(s)){
+      createBoss(s);
+      showMessage(`BOSS ${s}`, 850);
+      say("ボスにゃ!");
+    } else {
+      createStageBlocks(s);
+      showMessage(`STAGE ${s}`, 700);
     }
-
-    while(balls.length < 3){
-      const extra = createBall(balls.length === 1 ? -5 : 5);
-      extra.pierceUntil = catRushUntil;
-      balls.push(extra);
-    }
-
+    paddle.x = W / 2 - paddle.w / 2;
+    paddle.y = H - 110;
     updateHud();
   }
 
@@ -727,17 +934,18 @@
     particles = [];
     dashFx.active = false;
     catRushUntil = 0;
+    paddleBoostUntil = 0;
+    slowUntil = 0;
 
     paddle.w = 116;
     paddle.h = 18;
     paddle.x = W / 2 - paddle.w / 2;
     paddle.y = H - 110;
 
-    resetBalls();
-    createStageBlocks(stage);
+    generateBossStages();
+    loadStage(stage);
     updateHud();
     overlay.classList.add("hidden");
-    showMessage("スタート!", 700);
   }
 
   function goNextStage(){
@@ -745,14 +953,27 @@
       endGame(true);
       return;
     }
-
     stage++;
-    skill = Math.min(100, skill + 20);
-    resetBalls();
-    createStageBlocks(stage);
-    paddle.x = W / 2 - paddle.w / 2;
-    showMessage(`STAGE ${stage}`, 800);
+    skill = Math.min(100, skill + 15);
+    loadStage(stage);
+  }
+
+  function loseLife(){
+    lives--;
+    damageFlash = 1;
+    shake = 12;
+    playDamage();
     updateHud();
+
+    if(lives <= 0){
+      endGame(false);
+      return;
+    }
+
+    resetBalls();
+    if(boss) boss.bullets = [];
+    showMessage("もういっかい!", 700);
+    say("ふにゃ…");
   }
 
   function endGame(clear){
@@ -764,7 +985,7 @@
     overlay.innerHTML = `
       <div class="card">
         <div class="bigCat">🐱</div>
-        <div class="title">${clear ? "10面クリア！" : "ざんねん…"}</div>
+        <div class="title">${clear ? "20面クリア！" : "ざんねん…"}</div>
         <div class="sub">
           SCORE: <b>${score}</b><br>
           BEST: <b>${best}</b><br>
@@ -784,16 +1005,28 @@
         <div class="bigCat">🐱</div>
         <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し DX</div>
         <div class="sub">
-          猫背景、テンポ良し、必殺技あり。<br>
-          10面まであります。
-        </div>
-        <button class="btn" id="startBtn2">スタート！</button>
-        <div class="tiny">
-          操作：画面を左右ドラッグ<br>
+          左右ドラッグで移動<br>
           右下の ✨ は満タンで発動
         </div>
+        <div class="charGrid">
+          ${CHARACTERS.map((c, i) => `
+            <button class="charBtn" data-i="${i}">
+              <div class="emoji">${c.emoji}</div>
+              <div class="name">${c.name}</div>
+              <div class="skill">${c.skillName}<br>${c.desc}</div>
+            </button>
+          `).join("")}
+        </div>
+        <button class="btn" id="startBtn2">スタート！</button>
       </div>
     `;
+    overlay.querySelectorAll(".charBtn").forEach(btn => {
+      btn.onclick = () => {
+        const i = Number(btn.dataset.i);
+        selectedChar = CHARACTERS[i];
+        say(i === 1 ? "主役にゃ!" : "いくにゃ");
+      };
+    });
     document.getElementById("startBtn2").onclick = startGame;
   }
 
@@ -911,6 +1144,43 @@
     }
   }
 
+  function drawBoss(){
+    if(!boss) return;
+    const grad = ctx.createLinearGradient(0, boss.y, 0, boss.y + boss.h);
+    grad.addColorStop(0, boss.flash > 0.1 ? "#fff0a8" : "#ff9ac4");
+    grad.addColorStop(1, boss.flash > 0.1 ? "#ffd34d" : "#ff6faa");
+
+    roundRectPath(boss.x, boss.y, boss.w, boss.h, 20);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    ctx.stroke();
+
+    ctx.font = "54px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = INK;
+    ctx.fillText("😾", boss.x + boss.w/2, boss.y + boss.h/2 + 2);
+
+    const barW = W - 60;
+    roundRectPath(30, 90, barW, 12, 8);
+    ctx.fillStyle = "rgba(255,255,255,.3)";
+    ctx.fill();
+    roundRectPath(30, 90, barW * Math.max(0, boss.hp / boss.maxHp), 12, 8);
+    ctx.fillStyle = "#ff5d86";
+    ctx.fill();
+  }
+
+  function drawBossBullets(){
+    if(!boss) return;
+    for(const b of boss.bullets){
+      ctx.fillStyle = "#ff6d8c";
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
   function drawPaddle(){
     const g = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.h);
     g.addColorStop(0, "#fff3a5");
@@ -919,11 +1189,11 @@
     ctx.fillStyle = g;
     ctx.fill();
 
-    ctx.fillStyle = "#6f2858";
+    ctx.fillStyle = INK;
     ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("😄", paddle.x + paddle.w/2, paddle.y - 8);
+    ctx.fillText(selectedChar.emoji, paddle.x + paddle.w/2, paddle.y - 8);
   }
 
   function drawBalls(){
@@ -992,8 +1262,57 @@
   function update(dt){
     if(state !== "playing") return;
 
+    const now = performance.now();
+    const timeScale = now < slowUntil ? 0.62 : 1;
+
+    if(now < paddleBoostUntil){
+      paddle.w += (170 - paddle.w) * 0.15;
+    } else {
+      paddle.w += (116 - paddle.w) * 0.14;
+    }
+
     paddle.x += ((touchX - paddle.w/2) - paddle.x) * Math.min(1, 0.22 * dt * 60);
     paddle.x = Math.max(8, Math.min(W - paddle.w - 8, paddle.x));
+
+    if(boss){
+      boss.phase = boss.hp <= boss.maxHp * 0.35 ? 3 : boss.hp <= boss.maxHp * 0.7 ? 2 : 1;
+      boss.x += boss.vx * dt * 60 * timeScale;
+      if(boss.x < 20 || boss.x + boss.w > W - 20){
+        boss.vx *= -1;
+      }
+      boss.flash *= 0.88;
+      boss.shotTimer += dt * timeScale;
+
+      const interval = boss.phase === 1 ? 1.3 : boss.phase === 2 ? 0.95 : 0.65;
+      if(boss.shotTimer >= interval){
+        boss.shotTimer = 0;
+        spawnBossBullets();
+      }
+
+      for(let i=boss.bullets.length - 1; i>=0; i--){
+        const b = boss.bullets[i];
+        b.x += b.vx * dt * 60 * timeScale;
+        b.y += b.vy * dt * 60 * timeScale;
+
+        if(b.y > H + 30 || b.x < -30 || b.x > W + 30){
+          boss.bullets.splice(i, 1);
+          continue;
+        }
+
+        const hitPaddle =
+          b.x + b.r > paddle.x &&
+          b.x - b.r < paddle.x + paddle.w &&
+          b.y + b.r > paddle.y &&
+          b.y - b.r < paddle.y + paddle.h;
+
+        if(hitPaddle){
+          boss.bullets.splice(i, 1);
+          burst(b.x, b.y, "💥", 7);
+          loseLife();
+          return;
+        }
+      }
+    }
 
     for(let i=balls.length - 1; i>=0; i--){
       const ball = balls[i];
@@ -1001,8 +1320,8 @@
       ball.trail.push({ x:ball.x, y:ball.y });
       if(ball.trail.length > 6) ball.trail.shift();
 
-      ball.x += ball.vx * dt * 60;
-      ball.y += ball.vy * dt * 60;
+      ball.x += ball.vx * dt * 60 * timeScale;
+      ball.y += ball.vy * dt * 60 * timeScale;
 
       if(ball.x < ball.r){
         ball.x = ball.r;
@@ -1032,16 +1351,53 @@
         ball.vy = -Math.max(6.0, Math.abs(ball.vy));
         burst(ball.x, paddle.y, "🐾", 5);
         playTap(620);
+
+        if(now - lastPaddleMeow > 130){
+          playPaddleMeow();
+          say("ニャッ!");
+          lastPaddleMeow = now;
+        }
       }
 
-      for(const b of blocks){
-        if(!b.alive) continue;
-        if(
-          ball.x + ball.r > b.x &&
-          ball.x - ball.r < b.x + b.w &&
-          ball.y + ball.r > b.y &&
-          ball.y - ball.r < b.y + b.h
-        ){
+      if(boss){
+        const hitBoss =
+          ball.x + ball.r > boss.x &&
+          ball.x - ball.r < boss.x + boss.w &&
+          ball.y + ball.r > boss.y &&
+          ball.y - ball.r < boss.y + boss.h;
+
+        if(hitBoss){
+          boss.hp -= now < ball.pierceUntil ? 2 : 1;
+          boss.flash = 1;
+          score += 16;
+          skill = Math.min(100, skill + 6);
+          burst(ball.x, ball.y, "⭐", 7);
+          playTap(920);
+
+          if(now >= ball.pierceUntil){
+            ball.vy *= -1;
+          }
+
+          if(boss.hp <= 0){
+            score += 120;
+            boss = null;
+            goNextStage();
+            return;
+          }
+          updateHud();
+        }
+      } else {
+        for(const b of blocks){
+          if(!b.alive) continue;
+
+          const hitBlock =
+            ball.x + ball.r > b.x &&
+            ball.x - ball.r < b.x + b.w &&
+            ball.y + ball.r > b.y &&
+            ball.y - ball.r < b.y + b.h;
+
+          if(!hitBlock) continue;
+
           if(!Number.isFinite(b.hp)){
             ball.vy *= -1;
             burst(b.x + b.w/2, b.y + b.h/2, "💥", 4);
@@ -1049,14 +1405,15 @@
             break;
           }
 
-          b.hp -= 1;
+          const dmg = now < ball.pierceUntil ? 2 : 1;
+          b.hp -= dmg;
           score += b.maxHp >= 3 ? 14 : b.maxHp === 2 ? 12 : 10;
           skill = Math.min(100, skill + 6);
 
           burst(
             b.x + b.w/2,
             b.y + b.h/2,
-            performance.now() < ball.pierceUntil ? "🐱" : "✨",
+            now < ball.pierceUntil ? "🐱" : "✨",
             7
           );
 
@@ -1067,11 +1424,11 @@
             playTap(560);
           }
 
-          if(performance.now() >= ball.pierceUntil){
+          if(now >= ball.pierceUntil){
             ball.vy *= -1;
           }
 
-          if(score % 80 === 0){
+          if(score % 100 === 0){
             showMessage("GREAT!", 520);
           }
 
@@ -1086,25 +1443,16 @@
     }
 
     if(balls.length === 0){
-      lives--;
-      damageFlash = 1;
-      shake = 12;
-      playDamage();
-      updateHud();
-
-      if(lives <= 0){
-        endGame(false);
-        return;
-      }
-
-      balls = [createBall()];
-      showMessage("もういっかい!", 700);
+      loseLife();
+      return;
     }
 
-    const remainingBreakable = blocks.some(b => b.alive && Number.isFinite(b.hp));
-    if(!remainingBreakable){
-      goNextStage();
-      return;
+    if(!boss){
+      const remainingBreakable = blocks.some(b => b.alive && Number.isFinite(b.hp));
+      if(!remainingBreakable){
+        goNextStage();
+        return;
+      }
     }
 
     for(let i=particles.length - 1; i>=0; i--){
@@ -1118,7 +1466,7 @@
 
     if(dashFx.active){
       dashFx.x += 20 * dt * 60;
-      if(performance.now() > dashFx.until){
+      if(now > dashFx.until){
         dashFx.active = false;
       }
     }
@@ -1128,6 +1476,29 @@
 
     if(damageFlash > 0.02) damageFlash *= 0.88;
     else damageFlash = 0;
+
+    updateHud();
+  }
+
+  function spawnBossBullets(){
+    if(!boss) return;
+    const cx = boss.x + boss.w/2;
+    const y = boss.y + boss.h - 6;
+
+    if(boss.phase === 1){
+      boss.bullets.push({ x:cx, y, vx:0, vy:4.6, r:8 });
+      boss.bullets.push({ x:cx - 24, y, vx:-1.0, vy:4.4, r:7 });
+      boss.bullets.push({ x:cx + 24, y, vx: 1.0, vy:4.4, r:7 });
+    } else if(boss.phase === 2){
+      for(let i=-2; i<=2; i++){
+        boss.bullets.push({ x:cx + i*12, y, vx:i*0.7, vy:4.8, r:7 });
+      }
+    } else {
+      for(let i=-3; i<=3; i++){
+        boss.bullets.push({ x:cx + i*11, y, vx:i*0.9, vy:5.3, r:7 });
+      }
+      boss.bullets.push({ x:cx, y:y - 10, vx:0, vy:5.8, r:10 });
+    }
   }
 
   function draw(){
@@ -1136,7 +1507,12 @@
       ctx.translate((Math.random()-0.5) * shake, (Math.random()-0.5) * shake);
     }
     drawBackground();
-    drawBlocks();
+    if(boss){
+      drawBoss();
+      drawBossBullets();
+    } else {
+      drawBlocks();
+    }
     drawPaddle();
     drawBalls();
     drawParticles();
@@ -1177,15 +1553,19 @@
 
   skillBtn.addEventListener("click", () => {
     unlockAudio();
-    useSkill();
+    if(state === "playing" && skill >= 100){
+      skill = 0;
+      selectedChar.use();
+      updateHud();
+    }
   });
 
-  document.getElementById("startBtn").onclick = startGame;
   window.addEventListener("resize", resize);
 
   loadCat();
   resize();
   updateHud();
+  renderTitle();
   requestAnimationFrame(loop);
 })();
 </script>
