@@ -89,7 +89,7 @@
   .value{
     font-size:17px;
     font-weight:900;
-    color:#6f2858;
+    color:var(--ink);
     white-space:nowrap;
   }
 
@@ -210,7 +210,7 @@
     background:linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,255,255,.5));
     border:1px solid rgba(255,255,255,.96);
     box-shadow:var(--shadow);
-    color:#6f2858;
+    color:var(--ink);
     font:inherit;
     display:flex;
     align-items:center;
@@ -473,7 +473,6 @@
   const skillNameEl = document.getElementById("skillName");
   const skillDescEl = document.getElementById("skillDesc");
 
-  const INK = "#6f2858";
   const MAX_STAGE = 20;
   const WORDS = [
     "夢","仕事","健康","旅行","ダイエット","ポテチ","睡眠","散歩",
@@ -485,16 +484,16 @@
   ];
 
   const CHARACTERS = [
-    { id:"hide", emoji:"😄", name:"ヒデ", skillName:"キラキラ", desc:"見た目を選ぶ" },
-    { id:"cat", emoji:"🐱", name:"ネコ", skillName:"ラッシュ", desc:"見た目を選ぶ" },
-    { id:"bear", emoji:"🐻", name:"クマ", skillName:"ビッグ", desc:"見た目を選ぶ" },
-    { id:"rabbit", emoji:"🐰", name:"ウサ", skillName:"スロー", desc:"見た目を選ぶ" }
+    { id:"hide", emoji:"😄", name:"ヒデ", perk:"パドル少し広め" },
+    { id:"cat", emoji:"🐱", name:"ネコ", perk:"ゲージ少し早い" },
+    { id:"bear", emoji:"🐻", name:"クマ", perk:"ビッグが長い" },
+    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"球が少しやさしい" }
   ];
   let selectedChar = CHARACTERS[1];
 
   const SKILLS = [
     { type:"cat", emoji:"🐱", name:"ラッシュ", desc:"猫が飛んで3ボール" },
-    { type:"spark", emoji:"✨", name:"キラキラ", desc:"全体に1ダメージ" },
+    { type:"magnet", emoji:"🧲", name:"ぺたっ", desc:"3回までくっつく" },
     { type:"big", emoji:"🧸", name:"ビッグ", desc:"パドル巨大化" }
   ];
   let currentSkill = null;
@@ -509,7 +508,7 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v6") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v7") || 0);
 
   let pointerX = 0;
   let shake = 0;
@@ -527,6 +526,9 @@
 
   let paddleBoostUntil = 0;
   let slowUntil = 0;
+  let magnetUntil = 0;
+  let magnetCharges = 0;
+
   let catDash = {
     active:false,
     x:-180,
@@ -543,6 +545,21 @@
   let audioCtx = null;
   let musicStep = 0;
   let musicAccum = 0;
+
+  function currentPerks(){
+    return {
+      basePaddle:
+        selectedChar.id === "hide" ? 126 :
+        selectedChar.id === "bear" ? 120 :
+        116,
+      skillGainMult:
+        selectedChar.id === "cat" ? 1.12 : 1.0,
+      bigDurationMult:
+        selectedChar.id === "bear" ? 1.35 : 1.0,
+      launchSpeed:
+        selectedChar.id === "rabbit" ? 5.6 : 6.0
+    };
+  }
 
   function loadCat(i=0){
     if(i >= CAT_CANDIDATES.length) return;
@@ -660,7 +677,7 @@
   ];
 
   function averageBallSpeed(){
-    if (!balls.length) return 7.5;
+    if (!balls.length) return currentPerks().launchSpeed;
     let sum = 0;
     for (const b of balls) {
       sum += Math.hypot(b.vx, b.vy);
@@ -694,7 +711,7 @@
   function updateMusic(dt){
     if(!audioCtx || state !== "playing") return;
     const speed = averageBallSpeed();
-    const interval = Math.max(0.12, Math.min(0.19, 0.19 - (speed - 7.5) * 0.012));
+    const interval = Math.max(0.12, Math.min(0.20, 0.20 - (speed - 6.0) * 0.012));
     musicAccum += dt;
     while(musicAccum >= interval){
       musicAccum -= interval;
@@ -738,7 +755,7 @@
     let scale = 1;
 
     if(state === "title"){
-      text = "まってるにゃ";
+      text = "えらんでにゃ";
     } else if(state !== "playing"){
       text = "おつかれにゃ";
     } else if(score >= 1800){
@@ -763,7 +780,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v6", String(best));
+      localStorage.setItem("hidecat_fun_best_v7", String(best));
     }
   }
 
@@ -791,7 +808,8 @@
 
   function addSkill(amount){
     const before = skill;
-    skill = Math.max(0, Math.min(100, skill + amount));
+    const gain = amount * currentPerks().skillGainMult;
+    skill = Math.max(0, Math.min(100, skill + gain));
     if(before < 100 && skill >= 100 && !currentSkill){
       pickRandomSkill();
       showMessage(currentSkill.name + "!", 600);
@@ -805,7 +823,7 @@
     stageText.textContent = `${stage} / ${MAX_STAGE}`;
     bestText.textContent = best;
     skillFill.style.width = `${Math.max(0, Math.min(100, skill))}%`;
-    catSkillBadge.classList.toggle("show", catDash.active);
+    catSkillBadge.classList.toggle("show", catDash.active || performance.now() < magnetUntil);
     updateCatReaction();
     updateSkillUI();
   }
@@ -819,13 +837,16 @@
   }
 
   function createBall(vx = null){
+    const launchSpeed = currentPerks().launchSpeed;
     return {
       x: field.x + field.w / 2,
       y: field.y + field.h - 90,
-      vx: vx ?? (Math.random() > 0.5 ? 4.0 : -4.0),
-      vy: -6.0,
+      vx: vx ?? (Math.random() > 0.5 ? launchSpeed * 0.67 : -launchSpeed * 0.67),
+      vy: -launchSpeed,
       r: 9,
-      trail:[]
+      trail:[],
+      stuck:false,
+      stuckOffsetX:0
     };
   }
 
@@ -1022,29 +1043,16 @@
       }
     }
 
-    if(type === "spark"){
-      if(boss){
-        boss.hp = Math.max(0, boss.hp - 6);
-        boss.flash = 1;
-        burst(boss.x + boss.w/2, boss.y + boss.h/2, "✨", 14);
-      } else {
-        for (const b of blocks) {
-          if (!b.alive || !Number.isFinite(b.hp)) continue;
-          b.hp -= 1;
-          burst(b.x + b.w/2, b.y + b.h/2, "✨", 5);
-          if (b.hp <= 0) {
-            b.alive = false;
-            score += 10;
-          }
-        }
-      }
-      playTap(980);
-      say("キラッ!");
-      showMessage("キラキラ!", 700);
+    if(type === "magnet"){
+      magnetUntil = performance.now() + 8000;
+      magnetCharges = 3;
+      playTap(700);
+      say("ぺたっ!");
+      showMessage("くっつく!", 700);
     }
 
     if(type === "big"){
-      paddleBoostUntil = performance.now() + 8000;
+      paddleBoostUntil = performance.now() + 8000 * currentPerks().bigDurationMult;
       playTap(300);
       say("どーん!");
       showMessage("BIG PAD!", 700);
@@ -1055,6 +1063,8 @@
 
   function loadStage(s){
     catDash.active = false;
+    magnetUntil = 0;
+    magnetCharges = 0;
     resetBalls();
     if(isBossStage(s)){
       createBoss(s);
@@ -1086,8 +1096,10 @@
     catDash.active = false;
     paddleBoostUntil = 0;
     slowUntil = 0;
+    magnetUntil = 0;
+    magnetCharges = 0;
 
-    paddle.w = 116;
+    paddle.w = currentPerks().basePaddle;
     paddle.h = 18;
     paddle.x = field.x + field.w / 2 - paddle.w / 2;
     paddle.y = field.y + field.h - 24;
@@ -1151,7 +1163,7 @@
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
-        <div class="bigCat">🐱</div>
+        <div class="bigCat">${selectedChar.emoji}</div>
         <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し DX</div>
         <div class="sub">
           左右ドラッグで移動<br>
@@ -1162,7 +1174,7 @@
             <button class="charBtn ${selectedChar.id === c.id ? 'selected' : ''}" data-i="${i}">
               <div class="emoji">${c.emoji}</div>
               <div class="name">${c.name}</div>
-              <div class="skill">${c.skillName}<br>${c.desc}</div>
+              <div class="skill">${c.perk}</div>
             </button>
           `).join("")}
         </div>
@@ -1270,7 +1282,7 @@
       ctx.strokeStyle = "rgba(255,255,255,.45)";
       ctx.stroke();
 
-      ctx.fillStyle = INK;
+      ctx.fillStyle = "#6f2858";
       ctx.font = "bold 15px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -1305,7 +1317,7 @@
     ctx.font = "54px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = INK;
+    ctx.fillStyle = "#6f2858";
     ctx.fillText("😾", boss.x + boss.w/2, boss.y + boss.h/2 + 2);
 
     const barW = field.w - 24;
@@ -1335,7 +1347,7 @@
     ctx.fillStyle = g;
     ctx.fill();
 
-    ctx.fillStyle = INK;
+    ctx.fillStyle = "#6f2858";
     ctx.font = "22px sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -1447,10 +1459,11 @@
     const now = performance.now();
     const timeScale = now < slowUntil ? 0.65 : 1;
 
+    const basePaddle = currentPerks().basePaddle;
     if(now < paddleBoostUntil){
       paddle.w += (170 - paddle.w) * 0.15;
     } else {
-      paddle.w += (116 - paddle.w) * 0.14;
+      paddle.w += (basePaddle - paddle.w) * 0.14;
     }
 
     paddle.x += ((pointerX - paddle.w/2) - paddle.x) * Math.min(1, 0.25 * dt * 60);
@@ -1511,6 +1524,12 @@
     for(let i=balls.length - 1; i>=0; i--){
       const ball = balls[i];
 
+      if(ball.stuck){
+        ball.x = paddle.x + ball.stuckOffsetX;
+        ball.y = paddle.y - ball.r - 2;
+        continue;
+      }
+
       ball.trail.push({ x:ball.x, y:ball.y });
       if(ball.trail.length > 6) ball.trail.shift();
 
@@ -1540,13 +1559,22 @@
         ball.x < paddle.x + paddle.w &&
         ball.vy > 0
       ){
-        const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
-        ball.vx = hit * 6.2;
-        ball.vy = -Math.max(5.9, Math.abs(ball.vy));
-        burst(ball.x, paddle.y, "🐾", 5);
         playTap(620);
         playPaddleNyah();
         say("ニヤッ!", 380);
+
+        if(magnetCharges > 0 && now < magnetUntil){
+          ball.stuck = true;
+          ball.stuckOffsetX = Math.max(ball.r, Math.min(paddle.w - ball.r, ball.x - paddle.x));
+          magnetCharges--;
+          updateHud();
+          continue;
+        }
+
+        const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
+        ball.vx = hit * 6.2;
+        ball.vy = -Math.max(currentPerks().launchSpeed - 0.1, Math.abs(ball.vy));
+        burst(ball.x, paddle.y, "🐾", 5);
       }
 
       if(boss){
@@ -1707,16 +1735,31 @@
     pointerX = clientX - rect.left;
   }
 
+  function releaseStuckBalls(){
+    let released = false;
+    for(const ball of balls){
+      if(ball.stuck){
+        ball.stuck = false;
+        const hit = (pointerX - (paddle.x + paddle.w/2)) / (paddle.w/2);
+        ball.vx = hit * 6.2;
+        ball.vy = -Math.max(currentPerks().launchSpeed, 6.0);
+        released = true;
+      }
+    }
+    if(released) playTap(760);
+  }
+
   canvas.addEventListener("pointerdown", e => {
     unlockAudio();
     setPointerX(e.clientX);
+    releaseStuckBalls();
   });
 
   canvas.addEventListener("pointermove", e => {
     setPointerX(e.clientX);
   });
 
-  canvas.addEventListener("touchstart", e => {
+  canvas.addEventListener("touchstart", () => {
     unlockAudio();
   }, {passive:true});
 
