@@ -151,7 +151,7 @@
     text-shadow:0 0 14px rgba(0,0,0,.22);
     pointer-events:none;
     opacity:0;
-    transition:opacity .18s ease;
+    transition:opacity .18s ease, transform .18s ease;
     white-space:nowrap;
   }
 
@@ -316,6 +316,28 @@
     margin-bottom:10px;
   }
 
+  .titlePhoto{
+    width:96px;
+    height:96px;
+    margin:0 auto 12px;
+    border-radius:50%;
+    overflow:hidden;
+    border:4px solid rgba(255,255,255,.95);
+    box-shadow:0 10px 24px rgba(255,90,165,.22);
+    background:rgba(255,255,255,.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:56px;
+  }
+
+  .titlePhoto img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
   .title{
     font-size:clamp(28px, 7vw, 42px);
     font-weight:900;
@@ -388,6 +410,40 @@
     color:#8f5377;
     margin-top:4px;
   }
+
+  .rankBadge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:52px;
+    height:52px;
+    border-radius:999px;
+    background:linear-gradient(180deg,#fff8c8,#ffd84d);
+    color:#7a315d;
+    font-size:28px;
+    font-weight:900;
+    box-shadow:0 10px 18px rgba(0,0,0,.14);
+    margin:8px auto 12px;
+  }
+
+  .achWrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin:12px 0 14px;
+  }
+
+  .achChip{
+    padding:8px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    color:#7a315d;
+    background:rgba(255,255,255,.7);
+    border:1px solid rgba(255,255,255,.95);
+    box-shadow:0 6px 14px rgba(0,0,0,.08);
+  }
 </style>
 </head>
 <body>
@@ -409,7 +465,7 @@
     <div class="col">
       <div class="panel">
         <div class="label">STAGE</div>
-        <div class="value" id="stageText">1 / 20</div>
+        <div class="value" id="stageText">1 / 10</div>
       </div>
       <div class="panel">
         <div class="label">BEST</div>
@@ -442,7 +498,7 @@
       </div>
       <div id="skillReady">RANDOM</div>
     </button>
-    <div id="skillLabel">タップで吸着球を再発射 / SKILLで必殺技</div>
+    <div id="skillLabel">左右ドラッグで移動 / タップで再発射 / SKILLで必殺技</div>
     <div id="skillBar"><div id="skillFill"></div></div>
   </div>
 
@@ -476,7 +532,7 @@
   const skillNameEl = document.getElementById("skillName");
   const skillDescEl = document.getElementById("skillDesc");
 
-  const MAX_STAGE = 20;
+  const MAX_STAGE = 10;
   const WORDS = [
     "夢","仕事","健康","旅行","ダイエット","ポテチ","睡眠","散歩",
     "筋トレ","ラーメン","貯金","ごほうび","野菜","チョコ","読書","有休",
@@ -485,10 +541,10 @@
   const COLORS = ["#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff","#ffd4e5","#fff0b8"];
 
   const CHARACTERS = [
-    { id:"hide", emoji:"😄", name:"ヒデ", perk:"金色パドル / 少し広め" },
-    { id:"cat", emoji:"🐱", name:"ネコ", perk:"ピンクパドル / ゲージ少し早い" },
-    { id:"bear", emoji:"🐻", name:"クマ", perk:"青パドル / ビッグ長め" },
-    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑パドル / 球が少しやさしい" }
+    { id:"hide", emoji:"😄", name:"ヒデ", perk:"金色 / 幅広 + スコア10%UP" },
+    { id:"cat", emoji:"🐱", name:"ネコ", perk:"ピンク / ゲージ速い + アイテム出やすい" },
+    { id:"bear", emoji:"🐻", name:"クマ", perk:"青 / ビッグが長くて大きい" },
+    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑 / 球が少し遅い + 連射が速い" }
   ];
   let selectedChar = CHARACTERS[1];
 
@@ -507,9 +563,45 @@
     { type:"clone", emoji:"🪞", label:"分身" }
   ];
 
+  const BOSS_TYPES = {
+    beam: {
+      name:"ビームキャット",
+      top:"#ffd4e8",
+      bottom:"#ff7dae",
+      aura:"rgba(255,120,170,.5)",
+      beamGap:2.1,
+      beamWidth:18
+    },
+    zigzag: {
+      name:"ジグザグキャット",
+      top:"#d6e5ff",
+      bottom:"#8f95ff",
+      aura:"rgba(140,160,255,.52)",
+      beamGap:1.85,
+      beamWidth:16
+    },
+    warp: {
+      name:"ワープキャット",
+      top:"#d7fff0",
+      bottom:"#68d4c9",
+      aura:"rgba(120,255,220,.45)",
+      beamGap:2.35,
+      beamWidth:20
+    }
+  };
+
   const CANON = [
     [62,66,69],[57,61,64],[59,62,66],[54,57,61],
     [55,59,62],[62,66,69],[55,59,62],[57,61,64]
+  ];
+
+  const CAT_CANDIDATES = [
+    "./cat.png.JPG",
+    "./cat.png.jpg",
+    "./cat.JPG",
+    "./cat.jpg",
+    "./cat.jpeg",
+    "./cat.png"
   ];
 
   let currentSkill = null;
@@ -523,7 +615,7 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v9") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v12") || 0);
   let stageMode = "breakout";
   let stageVariant = 0;
 
@@ -560,6 +652,8 @@
     trail:[]
   };
 
+  let stats = null;
+
   let catImg = new Image();
   let catReady = false;
 
@@ -579,8 +673,21 @@
     return Math.max(min, Math.min(max, v));
   }
 
+  function resetStats(){
+    stats = {
+      bossesDefeated:0,
+      itemsCollected:0,
+      totalBlocksBroken:0,
+      combo:0,
+      comboTimer:0,
+      maxCombo:0,
+      damageTaken:0,
+      finalFormDefeated:false
+    };
+  }
+
   function getStageBaseSpeed(){
-    return Math.min(5.9, 4.12 + (stage - 1) * 0.09);
+    return Math.min(5.9, 4.12 + (stage - 1) * 0.12);
   }
 
   function paddleTheme(){
@@ -600,33 +707,66 @@
     const base = getStageBaseSpeed();
     return {
       basePaddle:
-        selectedChar.id === "hide" ? 126 :
+        selectedChar.id === "hide" ? 132 :
         selectedChar.id === "bear" ? 120 :
         116,
       skillGainMult:
-        selectedChar.id === "cat" ? 1.12 : 1.0,
+        selectedChar.id === "cat" ? 1.18 : 1.0,
+      itemDropBonus:
+        selectedChar.id === "cat" ? 0.12 : 0,
+      scoreBonus:
+        selectedChar.id === "hide" ? 1.10 : 1.0,
       bigDurationMult:
-        selectedChar.id === "bear" ? 1.35 : 1.0,
+        selectedChar.id === "bear" ? 1.6 : 1.0,
+      bigWidthBonus:
+        selectedChar.id === "bear" ? 18 : 0,
       launchSpeed:
-        selectedChar.id === "rabbit" ? base - 0.18 : base
+        selectedChar.id === "rabbit" ? base - 0.22 : base,
+      rapidCooldownMult:
+        selectedChar.id === "rabbit" ? 0.80 : 1.0,
+      controlMult:
+        selectedChar.id === "rabbit" ? 1.12 : 1.0
     };
   }
 
-  function loadCat(){
-    catImg = new Image();
-    catImg.onload = () => {
+  function addScore(points){
+    score += Math.round(points * currentPerks().scoreBonus);
+  }
+
+  function registerCombo(){
+    stats.combo += 1;
+    stats.comboTimer = 1.7;
+    stats.maxCombo = Math.max(stats.maxCombo, stats.combo);
+    if(stats.combo >= 4 && stats.combo % 4 === 0){
+      showMessage(`${stats.combo} COMBO!`, 420);
+    }
+  }
+
+  function resetCombo(){
+    stats.combo = 0;
+    stats.comboTimer = 0;
+  }
+
+  function loadCat(index = 0){
+    if(index >= CAT_CANDIDATES.length){
+      catReady = false;
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      catImg = img;
       catReady = true;
-      catBadgeImg.src = catImg.src;
-      catSkillImg.src = catImg.src;
+      catBadgeImg.src = img.src;
+      catSkillImg.src = img.src;
       catBadgeImg.style.display = "block";
       catSkillImg.style.display = "block";
       catBadgeFallback.style.display = "none";
       catSkillFallback.style.display = "none";
+      if(state === "title") renderTitle();
     };
-    catImg.onerror = () => {
-      catReady = false;
-    };
-    catImg.src = "./cat.png.JPG";
+    img.onerror = () => loadCat(index + 1);
+    img.src = CAT_CANDIDATES[index];
   }
 
   function unlockAudio(){
@@ -735,6 +875,22 @@
     }
   }
 
+  function playBeamCharge(){
+    if(!audioCtx) return;
+    const t = audioCtx.currentTime;
+    playTone(t, 260, 0.18, "sawtooth", 0.02);
+    playTone(t + 0.06, 360, 0.18, "triangle", 0.02);
+    playTone(t + 0.12, 480, 0.22, "triangle", 0.022);
+  }
+
+  function playBeamFire(){
+    if(!audioCtx) return;
+    const t = audioCtx.currentTime;
+    playTone(t, 780, 0.08, "square", 0.03);
+    playTone(t + 0.02, 520, 0.18, "sawtooth", 0.035);
+    playTone(t + 0.05, 220, 0.28, "triangle", 0.028);
+  }
+
   function averageBallSpeed(){
     if(!balls.length) return currentPerks().launchSpeed;
     let sum = 0;
@@ -756,15 +912,15 @@
 
     const arpPattern = [0,1,2,1,2,1,0,1];
     const arpNote = chord[arpPattern[stepInChord]] + 12;
-    playTone(t, midiToFreq(arpNote), 0.13, "square", 0.009);
+    playTone(t, midiToFreq(arpNote), 0.13, stageMode === "boss" ? "triangle" : "square", 0.009);
 
     if(stepInChord === 0 || stepInChord === 4){
-      playTone(t, midiToFreq(chord[0] - 24), 0.26, "sine", 0.032);
+      playTone(t, midiToFreq(chord[0] - 24), 0.26, "sine", stageMode === "boss" ? 0.024 : 0.032);
       playTone(t, midiToFreq(chord[1]), 0.18, "triangle", 0.008);
     }
 
     if(stepInChord === 2 || stepInChord === 6){
-      playTone(t, 2600, 0.025, "square", 0.0038);
+      playTone(t, stageMode === "boss" ? 1800 : 2600, 0.025, "square", 0.0038);
     }
 
     musicStep++;
@@ -852,11 +1008,7 @@
       text = "ボスにゃ";
       glow = "0 12px 28px rgba(255,216,77,.55)";
       scale = 1.06;
-    } else if(score >= 1800){
-      text = "伝説にゃ";
-      glow = "0 12px 28px rgba(255,216,77,.55)";
-      scale = 1.08;
-    } else if(score >= 1000){
+    } else if(score >= 1200){
       text = "強いにゃ!";
       glow = "0 12px 26px rgba(126,255,211,.5)";
       scale = 1.04;
@@ -874,7 +1026,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v9", String(best));
+      localStorage.setItem("hidecat_fun_best_v12", String(best));
     }
   }
 
@@ -968,9 +1120,12 @@
       if(boss){
         boss.hp = Math.max(0, boss.hp - 2);
         boss.flash = 1;
+        registerCombo();
         burst(boss.x + boss.w/2, boss.y + boss.h/2, "⭐", 12);
         if(boss.hp <= 0){
-          score += 120;
+          addScore(120);
+          stats.bossesDefeated += 1;
+          if(boss.secondForm) stats.finalFormDefeated = true;
           boss = null;
           goNextStage();
         }
@@ -1041,8 +1196,8 @@
     const bh = 28;
 
     const strong2Count = Math.min(2 + Math.floor(stageNum / 2), 8);
-    const strong3Count = Math.min(Math.floor(stageNum / 4), 5);
-    const wallCount = stageNum >= 4 ? Math.min(1 + Math.floor((stageNum - 4) / 4), 3) : 0;
+    const strong3Count = Math.min(Math.floor(stageNum / 3), 5);
+    const wallCount = stageNum >= 4 ? Math.min(1 + Math.floor((stageNum - 4) / 3), 3) : 0;
 
     let candidateIndices = [];
     let idx = 0;
@@ -1103,11 +1258,37 @@
     }
   }
 
+  function chooseBossType(exclude = null){
+    const keys = Object.keys(BOSS_TYPES).filter(k => k !== exclude);
+    return keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  function applyBossType(targetBoss, type, stageNum, keepPosition = false){
+    const meta = BOSS_TYPES[type];
+    const prevY = targetBoss.y;
+    targetBoss.type = type;
+    targetBoss.meta = meta;
+    targetBoss.baseY = field.y + 12;
+    if(!keepPosition){
+      targetBoss.y = targetBoss.baseY;
+    } else if(type !== "zigzag"){
+      targetBoss.y += (targetBoss.baseY - prevY) * 0.7;
+    }
+    targetBoss.vx =
+      (type === "zigzag" ? 1.9 :
+      type === "warp" ? 1.15 : 1.5) + stageNum * 0.04;
+    targetBoss.beamGap = meta.beamGap - (stageNum === MAX_STAGE ? 0.08 : 0);
+    targetBoss.beamWidth = meta.beamWidth;
+    targetBoss.teleportTimer = type === "warp" ? 2.0 : 0;
+    targetBoss.moveT = 0;
+  }
+
   function createBoss(stageNum){
     blocks = [];
     items = [];
     playerShots = [];
-    const maxHp = 12 + stageNum * 2;
+
+    const maxHp = stageNum === MAX_STAGE ? 24 : 18;
     boss = {
       x: field.x + field.w/2 - 52,
       y: field.y + 12,
@@ -1115,23 +1296,32 @@
       h: 78,
       hp: maxHp,
       maxHp,
-      vx: 1.45 + stageNum * 0.03,
       flash: 0,
       beamTimer: 0,
-      beamGap: 2.25,
       beam:null,
-      bob:0
+      bob:0,
+      secondForm:false,
+      type:"",
+      meta:null,
+      baseY:field.y + 12,
+      vx:1.5,
+      moveT:0,
+      teleportTimer:0,
+      beamGap:2.1,
+      beamWidth:18
     };
+
+    applyBossType(boss, chooseBossType(), stageNum);
   }
 
   function buildStars(){
     stars = [];
-    for(let i=0; i<44; i++){
+    for(let i=0; i<60; i++){
       stars.push({
         x: Math.random() * W,
         y: Math.random() * H,
         r: Math.random() * 2 + 0.5,
-        a: Math.random() * 0.5 + 0.15
+        a: Math.random() * 0.6 + 0.1
       });
     }
   }
@@ -1147,11 +1337,10 @@
   }
 
   function spawnItem(x, y){
-    if(Math.random() > 0.48) return;
+    const chance = 0.48 + currentPerks().itemDropBonus;
+    if(Math.random() > chance) return;
 
-    let pool = [
-      "gauge","score","heal","big","rapid","clone"
-    ];
+    const pool = ["gauge","score","heal","big","rapid","clone"];
     const pick = pool[Math.floor(Math.random() * pool.length)];
     const data = ITEM_TYPES.find(v => v.type === pick);
 
@@ -1168,13 +1357,14 @@
 
   function applyItem(type){
     worldFlash = Math.max(worldFlash, 0.12);
+    stats.itemsCollected += 1;
 
     if(type === "gauge"){
       addSkill(26);
       showMessage("ゲージUP!", 480);
     }
     if(type === "score"){
-      score += 220;
+      addScore(220);
       showMessage("+220", 380);
     }
     if(type === "heal"){
@@ -1221,10 +1411,13 @@
         if(boss){
           boss.hp = Math.max(0, boss.hp - 5);
           boss.flash = 1;
+          registerCombo();
           burst(boss.x + boss.w/2, boss.y + boss.h/2, "🐾", 18);
           addRing(boss.x + boss.w/2, boss.y + boss.h/2, "rgba(255,230,160,.95)", 78, 5);
           if(boss.hp <= 0){
-            score += 120;
+            addScore(120);
+            stats.bossesDefeated += 1;
+            if(boss.secondForm) stats.finalFormDefeated = true;
             boss = null;
             updateHud();
             goNextStage();
@@ -1264,7 +1457,7 @@
   }
 
   function stageKind(stageNum){
-    if(stageNum % 5 === 0) return "boss";
+    if(stageNum % 5 === 0 || stageNum === MAX_STAGE) return "boss";
     return "breakout";
   }
 
@@ -1276,12 +1469,13 @@
     rapidShotCooldown = 0;
     items = [];
     playerShots = [];
+    resetCombo();
 
     stageMode = stageKind(s);
     if(stageMode === "boss"){
       resetBalls(true);
       createBoss(s);
-      showMessage(`BOSS ${s}`, 850);
+      showMessage(s === MAX_STAGE ? "FINAL BOSS" : `BOSS ${s}`, 900);
       say("ボスにゃ!", 700);
     } else {
       resetBalls();
@@ -1319,6 +1513,7 @@
     magnetCharges = 0;
     rapidUntil = 0;
     rapidShotCooldown = 0;
+    resetStats();
 
     paddle.w = currentPerks().basePaddle;
     paddle.h = 18;
@@ -1327,6 +1522,36 @@
 
     loadStage(stage);
     overlay.classList.add("hidden");
+  }
+
+  function calculateRank(clear){
+    let value = score;
+    value += lives * 160;
+    value += stats.maxCombo * 20;
+    value += stats.itemsCollected * 18;
+    value += stats.bossesDefeated * 90;
+    value -= stats.damageTaken * 50;
+    if(clear) value += 320;
+    if(stats.finalFormDefeated) value += 140;
+
+    if(value >= 2600) return "S";
+    if(value >= 1900) return "A";
+    if(value >= 1250) return "B";
+    return "C";
+  }
+
+  function buildAchievements(clear){
+    const list = [];
+    if(clear) list.push("10面制覇");
+    if(clear && stats.damageTaken === 0) list.push("ノーダメ");
+    if(stats.bossesDefeated >= 2) list.push("ボスハンター");
+    if(stats.finalFormDefeated) list.push("真ボス突破");
+    if(stats.itemsCollected >= 8) list.push("アイテムマスター");
+    if(stats.maxCombo >= 12) list.push("コンボ職人");
+    if(clear && lives === 5) list.push("フルライフ");
+    if(selectedChar.id === "cat" && clear) list.push("ネコ推し完走");
+    if(selectedChar.id === "hide" && score >= 1800) list.push("高得点職人");
+    return list;
   }
 
   function goNextStage(){
@@ -1341,6 +1566,8 @@
 
   function loseLife(){
     lives--;
+    stats.damageTaken += 1;
+    resetCombo();
     damageFlash = 1;
     shake = 12;
     playDamage();
@@ -1363,16 +1590,23 @@
     stopMusic();
     saveBest();
     updateHud();
+
+    const rank = calculateRank(clear);
+    const achievements = buildAchievements(clear);
+
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
         <div class="bigCat">🐱</div>
-        <div class="title">${clear ? "20面クリア！" : "ざんねん…"}</div>
+        <div class="title">${clear ? "10面クリア！" : "ざんねん…"}</div>
+        <div class="rankBadge">${rank}</div>
         <div class="sub">
           SCORE: <b>${score}</b><br>
           BEST: <b>${best}</b><br>
-          STAGE: <b>${stage}</b>
+          STAGE: <b>${stage}</b><br>
+          COMBO MAX: <b>${stats.maxCombo}</b>
         </div>
+        ${achievements.length ? `<div class="achWrap">${achievements.map(v => `<span class="achChip">${v}</span>`).join("")}</div>` : ""}
         <button class="btn" id="restartBtn">もういっかい！</button>
       </div>
     `;
@@ -1384,11 +1618,14 @@
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
-        <div class="bigCat">${selectedChar.emoji}</div>
+        <div class="titlePhoto">
+          ${catReady ? `<img src="${catImg.src}" alt="cat">` : selectedChar.emoji}
+        </div>
         <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し DX</div>
         <div class="sub">
           左右ドラッグで移動<br>
-          タップでぺたっ再発射 / SKILLで発動
+          タップでぺたっ再発射 / SKILLで発動<br>
+          10面クリアを目指そう
         </div>
         <div class="charGrid">
           ${CHARACTERS.map((c, i) => `
@@ -1457,32 +1694,48 @@
   }
 
   function drawBackground(){
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0, "#ffd8ea");
-    g.addColorStop(.52, "#f3bad5");
-    g.addColorStop(1, "#ea96bd");
+    let g;
+    if(stageMode === "boss"){
+      g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, "#2a1433");
+      g.addColorStop(.45, "#35183f");
+      g.addColorStop(1, "#140d20");
+    } else {
+      g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0, "#ffd8ea");
+      g.addColorStop(.52, "#f3bad5");
+      g.addColorStop(1, "#ea96bd");
+    }
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
 
     for(const s of stars){
-      ctx.globalAlpha = s.a;
-      ctx.fillStyle = "#ffffff";
+      ctx.globalAlpha = stageMode === "boss" ? s.a * 1.2 : s.a;
+      ctx.fillStyle = stageMode === "boss" ? "#d8d9ff" : "#ffffff";
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.arc(s.x, s.y, stageMode === "boss" ? s.r * 1.1 : s.r, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
 
+    if(stageMode === "boss"){
+      const vignette = ctx.createRadialGradient(W/2, H/2, 120, W/2, H/2, Math.max(W,H)*0.75);
+      vignette.addColorStop(0, "rgba(0,0,0,0)");
+      vignette.addColorStop(1, "rgba(0,0,0,.42)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0,0,W,H);
+    }
+
     if(catReady){
       ctx.save();
-      ctx.globalAlpha = 0.28;
+      ctx.globalAlpha = stageMode === "boss" ? 0.18 : 0.28;
       roundRectPath(field.x, field.y, field.w, field.h, 26);
       ctx.clip();
       drawImageCover(catImg, field.x, field.y, field.w, field.h);
       ctx.restore();
     }
 
-    ctx.strokeStyle = "rgba(255,255,255,.58)";
+    ctx.strokeStyle = stageMode === "boss" ? "rgba(255,255,255,.38)" : "rgba(255,255,255,.58)";
     ctx.lineWidth = 2;
     roundRectPath(field.x, field.y, field.w, field.h, 26);
     ctx.stroke();
@@ -1531,13 +1784,17 @@
   function drawBoss(){
     if(!boss) return;
 
+    const meta = boss.meta || BOSS_TYPES.beam;
     const cx = boss.x + boss.w/2;
     const cy = boss.y + boss.h/2 + Math.sin(boss.bob) * 2;
 
     ctx.save();
     ctx.translate(cx, cy);
 
-    ctx.fillStyle = boss.flash > 0.1 ? "#fff0a8" : "#ff9ac4";
+    ctx.shadowColor = meta.aura;
+    ctx.shadowBlur = 18;
+
+    ctx.fillStyle = boss.flash > 0.1 ? "#fff0a8" : meta.bottom;
     ctx.beginPath();
     ctx.moveTo(-30, -10);
     ctx.lineTo(-16, -40);
@@ -1553,13 +1810,15 @@
     ctx.fill();
 
     const grad = ctx.createLinearGradient(0, -boss.h/2, 0, boss.h/2);
-    grad.addColorStop(0, boss.flash > 0.1 ? "#fff0a8" : "#ffd4e8");
-    grad.addColorStop(1, boss.flash > 0.1 ? "#ffd34d" : "#ff7dae");
+    grad.addColorStop(0, boss.flash > 0.1 ? "#fff0a8" : meta.top);
+    grad.addColorStop(1, boss.flash > 0.1 ? "#ffd34d" : meta.bottom);
     roundRectPath(-boss.w/2, -boss.h/2, boss.w, boss.h, 22);
     ctx.fillStyle = grad;
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.7)";
+    ctx.strokeStyle = "rgba(255,255,255,.82)";
     ctx.stroke();
+
+    ctx.shadowBlur = 0;
 
     if(catReady){
       ctx.save();
@@ -1604,30 +1863,38 @@
 
     const barW = field.w - 24;
     roundRectPath(field.x + 12, field.y + 8, barW, 12, 8);
-    ctx.fillStyle = "rgba(255,255,255,.3)";
+    ctx.fillStyle = "rgba(255,255,255,.2)";
     ctx.fill();
     roundRectPath(field.x + 12, field.y + 8, barW * Math.max(0, boss.hp / boss.maxHp), 12, 8);
-    ctx.fillStyle = "#ff5d86";
+    ctx.fillStyle = meta.bottom;
     ctx.fill();
 
     if(boss.beam){
       const beamX = boss.beam.x;
+      const beamW = boss.beamWidth || 18;
       if(boss.beam.state === "charge"){
-        ctx.strokeStyle = "rgba(255,255,255,.75)";
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(255,255,255,.9)";
+        ctx.lineWidth = 3;
         ctx.setLineDash([8,8]);
         ctx.beginPath();
         ctx.moveTo(beamX, boss.y + boss.h - 6);
         ctx.lineTo(beamX, field.y + field.h);
         ctx.stroke();
         ctx.setLineDash([]);
+
+        ctx.fillStyle = "rgba(255,180,220,.15)";
+        ctx.fillRect(beamX - beamW, boss.y + boss.h - 6, beamW * 2, field.y + field.h - (boss.y + boss.h - 6));
       } else {
         const gradB = ctx.createLinearGradient(beamX, boss.y, beamX, field.y + field.h);
-        gradB.addColorStop(0, "rgba(255,255,255,.96)");
-        gradB.addColorStop(.2, "rgba(255,122,170,.92)");
+        gradB.addColorStop(0, "rgba(255,255,255,1)");
+        gradB.addColorStop(.15, "rgba(255,180,220,.95)");
+        gradB.addColorStop(.35, meta.bottom);
         gradB.addColorStop(1, "rgba(255,122,170,.12)");
         ctx.fillStyle = gradB;
-        ctx.fillRect(beamX - 7, boss.y + boss.h - 6, 14, field.y + field.h - (boss.y + boss.h - 6));
+        ctx.fillRect(beamX - beamW/2, boss.y + boss.h - 6, beamW, field.y + field.h - (boss.y + boss.h - 6));
+
+        ctx.fillStyle = "rgba(255,255,255,.25)";
+        ctx.fillRect(beamX - beamW, boss.y + boss.h - 6, beamW * 2, field.y + field.h - (boss.y + boss.h - 6));
       }
     }
   }
@@ -1800,11 +2067,44 @@
     if(!boss) return;
 
     boss.bob += dt * 4.5;
-    boss.x += boss.vx * dt * 60;
+    boss.moveT += dt;
+
+    if(stage === MAX_STAGE && !boss.secondForm && boss.hp <= boss.maxHp * 0.5){
+      boss.secondForm = true;
+      const prev = boss.type;
+      applyBossType(boss, chooseBossType(prev), stage, true);
+      boss.beamGap *= 0.86;
+      worldFlash = Math.max(worldFlash, 0.2);
+      shake = Math.max(shake, 8);
+      showMessage("FINAL MODE!", 820);
+      say("本気にゃ!", 650);
+      playBeamCharge();
+    }
+
+    if(boss.type === "beam"){
+      boss.x += boss.vx * dt * 60;
+      boss.y += (boss.baseY - boss.y) * 0.08;
+    } else if(boss.type === "zigzag"){
+      boss.x += boss.vx * dt * 60;
+      boss.y = boss.baseY + Math.sin(boss.moveT * 2.7) * 18;
+    } else if(boss.type === "warp"){
+      boss.x += boss.vx * dt * 60;
+      boss.y += (boss.baseY - boss.y) * 0.08;
+      boss.teleportTimer -= dt;
+      if(boss.teleportTimer <= 0){
+        boss.teleportTimer = 1.9;
+        burst(boss.x + boss.w/2, boss.y + boss.h/2, "💨", 10);
+        boss.x = clamp(field.x + 20 + rand(0, field.w - boss.w - 40), field.x + 12, field.x + field.w - boss.w - 12);
+        burst(boss.x + boss.w/2, boss.y + boss.h/2, "✨", 12);
+        addRing(boss.x + boss.w/2, boss.y + boss.h/2, "rgba(180,255,220,.9)", 74, 4);
+      }
+    }
+
     if(boss.x < field.x + 12 || boss.x + boss.w > field.x + field.w - 12){
       boss.vx *= -1;
       boss.x = Math.max(field.x + 12, Math.min(field.x + field.w - boss.w - 12, boss.x));
     }
+
     boss.flash *= 0.88;
 
     boss.beamTimer += dt;
@@ -1816,20 +2116,28 @@
         timer:0.55,
         hit:false
       };
+      playBeamCharge();
+      showMessage("WARNING", 420);
     }
 
     if(boss.beam){
+      boss.beam.x = boss.x + boss.w/2;
       boss.beam.timer -= dt;
+
       if(boss.beam.state === "charge" && boss.beam.timer <= 0){
         boss.beam.state = "fire";
-        boss.beam.timer = 0.48;
+        boss.beam.timer = boss.secondForm ? 0.56 : 0.46;
+        playBeamFire();
+        worldFlash = Math.max(worldFlash, 0.18);
+        shake = Math.max(shake, 7);
       } else if(boss.beam.state === "fire" && boss.beam.timer <= 0){
         boss.beam = null;
       }
 
       if(boss.beam && boss.beam.state === "fire"){
         const bx = boss.beam.x;
-        const paddleHit = bx >= paddle.x && bx <= paddle.x + paddle.w;
+        const beamW = boss.beamWidth || 18;
+        const paddleHit = bx + beamW/2 >= paddle.x && bx - beamW/2 <= paddle.x + paddle.w;
         if(paddleHit && !boss.beam.hit){
           boss.beam.hit = true;
           burst(bx, paddle.y, "💥", 10);
@@ -1862,7 +2170,7 @@
     const currentSpeed = Math.hypot(ball.vx, ball.vy);
     const nextSpeed = Math.max(minSpeed, Math.min(currentSpeed * 0.94, minSpeed + 1.1));
 
-    ball.vx = hit * nextSpeed * 0.92;
+    ball.vx = hit * nextSpeed * 0.92 * currentPerks().controlMult;
     ball.vy = -Math.sqrt(Math.max(minSpeed * minSpeed * 0.9, nextSpeed * nextSpeed - ball.vx * ball.vx));
 
     burst(ball.x, paddle.y, "🐾", 9);
@@ -1909,9 +2217,8 @@
   }
 
   function spawnPlayerShot(){
-    const theme = paddleTheme();
     const px = paddle.x + paddle.w/2 + rand(-paddle.w * 0.24, paddle.w * 0.24);
-    playerShots.push({ x:px, y:paddle.y - 4, vy:-10.5, col:theme.accent });
+    playerShots.push({ x:px, y:paddle.y - 4, vy:-10.5 });
     playTap(980);
   }
 
@@ -1930,14 +2237,17 @@
         if(s.x > rect.x && s.x < rect.x + rect.w && s.y > rect.y && s.y < rect.y + rect.h){
           boss.hp -= 1;
           boss.flash = 1;
-          score += 4;
+          registerCombo();
+          addScore(4);
           addSkill(2);
           burst(s.x, s.y, "💥", 8);
           worldFlash = Math.max(worldFlash, 0.08);
           playerShots.splice(i, 1);
 
           if(boss.hp <= 0){
-            score += 120;
+            addScore(120);
+            stats.bossesDefeated += 1;
+            if(boss.secondForm) stats.finalFormDefeated = true;
             boss = null;
             goNextStage();
             return;
@@ -1958,13 +2268,15 @@
           }
 
           b.hp -= 1;
-          score += b.maxHp >= 3 ? 8 : b.maxHp === 2 ? 6 : 5;
+          registerCombo();
+          addScore(b.maxHp >= 3 ? 8 : b.maxHp === 2 ? 6 : 5);
           addSkill(2);
           burst(s.x, s.y, "✨", 8);
           worldFlash = Math.max(worldFlash, 0.06);
 
           if(b.hp <= 0){
             b.alive = false;
+            stats.totalBlocksBroken += 1;
             spawnItem(b.x + b.w/2, b.y + b.h/2);
           }
 
@@ -2002,9 +2314,17 @@
 
     const now = performance.now();
 
+    if(stats.comboTimer > 0){
+      stats.comboTimer -= dt;
+      if(stats.comboTimer <= 0){
+        resetCombo();
+      }
+    }
+
     const basePaddle = currentPerks().basePaddle;
+    const bigTarget = 170 + currentPerks().bigWidthBonus;
     if(now < paddleBoostUntil){
-      paddle.w += (170 - paddle.w) * 0.15;
+      paddle.w += (bigTarget - paddle.w) * 0.15;
     } else {
       paddle.w += (basePaddle - paddle.w) * 0.14;
     }
@@ -2030,7 +2350,7 @@
     if(now < rapidUntil){
       rapidShotCooldown -= dt;
       while(rapidShotCooldown <= 0){
-        rapidShotCooldown += 0.16;
+        rapidShotCooldown += 0.16 * currentPerks().rapidCooldownMult;
         spawnPlayerShot();
       }
     }
@@ -2085,7 +2405,8 @@
         if(hitRect(ball, rect)){
           boss.hp -= 1;
           boss.flash = 1;
-          score += 16;
+          registerCombo();
+          addScore(16);
           addSkill(6);
           burst(ball.x, ball.y, "⭐", 12);
           worldFlash = Math.max(worldFlash, 0.08);
@@ -2093,7 +2414,9 @@
           playTap(920);
           reflectBall(ball, rect);
           if(boss.hp <= 0){
-            score += 120;
+            addScore(120);
+            stats.bossesDefeated += 1;
+            if(boss.secondForm) stats.finalFormDefeated = true;
             boss = null;
             goNextStage();
             return;
@@ -2103,7 +2426,8 @@
 
         if(boss && boss.beam && boss.beam.state === "fire"){
           const bx = boss.beam.x;
-          if(ball.x + ball.r > bx - 7 && ball.x - ball.r < bx + 7 && ball.y > boss.y + boss.h - 8){
+          const beamW = boss.beamWidth || 18;
+          if(ball.x + ball.r > bx - beamW/2 && ball.x - ball.r < bx + beamW/2 && ball.y > boss.y + boss.h - 8){
             ball.vy *= -1;
             ball.vx *= 0.96;
             burst(ball.x, ball.y, "⚡", 7);
@@ -2123,7 +2447,8 @@
           }
 
           b.hp -= 1;
-          score += b.maxHp >= 3 ? 14 : b.maxHp === 2 ? 12 : 10;
+          registerCombo();
+          addScore(b.maxHp >= 3 ? 14 : b.maxHp === 2 ? 12 : 10);
           addSkill(6);
           burst(b.x + b.w/2, b.y + b.h/2, "✨", 10);
           worldFlash = Math.max(worldFlash, 0.06);
@@ -2131,6 +2456,7 @@
 
           if(b.hp <= 0){
             b.alive = false;
+            stats.totalBlocksBroken += 1;
             playTap(860);
             spawnItem(b.x + b.w/2, b.y + b.h/2);
             burst(b.x + b.w/2, b.y + b.h/2, "💫", 12);
@@ -2222,7 +2548,7 @@
       if(ball.stuck){
         ball.stuck = false;
         const hit = (pointerX - (paddle.x + paddle.w/2)) / (paddle.w/2);
-        ball.vx = hit * 5.2;
+        ball.vx = hit * 5.2 * currentPerks().controlMult;
         ball.vy = -Math.max(currentPerks().launchSpeed, 4.8);
         released = true;
       }
