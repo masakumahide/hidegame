@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>ヒデちゃん&猫ちゃん ブロック崩し DX</title>
+<title>ヒデちゃん&クマちゃん ブロック崩し DX</title>
 <style>
   :root{
     --bg1:#ffd9ea;
@@ -303,8 +303,8 @@
     width:min(94vw,460px);
     padding:22px 18px 20px;
     border-radius:28px;
-    background:linear-gradient(180deg,rgba(255,255,255,.64),rgba(255,255,255,.38));
-    border:1px solid rgba(255,255,255,.9);
+    background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.40));
+    border:1px solid rgba(255,255,255,.92);
     box-shadow:0 20px 40px rgba(0,0,0,.2);
     text-align:center;
     color:var(--ink);
@@ -317,8 +317,8 @@
   }
 
   .titlePhoto{
-    width:96px;
-    height:96px;
+    width:104px;
+    height:104px;
     margin:0 auto 12px;
     border-radius:50%;
     overflow:hidden;
@@ -381,8 +381,8 @@
     border:none;
     border-radius:20px;
     padding:14px 10px;
-    background:rgba(255,255,255,.48);
-    border:2px solid rgba(255,255,255,.72);
+    background:rgba(255,255,255,.52);
+    border:2px solid rgba(255,255,255,.78);
     color:var(--ink);
     box-shadow:var(--shadow);
     font:inherit;
@@ -391,6 +391,7 @@
   .charBtn.selected{
     border-color:#ff63ad;
     box-shadow:0 0 0 3px rgba(255,99,173,.18), var(--shadow);
+    transform:scale(1.02);
   }
 
   .charBtn .emoji{
@@ -543,8 +544,8 @@
   const CHARACTERS = [
     { id:"hide", emoji:"😄", name:"ヒデ", perk:"金色 / 幅広 + スコア10%UP" },
     { id:"cat", emoji:"🐱", name:"ネコ", perk:"ピンク / ゲージ速い + アイテム出やすい" },
-    { id:"bear", emoji:"🐻", name:"クマ", perk:"青 / ビッグが長くて大きい" },
-    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑 / 球が少し遅い + 連射が速い" }
+    { id:"bear", emoji:"🐻", name:"クマ", perk:"青 / ビッグ長い + 安定" },
+    { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑 / 球やさしめ + 連射速い" }
   ];
   let selectedChar = CHARACTERS[1];
 
@@ -598,15 +599,19 @@
     [55,59,62],[62,66,69],[55,59,62],[57,61,64]
   ];
 
+  const CUTE_THEME = [
+    [69,73,76],[67,71,74],[66,69,73],[64,67,71],
+    [62,66,69],[64,67,71],[66,69,73],[67,71,74]
+  ];
+
+  const STORY_THEME = [
+    [64,67,71],[62,66,69],[60,64,67],[62,65,69],
+    [64,67,71],[67,71,74],[69,73,76],[71,74,78]
+  ];
+
   const BOSS_THEME = [
-    [38,45,50],
-    [36,43,48],
-    [35,42,47],
-    [33,40,45],
-    [31,38,43],
-    [30,37,42],
-    [29,36,41],
-    [28,35,40]
+    [38,45,50],[36,43,48],[35,42,47],[33,40,45],
+    [31,38,43],[30,37,42],[29,36,41],[28,35,40]
   ];
 
   const CAT_CANDIDATES = [
@@ -630,7 +635,7 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v13") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v14") || 0);
   let stageMode = "breakout";
   let stageVariant = 0;
 
@@ -679,6 +684,8 @@
   let audioCtx = null;
   let musicStep = 0;
   let musicAccum = 0;
+  let audioPrimed = false;
+  let musicSceneKey = "";
 
   function rand(min, max){
     return Math.random() * (max - min) + min;
@@ -740,7 +747,7 @@
       scoreBonus:
         selectedChar.id === "hide" ? 1.10 : 1.0,
       bigDurationMult:
-        selectedChar.id === "bear" ? 1.6 : 1.0,
+        selectedChar.id === "bear" ? 1.55 : 1.0,
       bigWidthBonus:
         selectedChar.id === "bear" ? 18 : 0,
       launchSpeed:
@@ -750,6 +757,24 @@
       controlMult:
         selectedChar.id === "rabbit" ? 1.12 : 1.0
     };
+  }
+
+  function currentMusicMode(){
+    if(state === "opening" || state === "title") return "cute";
+    if(state === "story") return "story";
+    if(state === "celebration") return "celebrate";
+    if(state === "playing" && stageMode === "boss") return "boss";
+    if(state === "playing") return "play";
+    return "none";
+  }
+
+  function resetMusicForScene(){
+    const key = `${state}:${stageMode}:${stage}`;
+    if(key !== musicSceneKey){
+      musicSceneKey = key;
+      musicStep = 0;
+      musicAccum = 0;
+    }
   }
 
   function addScore(points){
@@ -941,13 +966,45 @@
     return sum / Math.max(1, count);
   }
 
-  function tickMusicStep(){
-    if(!audioCtx || state !== "playing") return;
+  function tickCuteTheme(chords, lively = 1){
+    const chord = chords[Math.floor(musicStep / 8) % chords.length];
+    const step = musicStep % 8;
     const t = audioCtx.currentTime + 0.01;
 
-    if(stageMode === "boss"){
+    const arp = [0,1,2,1,2,1,0,1];
+    const note = chord[arp[step]] + 12;
+    playTone(t, midiToFreq(note), 0.12, "square", 0.011 * lively);
+    playTone(t + 0.015, midiToFreq(note + 12), 0.07, "sine", 0.006 * lively);
+
+    if(step === 0 || step === 4){
+      playTone(t, midiToFreq(chord[0] - 12), 0.22, "triangle", 0.020 * lively);
+      playTone(t + 0.02, midiToFreq(chord[1]), 0.16, "sine", 0.010 * lively);
+    }
+
+    if(step === 2 || step === 6){
+      playTone(t, 2200, 0.03, "square", 0.004 * lively);
+    }
+
+    if(step === 7){
+      playTone(t + 0.02, midiToFreq(chord[2] + 19), 0.11, "triangle", 0.007 * lively);
+    }
+  }
+
+  function tickMusicStep(){
+    if(!audioCtx) return;
+    const mode = currentMusicMode();
+    if(mode === "none") return;
+
+    if(mode === "cute"){
+      tickCuteTheme(CUTE_THEME, 1.15);
+    } else if(mode === "story"){
+      tickCuteTheme(STORY_THEME, 0.95);
+    } else if(mode === "celebrate"){
+      tickCuteTheme(CUTE_THEME, 1.35);
+    } else if(mode === "boss"){
       const chord = BOSS_THEME[Math.floor(musicStep / 8) % BOSS_THEME.length];
       const step = musicStep % 8;
+      const t = audioCtx.currentTime + 0.01;
       const low = chord[0];
       const mid = chord[1];
       const high = chord[2];
@@ -981,18 +1038,19 @@
       }
     } else {
       const chord = CANON[Math.floor(musicStep / 8) % CANON.length];
-      const stepInChord = musicStep % 8;
-      const arpPattern = [0,1,2,1,2,1,0,1];
-      const arpNote = chord[arpPattern[stepInChord]] + 12;
+      const step = musicStep % 8;
+      const t = audioCtx.currentTime + 0.01;
+      const arp = [0,1,2,1,2,1,0,1];
+      const note = chord[arp[step]] + 12;
 
-      playTone(t, midiToFreq(arpNote), 0.13, "square", 0.009);
+      playTone(t, midiToFreq(note), 0.13, "square", 0.009);
 
-      if(stepInChord === 0 || stepInChord === 4){
+      if(step === 0 || step === 4){
         playTone(t, midiToFreq(chord[0] - 24), 0.26, "sine", 0.032);
         playTone(t, midiToFreq(chord[1]), 0.18, "triangle", 0.008);
       }
 
-      if(stepInChord === 2 || stepInChord === 6){
+      if(step === 2 || step === 6){
         playTone(t, 2600, 0.025, "square", 0.0038);
       }
     }
@@ -1001,13 +1059,20 @@
   }
 
   function updateMusic(dt){
-    if(!audioCtx || state !== "playing") return;
-    const speed = averageBallSpeed();
-    let interval;
+    if(!audioCtx || !audioPrimed) return;
+    const mode = currentMusicMode();
+    if(mode === "none") return;
 
-    if(stageMode === "boss"){
+    let interval = 0.22;
+
+    if(mode === "cute") interval = 0.17;
+    else if(mode === "story") interval = 0.20;
+    else if(mode === "celebrate") interval = 0.15;
+    else if(mode === "boss"){
+      const speed = averageBallSpeed();
       interval = Math.max(0.17, Math.min(0.30, 0.26 - (speed - 5.2) * 0.008));
-    } else {
+    } else if(mode === "play"){
+      const speed = averageBallSpeed();
       interval = Math.max(0.16, Math.min(0.26, 0.24 - (speed - 6.0) * 0.01));
     }
 
@@ -1018,13 +1083,8 @@
     }
   }
 
-  function startMusic(){
-    unlockAudio();
+  function resetMusic(){
     musicStep = 0;
-    musicAccum = 0;
-  }
-
-  function stopMusic(){
     musicAccum = 0;
   }
 
@@ -1083,10 +1143,17 @@
 
     if(state === "title"){
       text = "えらんでにゃ";
+      glow = "0 12px 28px rgba(255,99,173,.40)";
+      scale = 1.05;
     } else if(state === "opening"){
       text = "みてにゃ";
     } else if(state === "story"){
       text = "がんばるにゃ";
+      glow = "0 12px 26px rgba(255,216,77,.35)";
+    } else if(state === "celebration"){
+      text = "やったにゃ!";
+      glow = "0 14px 30px rgba(126,255,211,.58)";
+      scale = 1.08;
     } else if(state !== "playing"){
       text = "おつかれにゃ";
     } else if(stageMode === "boss"){
@@ -1111,7 +1178,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v13", String(best));
+      localStorage.setItem("hidecat_fun_best_v14", String(best));
     }
   }
 
@@ -1192,9 +1259,9 @@
     skillsArea.style.left = `${view.x + 14}px`;
     skillsArea.style.right = `${W - (view.x + view.w) + 14}px`;
 
-    catBadge.style.left = `${view.x + view.w / 2}px`;
-    catTalk.style.left = `${view.x + view.w / 2}px`;
-    message.style.left = `${view.x + view.w / 2}px`;
+    catBadge.style.left = `${viewCenterX()}px`;
+    catTalk.style.left = `${viewCenterX()}px`;
+    message.style.left = `${viewCenterX()}px`;
 
     catSkillBadge.style.left = `${view.x + 14}px`;
   }
@@ -1514,7 +1581,7 @@
 
   function buildStars(){
     stars = [];
-    for(let i=0; i<60; i++){
+    for(let i=0; i<74; i++){
       stars.push({
         x: Math.random() * W,
         y: Math.random() * H,
@@ -1685,9 +1752,7 @@
       say(s === 1 ? "ランダムにゃ!" : "いくにゃ!", 520);
     }
 
-    musicStep = 0;
-    musicAccum = 0;
-
+    resetMusic();
     paddle.x = field.x + field.w / 2 - paddle.w / 2;
     paddle.y = field.y + field.h - 24;
     updateHud();
@@ -1695,7 +1760,8 @@
 
   function startGameNow(){
     unlockAudio();
-    startMusic();
+    audioPrimed = true;
+    resetMusic();
 
     state = "playing";
     stage = 1;
@@ -1732,6 +1798,7 @@
     overlay.classList.add("hidden");
     storyTime = 0;
     state = "story";
+    resetMusic();
     say("がんばるにゃ", 1000);
   }
 
@@ -1767,7 +1834,6 @@
 
   function showClearCard(){
     state = "clear";
-    stopMusic();
     saveBest();
     updateHud();
 
@@ -1795,7 +1861,6 @@
 
   function showGameOverCard(){
     state = "gameover";
-    stopMusic();
     saveBest();
     updateHud();
 
@@ -1825,7 +1890,7 @@
     if(stage >= MAX_STAGE){
       state = "celebration";
       celebrationTime = 0;
-      stopMusic();
+      resetMusic();
       saveBest();
       overlay.classList.add("hidden");
       return;
@@ -1863,15 +1928,16 @@
   function renderTitle(){
     state = "title";
     stageMode = "breakout";
+    resetMusic();
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
         <div class="titlePhoto">
           ${catReady ? `<img src="${catImg.src}" alt="cat">` : selectedChar.emoji}
         </div>
-        <div class="title">ヒデちゃん&猫ちゃん<br>ブロック崩し DX</div>
+        <div class="title">ヒデちゃん&クマちゃん<br>ブロック崩し DX</div>
         <div class="sub">
-          左右ドラッグで移動<br>
+          にゃんにゃん全開でいくよ！<br>
           タップでぴたっ再発射 / SKILLで発動<br>
           10面クリアを目指そう
         </div>
@@ -1884,14 +1950,15 @@
             </button>
           `).join("")}
         </div>
-        <button class="btn" id="startBtn2">スタート！</button>
+        <button class="btn" id="startBtn2">テンションMAXでスタート！</button>
       </div>
     `;
     overlay.querySelectorAll(".charBtn").forEach(btn => {
       btn.onclick = () => {
         const i = Number(btn.dataset.i);
         selectedChar = CHARACTERS[i];
-        say(i === 1 ? "主役にゃ!" : "いくにゃ", 520);
+        say(i === 1 ? "主役にゃ!" : "いくにゃ!", 520);
+        playTap(880);
         renderTitle();
       };
     });
@@ -1912,7 +1979,6 @@
     layoutField();
 
     if(!pointerX) pointerX = viewCenterX();
-
     paddle.y = field.y + field.h - 24;
     buildStars();
   }
@@ -1967,6 +2033,46 @@
       ctx.fillStyle = styleA;
       ctx.fillRect(0, 0, leftW, H);
       ctx.fillRect(rightX, 0, rightW, H);
+    }
+  }
+
+  function drawCatSticker(x, y, size, rot=0, alpha=1, photoBias=0.75){
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+
+    if(catReady && Math.random() < photoBias){
+      ctx.beginPath();
+      ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(catImg, -size / 2, -size / 2, size, size);
+    } else {
+      ctx.font = `${Math.floor(size)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#fff";
+      ctx.fillText("🐱", 0, 0);
+    }
+    ctx.restore();
+  }
+
+  function drawCatOrbit(count, centerX, centerY, radiusX, radiusY, sizeBase, time, alpha=0.92){
+    for(let i=0; i<count; i++){
+      const a = (i / count) * Math.PI * 2 + time;
+      const x = centerX + Math.cos(a) * radiusX;
+      const y = centerY + Math.sin(a * 1.15) * radiusY;
+      drawCatSticker(x, y, sizeBase + Math.sin(a * 3) * 4, a * 0.2, alpha, 0.9);
+    }
+  }
+
+  function drawTitleCats(time){
+    for(let i=0; i<8; i++){
+      const side = i % 2 === 0 ? -1 : 1;
+      const row = Math.floor(i / 2);
+      const x = viewCenterX() + side * (view.w * 0.34);
+      const y = H * (0.16 + row * 0.15) + Math.sin(time * 2 + i) * 10;
+      drawCatSticker(x, y, 34 + (i % 3) * 4, Math.sin(time * 1.5 + i) * 0.18, 0.86, 0.85);
     }
   }
 
@@ -2398,14 +2504,15 @@
 
   function drawOpeningMovie(){
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#1a0f22");
-    g.addColorStop(1, "#59305f");
+    g.addColorStop(0, "#241235");
+    g.addColorStop(.45, "#55306b");
+    g.addColorStop(1, "#ff83bc");
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(0,0,0,.45)");
+    drawSideMats("rgba(15,8,20,.70)", "rgba(255,120,180,.16)");
 
     for(const s of stars){
-      ctx.globalAlpha = s.a * 1.4;
+      ctx.globalAlpha = s.a * 1.45;
       ctx.fillStyle = "#fff";
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
@@ -2416,78 +2523,107 @@
     const t = openingTime;
     const cx = viewCenterX();
 
+    drawCatOrbit(7, cx, H * 0.22, Math.min(120, view.w * 0.26), 26, 34, t * 0.7, 0.82);
+    drawCatOrbit(6, cx, H * 0.74, Math.min(150, view.w * 0.30), 24, 28, -t * 0.9, 0.76);
+
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     if(t < 2.4){
       ctx.fillStyle = "rgba(255,255,255,.95)";
-      ctx.font = "900 20px sans-serif";
-      ctx.fillText("ある日…", cx, H * 0.25);
+      ctx.font = "900 22px sans-serif";
+      ctx.fillText("ある日…", cx, H * 0.20);
+
       if(catReady){
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, H * 0.50, 64, 0, Math.PI * 2);
+        ctx.arc(cx, H * 0.48, 72, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(catImg, cx - 64, H * 0.50 - 64, 128, 128);
+        ctx.drawImage(catImg, cx - 72, H * 0.48 - 72, 144, 144);
         ctx.restore();
       } else {
-        ctx.font = "90px sans-serif";
-        ctx.fillText("🐱", cx, H * 0.52);
+        ctx.font = "100px sans-serif";
+        ctx.fillText("🐱", cx, H * 0.50);
       }
-    } else if(t < 5){
+
+      ctx.font = "900 16px sans-serif";
+      ctx.fillStyle = "#ffe78b";
+      ctx.fillText(audioPrimed ? "クマちゃんがきらきら…" : "最初のタップで音ON", cx, H * 0.68);
+    } else if(t < 5.2){
       ctx.fillStyle = "#fff6c8";
       ctx.font = "900 18px sans-serif";
-      ctx.fillText("ヒデちゃんと猫ちゃんの", cx, H * 0.22);
-      ctx.fillText("平和な時間…", cx, H * 0.28);
+      ctx.fillText("ヒデちゃんとクマちゃんの", cx, H * 0.18);
+      ctx.fillText("かわいい毎日…", cx, H * 0.24);
+
       ctx.font = "82px sans-serif";
-      ctx.fillText("😄", cx - view.w * 0.16, H * 0.58);
+      ctx.fillText("😄", cx - view.w * 0.16, H * 0.54);
+
       if(catReady){
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.58, 42, 0, Math.PI * 2);
+        ctx.arc(cx + view.w * 0.16, H * 0.54, 48, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 42, H * 0.58 - 42, 84, 84);
+        ctx.drawImage(catImg, cx + view.w * 0.16 - 48, H * 0.54 - 48, 96, 96);
         ctx.restore();
       } else {
-        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.58);
+        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.54);
       }
-    } else if(t < 7.4){
+
+      for(let i=0; i<8; i++){
+        const x = cx + Math.sin(t * 1.4 + i) * Math.min(120, view.w * 0.26);
+        const y = H * 0.72 + Math.cos(t * 1.6 + i * 1.4) * 26;
+        ctx.font = "22px sans-serif";
+        ctx.fillText(i % 2 ? "🐾" : "✨", x, y);
+      }
+    } else if(t < 7.8){
       ctx.fillStyle = "#ffd84d";
       ctx.font = "900 18px sans-serif";
-      ctx.fillText("そこへ…", cx, H * 0.22);
-      ctx.fillText("わるい猫ボスが現れた", cx, H * 0.28);
+      ctx.fillText("そこへ…", cx, H * 0.18);
+      ctx.fillText("わるい猫ボスが現れた！", cx, H * 0.24);
 
       ctx.save();
-      ctx.translate(cx, H * 0.58);
-      ctx.scale(1.2, 1.2);
-      ctx.fillStyle = "rgba(255,255,255,.08)";
+      ctx.translate(cx, H * 0.54);
+      ctx.scale(1.25, 1.25);
+      ctx.fillStyle = "rgba(255,255,255,.10)";
       ctx.beginPath();
-      ctx.arc(0, 0, 72, 0, Math.PI * 2);
+      ctx.arc(0, 0, 76, 0, Math.PI * 2);
       ctx.fill();
-      ctx.font = "96px sans-serif";
+      ctx.font = "102px sans-serif";
       ctx.fillStyle = "#fff";
       ctx.fillText("😾", 0, 0);
       ctx.restore();
+
+      for(let i=0; i<10; i++){
+        const a = (i / 10) * Math.PI * 2 + t * 2.2;
+        const x = cx + Math.cos(a) * Math.min(140, view.w * 0.32);
+        const y = H * 0.54 + Math.sin(a) * 90;
+        ctx.font = "24px sans-serif";
+        ctx.fillText(i % 2 ? "⚡" : "💥", x, y);
+      }
     } else {
       ctx.fillStyle = "#fff";
-      ctx.font = "900 28px sans-serif";
-      ctx.fillText("ヒデちゃん&猫ちゃん", cx, H * 0.34);
-      ctx.fillText("ブロック崩し DX", cx, H * 0.42);
-      ctx.font = "900 16px sans-serif";
-      ctx.fillStyle = "#ffd84d";
-      ctx.fillText("タップでスキップ", cx, H * 0.70);
+      ctx.font = "900 30px sans-serif";
+      ctx.fillText("ヒデちゃん&クマちゃん", cx, H * 0.32);
+      ctx.fillText("ブロック崩し DX", cx, H * 0.40);
+
+      ctx.font = "900 18px sans-serif";
+      ctx.fillStyle = "#ffe78b";
+      ctx.fillText(audioPrimed ? "タップでスキップ" : "最初のタップで音ON", cx, H * 0.72);
     }
   }
 
   function drawStoryMovie(){
     const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#2a1830");
-    g.addColorStop(1, "#7c477e");
+    g.addColorStop(0, "#31183c");
+    g.addColorStop(.55, "#734a8b");
+    g.addColorStop(1, "#ff9bc9");
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(0,0,0,.36)");
+    drawSideMats("rgba(18,10,24,.62)", "rgba(255,170,210,.12)");
 
     const cx = viewCenterX();
+
+    drawCatOrbit(6, cx, H * 0.18, Math.min(130, view.w * 0.26), 20, 24, storyTime * 1.2, 0.68);
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -2495,47 +2631,55 @@
     if(storyTime < 1.6){
       ctx.fillStyle = "#fff6c8";
       ctx.font = "900 18px sans-serif";
-      ctx.fillText("ヒデちゃんと猫ちゃん…", cx, H * 0.25);
-      ctx.fillText("ちょっと悲しそう…", cx, H * 0.31);
+      ctx.fillText("ヒデちゃんとクマちゃん…", cx, H * 0.22);
+      ctx.fillText("ちょっと悲しそう…", cx, H * 0.28);
 
-      ctx.font = "86px sans-serif";
-      ctx.fillText("🥺", cx - view.w * 0.16, H * 0.58);
+      ctx.font = "88px sans-serif";
+      ctx.fillText("🥺", cx - view.w * 0.16, H * 0.54);
 
       if(catReady){
         ctx.save();
-        ctx.globalAlpha = 0.95;
         ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.58, 48, 0, Math.PI * 2);
+        ctx.arc(cx + view.w * 0.16, H * 0.54, 50, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 48, H * 0.58 - 48, 96, 96);
+        ctx.drawImage(catImg, cx + view.w * 0.16 - 50, H * 0.54 - 50, 100, 100);
         ctx.restore();
-        ctx.font = "20px sans-serif";
-        ctx.fillText("…", cx + view.w * 0.16, H * 0.68);
       } else {
-        ctx.font = "86px sans-serif";
-        ctx.fillText("😿", cx + view.w * 0.16, H * 0.58);
+        ctx.font = "88px sans-serif";
+        ctx.fillText("😿", cx + view.w * 0.16, H * 0.54);
       }
+
+      ctx.font = "24px sans-serif";
+      ctx.fillText("…", cx, H * 0.72);
     } else {
       ctx.fillStyle = "#ffd84d";
-      ctx.font = "900 28px sans-serif";
-      ctx.fillText("頑張るぞ！", cx, H * 0.25);
+      ctx.font = "900 30px sans-serif";
+      ctx.fillText("頑張るぞ！", cx, H * 0.22);
+
       ctx.font = "96px sans-serif";
-      ctx.fillText("😤", cx - view.w * 0.16, H * 0.58);
+      ctx.fillText("😤", cx - view.w * 0.16, H * 0.54);
 
       if(catReady){
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.58, 48, 0, Math.PI * 2);
+        ctx.arc(cx + view.w * 0.16, H * 0.54, 50, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 48, H * 0.58 - 48, 96, 96);
+        ctx.drawImage(catImg, cx + view.w * 0.16 - 50, H * 0.54 - 50, 100, 100);
         ctx.restore();
       } else {
-        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.58);
+        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.54);
+      }
+
+      for(let i=0; i<10; i++){
+        const x = cx + Math.sin(storyTime * 3 + i) * Math.min(130, view.w * 0.28);
+        const y = H * 0.72 + Math.cos(storyTime * 4 + i) * 26;
+        ctx.font = "22px sans-serif";
+        ctx.fillText(i % 2 ? "✨" : "🐾", x, y);
       }
 
       ctx.font = "900 16px sans-serif";
       ctx.fillStyle = "#fff";
-      ctx.fillText("タップで開始", cx, H * 0.76);
+      ctx.fillText("タップで開始", cx, H * 0.82);
     }
   }
 
@@ -2545,7 +2689,7 @@
     g.addColorStop(1, "#4c2556");
     ctx.fillStyle = g;
     ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(0,0,0,.45)");
+    drawSideMats("rgba(0,0,0,.45)", "rgba(130,255,220,.12)");
 
     const t = celebrationTime;
     for(let i=0; i<18; i++){
@@ -2601,6 +2745,8 @@
     }
     ctx.restore();
 
+    drawCatOrbit(8, cxBase, H * 0.50, Math.min(150, view.w * 0.32), 96, 28, t * 1.5, 0.80);
+
     ctx.fillStyle = "#ffd84d";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -2611,10 +2757,10 @@
     ctx.fillText("AIダンスでお祝い中…", cxBase, H * 0.26);
     ctx.fillText("タップで結果へ", cxBase, H * 0.82);
 
-    for(let i=0; i<10; i++){
-      const a = (i / 10) * Math.PI * 2 + t * 1.6;
-      const px = cxBase + Math.cos(a) * Math.min(130, view.w * 0.28);
-      const py = H * 0.48 + Math.sin(a) * 90;
+    for(let i=0; i<12; i++){
+      const a = (i / 12) * Math.PI * 2 + t * 1.6;
+      const px = cxBase + Math.cos(a) * Math.min(150, view.w * 0.32);
+      const py = H * 0.48 + Math.sin(a) * 100;
       ctx.font = "24px sans-serif";
       ctx.fillText(i % 2 ? "✨" : "🎉", px, py);
     }
@@ -3018,18 +3164,28 @@
   }
 
   function update(dt){
+    resetMusicForScene();
+
     if(state === "opening"){
       updateOpening(dt);
+      updateMusic(dt);
       updateHud();
       return;
     }
     if(state === "story"){
       updateStory(dt);
+      updateMusic(dt);
+      updateHud();
+      return;
+    }
+    if(state === "title"){
+      updateMusic(dt);
       updateHud();
       return;
     }
     if(state === "celebration"){
       updateCelebration(dt);
+      updateMusic(dt);
       updateHud();
       return;
     }
@@ -3245,6 +3401,7 @@
     const prevMode = stageMode;
     stageMode = "breakout";
     drawBackground();
+    drawTitleCats(performance.now() / 900);
     stageMode = prevMode;
   }
 
@@ -3312,8 +3469,16 @@
   }
 
   canvas.addEventListener("pointerdown", e => {
-    unlockAudio();
     setPointerX(e.clientX);
+
+    if(!audioPrimed){
+      unlockAudio();
+      audioPrimed = true;
+      resetMusic();
+      if(state === "opening"){
+        return;
+      }
+    }
 
     if(state === "opening"){
       renderTitle();
@@ -3337,11 +3502,19 @@
   });
 
   canvas.addEventListener("touchstart", () => {
-    unlockAudio();
+    if(!audioPrimed){
+      unlockAudio();
+      audioPrimed = true;
+      resetMusic();
+    }
   }, {passive:true});
 
   skillButton.addEventListener("click", () => {
-    unlockAudio();
+    if(!audioPrimed){
+      unlockAudio();
+      audioPrimed = true;
+      resetMusic();
+    }
     useSkill();
   });
 
