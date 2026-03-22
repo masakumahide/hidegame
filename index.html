@@ -155,6 +155,46 @@
     white-space:nowrap;
   }
 
+  #comboDisplay{
+    position:absolute;
+    top:136px;
+    right:14px;
+    z-index:24;
+    min-width:84px;
+    padding:10px 12px;
+    border-radius:18px;
+    background:rgba(255,255,255,.65);
+    border:1px solid rgba(255,255,255,.92);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(6px);
+    text-align:center;
+    opacity:0;
+    transform:translateY(-6px) scale(.92);
+    transition:opacity .14s ease, transform .14s ease;
+    pointer-events:none;
+  }
+
+  #comboDisplay.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+
+  #comboLabel{
+    font-size:10px;
+    font-weight:900;
+    color:#9e5a83;
+    letter-spacing:.06em;
+  }
+
+  #comboValue{
+    margin-top:2px;
+    font-size:26px;
+    line-height:1;
+    font-weight:900;
+    color:#ff5aa5;
+    text-shadow:0 0 12px rgba(255,90,165,.16);
+  }
+
   #catSkillBadge{
     position:absolute;
     left:14px;
@@ -476,17 +516,22 @@
   </div>
 
   <div id="catBadge">
-    <img id="catBadgeImg" alt="cat">
+    <img id="catBadgeImg" alt="kuma">
     <div id="catBadgeFallback">🐱</div>
   </div>
 
   <div id="catSkillBadge">
-    <img id="catSkillImg" alt="cat">
+    <img id="catSkillImg" alt="kuma">
     <div id="catSkillFallback">🐱</div>
   </div>
 
   <div id="catTalk">にゃっ</div>
   <div id="message"></div>
+
+  <div id="comboDisplay">
+    <div id="comboLabel">COMBO</div>
+    <div id="comboValue">x3</div>
+  </div>
 
   <div id="skillsArea">
     <button id="skillButton" class="disabled">
@@ -522,6 +567,8 @@
   const app = document.getElementById("app");
   const hud = document.getElementById("hud");
   const skillsArea = document.getElementById("skillsArea");
+  const comboDisplay = document.getElementById("comboDisplay");
+  const comboValue = document.getElementById("comboValue");
   const catBadge = document.getElementById("catBadge");
   const catBadgeImg = document.getElementById("catBadgeImg");
   const catSkillImg = document.getElementById("catSkillImg");
@@ -635,7 +682,7 @@
   let score = 0;
   let lives = 3;
   let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v14") || 0);
+  let best = Number(localStorage.getItem("hidecat_fun_best_v15") || 0);
   let stageMode = "breakout";
   let stageVariant = 0;
 
@@ -777,6 +824,13 @@
     }
   }
 
+  function comboTempoFactor(){
+    if(!stats) return 1;
+    if(stats.combo >= 8) return 1.22;
+    if(stats.combo >= 4) return 1.10;
+    return 1;
+  }
+
   function addScore(points){
     score += Math.round(points * currentPerks().scoreBonus);
   }
@@ -852,6 +906,14 @@
     const t = audioCtx.currentTime;
     playTone(t, 170, 0.16, "sawtooth", 0.035);
     playTone(t + 0.05, 125, 0.22, "sawtooth", 0.03);
+  }
+
+  function playExplosion(){
+    if(!audioCtx) return;
+    const t = audioCtx.currentTime;
+    playTone(t, 110, 0.20, "sawtooth", 0.055);
+    playTone(t + 0.01, 80, 0.28, "triangle", 0.05);
+    playTone(t + 0.02, 52, 0.34, "sawtooth", 0.04);
   }
 
   function playMeow(){
@@ -1044,6 +1106,7 @@
       const note = chord[arp[step]] + 12;
 
       playTone(t, midiToFreq(note), 0.13, "square", 0.009);
+      playTone(t + 0.015, midiToFreq(note + 12), 0.07, "sine", 0.005);
 
       if(step === 0 || step === 4){
         playTone(t, midiToFreq(chord[0] - 24), 0.26, "sine", 0.032);
@@ -1071,9 +1134,11 @@
     else if(mode === "boss"){
       const speed = averageBallSpeed();
       interval = Math.max(0.17, Math.min(0.30, 0.26 - (speed - 5.2) * 0.008));
+      interval /= comboTempoFactor();
     } else if(mode === "play"){
       const speed = averageBallSpeed();
       interval = Math.max(0.16, Math.min(0.26, 0.24 - (speed - 6.0) * 0.01));
+      interval /= comboTempoFactor();
     }
 
     musicAccum += dt;
@@ -1178,7 +1243,7 @@
   function saveBest(){
     if(score > best){
       best = score;
-      localStorage.setItem("hidecat_fun_best_v14", String(best));
+      localStorage.setItem("hidecat_fun_best_v15", String(best));
     }
   }
 
@@ -1202,6 +1267,20 @@
       skillDescEl.textContent = "ゲージをためてね";
     }
     skillButton.classList.toggle("disabled", !ready);
+  }
+
+  function updateComboUI(){
+    const show = state === "playing" && stats && stats.combo >= 3;
+    comboDisplay.classList.toggle("show", show);
+    comboValue.textContent = `x${Math.max(3, stats ? stats.combo : 3)}`;
+
+    if(show){
+      const scale =
+        stats.combo >= 8 ? 1.14 :
+        stats.combo >= 5 ? 1.08 :
+        1.0;
+      comboDisplay.style.transform = `translateY(0) scale(${scale})`;
+    }
   }
 
   function addSkill(amount){
@@ -1228,6 +1307,7 @@
       performance.now() < paddleBoostUntil ||
       performance.now() < rapidUntil;
     catSkillBadge.classList.toggle("show", activeSkillVisual);
+    updateComboUI();
     updateCatReaction();
     updateSkillUI();
   }
@@ -1264,6 +1344,7 @@
     message.style.left = `${viewCenterX()}px`;
 
     catSkillBadge.style.left = `${view.x + 14}px`;
+    comboDisplay.style.right = `${W - (view.x + view.w) + 14}px`;
   }
 
   function layoutField(){
@@ -1292,6 +1373,11 @@
       return ["gauge","score","big","rapid","clone"];
     }
     return ["gauge","score","heal","big","rapid","clone"];
+  }
+
+  function getBombCount(stageNum, available){
+    const desired = Math.max(0, Math.min(4, Math.floor((stageNum - 1) / 2)));
+    return Math.min(desired, Math.max(0, available));
   }
 
   function createBall(vx = null){
@@ -1472,8 +1558,11 @@
     }
 
     const extraWalls = new Set([...hardWallSet].slice(0, Math.min(hardWallSet.size, stageNum >= 6 ? 9 : 6)));
-    const strong3Set = new Set(candidateIndices.slice(0, strong3Count));
-    const strong2Set = new Set(candidateIndices.slice(strong3Count, strong3Count + strong2Count));
+    const nonWallCandidates = candidateIndices.filter(v => !extraWalls.has(v));
+    const bombCount = getBombCount(stageNum, nonWallCandidates.length);
+    const bombSet = new Set(nonWallCandidates.slice(0, bombCount));
+    const strong3Set = new Set(nonWallCandidates.slice(bombCount, bombCount + strong3Count));
+    const strong2Set = new Set(nonWallCandidates.slice(bombCount + strong3Count, bombCount + strong3Count + strong2Count));
 
     idx = 0;
     const wordShift = stageNum * 5 + randInt(0, WORDS.length - 1);
@@ -1488,11 +1577,17 @@
         let hp = 1;
         let label = WORDS[(idx + wordShift) % WORDS.length];
         let color = COLORS[(idx + stageNum + stageVariant) % COLORS.length];
+        let bomb = false;
 
         if(extraWalls.has(idx)){
           hp = Infinity;
           label = "壁";
           color = "#b88aa3";
+        } else if(bombSet.has(idx)){
+          hp = 1;
+          label = "💣";
+          color = "#ffb24d";
+          bomb = true;
         } else if(strong3Set.has(idx) && stageNum >= 3){
           hp = 3;
         } else if(strong2Set.has(idx) && stageNum >= 2){
@@ -1508,7 +1603,8 @@
           color,
           hp,
           maxHp: hp,
-          alive:true
+          alive:true,
+          bomb
         });
 
         idx++;
@@ -1656,6 +1752,59 @@
     burst(paddle.x + paddle.w/2, paddle.y - 8, "✨", 14);
     addRing(paddle.x + paddle.w/2, paddle.y - 8, "rgba(255,255,190,.9)", 56, 4);
     updateHud();
+  }
+
+  function blockScore(block){
+    if(block.bomb) return 16;
+    return block.maxHp >= 3 ? 14 : block.maxHp === 2 ? 12 : 10;
+  }
+
+  function pointRectDistance(px, py, rect){
+    const nx = Math.max(rect.x, Math.min(px, rect.x + rect.w));
+    const ny = Math.max(rect.y, Math.min(py, rect.y + rect.h));
+    return Math.hypot(px - nx, py - ny);
+  }
+
+  function destroyBlock(block, byExplosion=false){
+    if(!block.alive || !Number.isFinite(block.hp)) return;
+
+    block.alive = false;
+    stats.totalBlocksBroken += 1;
+
+    const cx = block.x + block.w / 2;
+    const cy = block.y + block.h / 2;
+
+    if(block.bomb && !byExplosion){
+      triggerBombExplosion(block);
+    } else {
+      burst(cx, cy, byExplosion ? "💥" : (block.bomb ? "💥" : "💫"), byExplosion ? 10 : 12);
+      if(byExplosion){
+        addRing(cx, cy, "rgba(255,180,90,.95)", 66, 4);
+      }
+    }
+
+    spawnItem(cx, cy);
+  }
+
+  function triggerBombExplosion(source){
+    const cx = source.x + source.w / 2;
+    const cy = source.y + source.h / 2;
+
+    playExplosion();
+    worldFlash = Math.max(worldFlash, 0.24);
+    shake = Math.max(shake, 10);
+    burst(cx, cy, "💥", 18);
+    addRing(cx, cy, "rgba(255,182,90,.98)", 88, 6);
+
+    for(const target of blocks){
+      if(target === source || !target.alive || !Number.isFinite(target.hp)) continue;
+      if(pointRectDistance(cx, cy, target) <= 60){
+        registerCombo();
+        addScore(Math.max(5, Math.round(blockScore(target) * 0.75)));
+        addSkill(4);
+        destroyBlock(target, true);
+      }
+    }
   }
 
   function useSkill(){
@@ -1933,7 +2082,7 @@
     overlay.innerHTML = `
       <div class="card">
         <div class="titlePhoto">
-          ${catReady ? `<img src="${catImg.src}" alt="cat">` : selectedChar.emoji}
+          ${catReady ? `<img src="${catImg.src}" alt="kuma">` : selectedChar.emoji}
         </div>
         <div class="title">ヒデちゃん&クマちゃん<br>ブロック崩し DX</div>
         <div class="sub">
@@ -1957,7 +2106,7 @@
       btn.onclick = () => {
         const i = Number(btn.dataset.i);
         selectedChar = CHARACTERS[i];
-        say(i === 1 ? "主役にゃ!" : "いくにゃ!", 520);
+        say(i === 2 ? "クマでいくにゃ!" : i === 1 ? "主役にゃ!" : "いくにゃ!", 520);
         playTap(880);
         renderTitle();
       };
@@ -2076,6 +2225,18 @@
     }
   }
 
+  function getFallWarningStrength(){
+    if(!balls.length || state !== "playing") return 0;
+    const threshold = field.y + field.h * 0.66;
+    let maxStrength = 0;
+    for(const ball of balls){
+      if(ball.stuck) continue;
+      const over = clamp((ball.y - threshold) / (field.y + field.h - threshold), 0, 1);
+      if(over > maxStrength) maxStrength = over;
+    }
+    return maxStrength;
+  }
+
   function drawBackground(){
     let g;
     if(stageMode === "boss"){
@@ -2130,6 +2291,25 @@
     roundRectPath(field.x, field.y, field.w, field.h, 26);
     ctx.stroke();
 
+    const warn = getFallWarningStrength();
+    if(warn > 0){
+      const pulse = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(performance.now() / 120));
+      const alpha = warn * pulse * 0.48;
+      const bandH = 22 + warn * 10;
+      const y = field.y + field.h - bandH;
+      const grad = ctx.createLinearGradient(0, y, 0, y + bandH);
+      grad.addColorStop(0, `rgba(255,70,90,0)`);
+      grad.addColorStop(1, `rgba(255,40,70,${alpha})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(field.x + 6, y, field.w - 12, bandH);
+      ctx.strokeStyle = `rgba(255,120,140,${Math.min(.85, alpha + .15)})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(field.x + 10, field.y + field.h - 4);
+      ctx.lineTo(field.x + field.w - 10, field.y + field.h - 4);
+      ctx.stroke();
+    }
+
     if(worldFlash > 0){
       ctx.fillStyle = `rgba(255,255,255,${worldFlash * 0.22})`;
       ctx.fillRect(0,0,W,H);
@@ -2144,6 +2324,28 @@
   function drawBlocks(){
     for(const b of blocks){
       if(!b.alive) continue;
+
+      if(b.bomb){
+        const pulse = 0.72 + 0.28 * (0.5 + 0.5 * Math.sin(performance.now() / 120 + b.x * 0.03));
+        ctx.save();
+        ctx.shadowColor = `rgba(255,145,60,${0.45 * pulse})`;
+        ctx.shadowBlur = 18 * pulse;
+
+        roundRectPath(b.x, b.y, b.w, b.h, 10);
+        ctx.fillStyle = `rgba(255,${120 + Math.floor(40 * pulse)},70,1)`;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.70)";
+        ctx.stroke();
+
+        ctx.restore();
+
+        ctx.fillStyle = "#fff7dd";
+        ctx.font = "bold 18px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("💣", b.x + b.w/2, b.y + b.h/2 + 1);
+        continue;
+      }
 
       roundRectPath(b.x, b.y, b.w, b.h, 10);
       ctx.fillStyle = b.color;
@@ -2622,7 +2824,6 @@
     drawSideMats("rgba(18,10,24,.62)", "rgba(255,170,210,.12)");
 
     const cx = viewCenterX();
-
     drawCatOrbit(6, cx, H * 0.18, Math.min(130, view.w * 0.26), 20, 24, storyTime * 1.2, 0.68);
 
     ctx.textAlign = "center";
@@ -2970,8 +3171,15 @@
     playTap(620);
     playPaddleNyah();
     say("ニヤッ!", 360);
-    worldFlash = Math.max(worldFlash, 0.08);
-    shake = Math.max(shake, 3.5);
+
+    const comboPower =
+      !stats ? 0 :
+      stats.combo >= 8 ? 1 :
+      stats.combo >= 4 ? 0.55 :
+      stats.combo >= 1 ? 0.2 : 0;
+
+    worldFlash = Math.max(worldFlash, 0.08 + comboPower * 0.08);
+    shake = Math.max(shake, 3.5 + comboPower * 4.5);
 
     if(magnetCharges > 0 && now < magnetUntil){
       ball.stuck = true;
@@ -2990,8 +3198,8 @@
     ball.vx = hit * nextSpeed * 0.92 * currentPerks().controlMult;
     ball.vy = -Math.sqrt(Math.max(minSpeed * minSpeed * 0.9, nextSpeed * nextSpeed - ball.vx * ball.vx));
 
-    burst(ball.x, paddle.y, "🐾", 9);
-    addRing(ball.x, paddle.y, "rgba(255,240,180,.95)", 48, 4);
+    burst(ball.x, paddle.y, "🐾", 9 + Math.floor(comboPower * 6));
+    addRing(ball.x, paddle.y, "rgba(255,240,180,.95)", 48 + comboPower * 18, 4 + comboPower * 1.5);
     return false;
   }
 
@@ -3087,17 +3295,26 @@
             break;
           }
 
+          if(b.bomb){
+            registerCombo();
+            addScore(blockScore(b));
+            addSkill(6);
+            destroyBlock(b, false);
+            playerShots.splice(i, 1);
+            updateHud();
+            hit = true;
+            break;
+          }
+
           b.hp -= 1;
           registerCombo();
-          addScore(b.maxHp >= 3 ? 8 : b.maxHp === 2 ? 6 : 5);
+          addScore(blockScore(b));
           addSkill(2);
           burst(s.x, s.y, "✨", 8);
           worldFlash = Math.max(worldFlash, 0.06);
 
           if(b.hp <= 0){
-            b.alive = false;
-            stats.totalBlocksBroken += 1;
-            spawnItem(b.x + b.w/2, b.y + b.h/2);
+            destroyBlock(b, false);
           }
 
           playerShots.splice(i, 1);
@@ -3333,20 +3550,27 @@
             break;
           }
 
+          if(b.bomb){
+            registerCombo();
+            addScore(blockScore(b));
+            addSkill(6);
+            reflectBall(ball, b);
+            destroyBlock(b, false);
+            updateHud();
+            break;
+          }
+
           b.hp -= 1;
           registerCombo();
-          addScore(b.maxHp >= 3 ? 14 : b.maxHp === 2 ? 12 : 10);
+          addScore(blockScore(b));
           addSkill(6);
           burst(b.x + b.w/2, b.y + b.h/2, "✨", 10);
           worldFlash = Math.max(worldFlash, 0.06);
           shake = Math.max(shake, 2.8);
 
           if(b.hp <= 0){
-            b.alive = false;
-            stats.totalBlocksBroken += 1;
+            destroyBlock(b, false);
             playTap(860);
-            spawnItem(b.x + b.w/2, b.y + b.h/2);
-            burst(b.x + b.w/2, b.y + b.h/2, "💫", 12);
           } else {
             playTap(560);
           }
@@ -3528,6 +3752,7 @@
 
   loadCat();
   resize();
+  resetStats();
   updateHud();
   overlay.classList.add("hidden");
   requestAnimationFrame(loop);
