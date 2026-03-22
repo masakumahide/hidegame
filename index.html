@@ -14,7 +14,6 @@
     --yellow:#ffd84d;
     --shadow:0 10px 24px rgba(0,0,0,.18);
   }
-
   *{
     box-sizing:border-box;
     margin:0;
@@ -22,7 +21,6 @@
     -webkit-tap-highlight-color:transparent;
     user-select:none;
   }
-
   html,body{
     width:100%;
     height:100%;
@@ -36,7 +34,6 @@
       sans-serif;
     background:linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
   }
-
   #app{
     position:relative;
     width:100vw;
@@ -44,7 +41,6 @@
     overflow:hidden;
     touch-action:none;
   }
-
   canvas{
     display:block;
     width:100%;
@@ -62,13 +58,11 @@
     z-index:20;
     pointer-events:none;
   }
-
   .col{
     display:flex;
     flex-direction:column;
     gap:8px;
   }
-
   .panel{
     min-width:96px;
     padding:9px 12px;
@@ -78,14 +72,12 @@
     box-shadow:var(--shadow);
     backdrop-filter:blur(6px);
   }
-
   .label{
     font-size:11px;
     font-weight:700;
     color:#9e5a83;
     margin-bottom:4px;
   }
-
   .value{
     font-size:17px;
     font-weight:900;
@@ -107,15 +99,14 @@
     box-shadow:0 10px 24px rgba(255,90,165,.22);
     z-index:26;
     transition:transform .18s ease, box-shadow .18s ease;
+    pointer-events:none;
   }
-
   #catBadge img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:none;
   }
-
   #catBadgeFallback{
     width:100%;
     height:100%;
@@ -141,11 +132,10 @@
 
   #message{
     position:absolute;
-    top:38%;
     left:50%;
-    transform:translateX(-50%);
+    transform:translateX(-50%) scale(1);
     z-index:25;
-    font-size:clamp(28px, 9vw, 54px);
+    font-size:clamp(24px, 7vw, 42px);
     font-weight:900;
     color:var(--yellow);
     text-shadow:0 0 14px rgba(0,0,0,.22);
@@ -157,10 +147,8 @@
 
   #comboDisplay{
     position:absolute;
-    top:136px;
-    right:14px;
     z-index:24;
-    min-width:84px;
+    min-width:88px;
     padding:10px 12px;
     border-radius:18px;
     background:rgba(255,255,255,.65);
@@ -173,19 +161,16 @@
     transition:opacity .14s ease, transform .14s ease;
     pointer-events:none;
   }
-
   #comboDisplay.show{
     opacity:1;
     transform:translateY(0) scale(1);
   }
-
   #comboLabel{
     font-size:10px;
     font-weight:900;
     color:#9e5a83;
     letter-spacing:.06em;
   }
-
   #comboValue{
     margin-top:2px;
     font-size:26px;
@@ -212,19 +197,16 @@
     transition:opacity .18s ease, transform .18s ease;
     pointer-events:none;
   }
-
   #catSkillBadge.show{
     opacity:1;
     transform:scale(1);
   }
-
   #catSkillBadge img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:none;
   }
-
   #catSkillFallback{
     width:100%;
     height:100%;
@@ -241,7 +223,6 @@
     bottom:12px;
     z-index:24;
   }
-
   #skillButton{
     width:100%;
     border:none;
@@ -258,53 +239,44 @@
     gap:12px;
     min-height:62px;
   }
-
   #skillButton.disabled{
     opacity:.55;
     filter:grayscale(.75);
   }
-
   #skillLeft{
     display:flex;
     align-items:center;
     gap:10px;
   }
-
   #skillEmoji{
     font-size:26px;
     line-height:1;
   }
-
   #skillTextWrap{
     text-align:left;
   }
-
   #skillName{
     font-size:16px;
     font-weight:900;
     line-height:1.1;
   }
-
   #skillDesc{
     font-size:11px;
     color:#8f5377;
     margin-top:3px;
   }
-
   #skillReady{
     font-size:11px;
     font-weight:900;
     color:#b65586;
     white-space:nowrap;
   }
-
   #skillLabel{
     font-size:12px;
     color:#fff;
     margin:8px 0 6px;
     text-shadow:0 2px 6px rgba(0,0,0,.25);
   }
-
   #skillBar{
     height:16px;
     border-radius:999px;
@@ -313,7 +285,6 @@
     overflow:hidden;
     box-shadow:var(--shadow);
   }
-
   #skillFill{
     width:0%;
     height:100%;
@@ -334,50 +305,95 @@
     background:rgba(255,228,239,.34);
     backdrop-filter:blur(4px);
   }
-
   #overlay.hidden{
     display:none;
   }
-
   .card{
     width:min(94vw,460px);
     padding:22px 18px 20px;
     border-radius:28px;
-    background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.40));
+    background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.42));
     border:1px solid rgba(255,255,255,.92);
-    box-shadow:0 20px 40px rgba(0,0,0,.2);
+    box-shadow:0 20px 40px rgba(0,0,0,.22);
     text-align:center;
     color:var(--ink);
   }
-
-  .bigCat{
-    font-size:72px;
-    line-height:1;
-    margin-bottom:10px;
+  .movieWrap{
+    width:min(94vw,460px);
+    padding:18px;
+    border-radius:30px;
+    background:linear-gradient(180deg,rgba(53,26,64,.92),rgba(133,74,146,.86));
+    border:1px solid rgba(255,255,255,.28);
+    box-shadow:0 18px 50px rgba(0,0,0,.34);
+    text-align:center;
+    color:#fff;
   }
-
-  .titlePhoto{
-    width:104px;
-    height:104px;
-    margin:0 auto 12px;
+  .movieFrame{
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    padding:24px 18px;
+    background:radial-gradient(circle at top,#ffb0d2 0%, #8e4aa5 48%, #31183c 100%);
+    min-height:360px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  }
+  .movieCats{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+  .movieCat{
+    position:absolute;
+    width:52px;
+    height:52px;
     border-radius:50%;
     overflow:hidden;
-    border:4px solid rgba(255,255,255,.95);
-    box-shadow:0 10px 24px rgba(255,90,165,.22);
+    border:2px solid rgba(255,255,255,.86);
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
     background:rgba(255,255,255,.35);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:56px;
+    animation:floaty 2.8s ease-in-out infinite;
   }
-
-  .titlePhoto img{
+  .movieCat img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:block;
   }
-
+  .movieCat.fallback{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    color:#fff;
+  }
+  @keyframes floaty{
+    0%,100%{ transform:translateY(0) scale(1); }
+    50%{ transform:translateY(-10px) scale(1.05); }
+  }
+  .movieMainPhoto{
+    width:120px;
+    height:120px;
+    margin:0 auto 14px;
+    border-radius:50%;
+    overflow:hidden;
+    border:4px solid rgba(255,255,255,.9);
+    box-shadow:0 10px 24px rgba(0,0,0,.22);
+    background:rgba(255,255,255,.28);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:60px;
+  }
+  .movieMainPhoto img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .bigCat{
+    font-size:72px;
+    line-height:1;
+    margin-bottom:10px;
+  }
   .title{
     font-size:clamp(28px, 7vw, 42px);
     font-weight:900;
@@ -386,14 +402,26 @@
     margin-bottom:10px;
     text-shadow:0 0 14px rgba(255,90,165,.2);
   }
-
+  .movieTitle{
+    font-size:clamp(28px, 8vw, 42px);
+    font-weight:900;
+    line-height:1.14;
+    color:#fff7d4;
+    margin-bottom:10px;
+    text-shadow:0 4px 16px rgba(0,0,0,.25);
+  }
   .sub{
     font-size:14px;
     line-height:1.6;
     color:#8f5377;
     margin-bottom:16px;
   }
-
+  .movieSub{
+    font-size:15px;
+    line-height:1.7;
+    color:#fff;
+    text-shadow:0 2px 10px rgba(0,0,0,.22);
+  }
   .btn{
     border:none;
     border-radius:999px;
@@ -404,19 +432,16 @@
     background:linear-gradient(180deg,#ff60ae,#ff2c92);
     box-shadow:0 8px 0 #b81f69, 0 10px 16px rgba(0,0,0,.16);
   }
-
   .btn:active{
     transform:translateY(4px);
     box-shadow:0 4px 0 #b81f69, 0 8px 12px rgba(0,0,0,.14);
   }
-
   .charGrid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:12px;
     margin:16px 0 12px;
   }
-
   .charBtn{
     border:none;
     border-radius:20px;
@@ -427,31 +452,26 @@
     box-shadow:var(--shadow);
     font:inherit;
   }
-
   .charBtn.selected{
     border-color:#ff63ad;
     box-shadow:0 0 0 3px rgba(255,99,173,.18), var(--shadow);
     transform:scale(1.02);
   }
-
   .charBtn .emoji{
     font-size:40px;
     line-height:1.1;
   }
-
   .charBtn .name{
     font-size:17px;
     font-weight:900;
     margin-top:4px;
   }
-
   .charBtn .skill{
     font-size:11px;
     line-height:1.45;
     color:#8f5377;
     margin-top:4px;
   }
-
   .rankBadge{
     display:inline-flex;
     align-items:center;
@@ -466,25 +486,6 @@
     box-shadow:0 10px 18px rgba(0,0,0,.14);
     margin:8px auto 12px;
   }
-
-  .achWrap{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    justify-content:center;
-    margin:12px 0 14px;
-  }
-
-  .achChip{
-    padding:8px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:900;
-    color:#7a315d;
-    background:rgba(255,255,255,.7);
-    border:1px solid rgba(255,255,255,.95);
-    box-shadow:0 6px 14px rgba(0,0,0,.08);
-  }
 </style>
 </head>
 <body>
@@ -493,25 +494,12 @@
 
   <div id="hud">
     <div class="col">
-      <div class="panel">
-        <div class="label">SCORE</div>
-        <div class="value" id="scoreText">0</div>
-      </div>
-      <div class="panel">
-        <div class="label">LIFE</div>
-        <div class="value" id="lifeText">3</div>
-      </div>
+      <div class="panel"><div class="label">SCORE</div><div class="value" id="scoreText">0</div></div>
+      <div class="panel"><div class="label">LIFE</div><div class="value" id="lifeText">3</div></div>
     </div>
-
     <div class="col">
-      <div class="panel">
-        <div class="label">STAGE</div>
-        <div class="value" id="stageText">1 / 10</div>
-      </div>
-      <div class="panel">
-        <div class="label">BEST</div>
-        <div class="value" id="bestText">0</div>
-      </div>
+      <div class="panel"><div class="label">STAGE</div><div class="value" id="stageText">1 / 10</div></div>
+      <div class="panel"><div class="label">BEST</div><div class="value" id="bestText">0</div></div>
     </div>
   </div>
 
@@ -553,375 +541,224 @@
 
 <script>
 (() => {
-  const canvas = document.getElementById("game");
+  const $ = id => document.getElementById(id);
+  const canvas = $("game");
   const ctx = canvas.getContext("2d");
 
-  const scoreText = document.getElementById("scoreText");
-  const lifeText = document.getElementById("lifeText");
-  const stageText = document.getElementById("stageText");
-  const bestText = document.getElementById("bestText");
-  const skillFill = document.getElementById("skillFill");
-  const message = document.getElementById("message");
-  const catTalk = document.getElementById("catTalk");
-  const overlay = document.getElementById("overlay");
-  const app = document.getElementById("app");
-  const hud = document.getElementById("hud");
-  const skillsArea = document.getElementById("skillsArea");
-  const comboDisplay = document.getElementById("comboDisplay");
-  const comboValue = document.getElementById("comboValue");
-  const catBadge = document.getElementById("catBadge");
-  const catBadgeImg = document.getElementById("catBadgeImg");
-  const catSkillImg = document.getElementById("catSkillImg");
-  const catBadgeFallback = document.getElementById("catBadgeFallback");
-  const catSkillFallback = document.getElementById("catSkillFallback");
-  const catSkillBadge = document.getElementById("catSkillBadge");
-  const skillButton = document.getElementById("skillButton");
-  const skillEmojiEl = document.getElementById("skillEmoji");
-  const skillNameEl = document.getElementById("skillName");
-  const skillDescEl = document.getElementById("skillDesc");
+  const ui = {
+    app:$("app"), hud:$("hud"), overlay:$("overlay"),
+    score:$("scoreText"), life:$("lifeText"), stage:$("stageText"), best:$("bestText"),
+    catBadge:$("catBadge"), catBadgeImg:$("catBadgeImg"), catBadgeFallback:$("catBadgeFallback"),
+    catSkillBadge:$("catSkillBadge"), catSkillImg:$("catSkillImg"), catSkillFallback:$("catSkillFallback"),
+    catTalk:$("catTalk"), message:$("message"),
+    combo:$("comboDisplay"), comboValue:$("comboValue"),
+    skillButton:$("skillButton"), skillEmoji:$("skillEmoji"), skillName:$("skillName"), skillDesc:$("skillDesc"), skillFill:$("skillFill"),
+    skillsArea:$("skillsArea")
+  };
 
+  const DPR = Math.min(2, window.devicePixelRatio || 1);
   const MAX_STAGE = 10;
-  const WORDS = [
-    "夢","仕事","健康","旅行","ダイエット","ポテチ","睡眠","散歩",
-    "筋トレ","ラーメン","貯金","ごほうび","野菜","チョコ","読書","有休",
-    "温泉","締切","休日","猫","会議","サボり","水","お菓子"
-  ];
+  const BOSS_STAGES = new Set([3,6,10]);
+  const CAT_FILES = ["./cat.png.JPG","./cat.png.jpg","./cat.JPG","./cat.jpg","./cat.jpeg","./cat.png"];
+  const WORDS = ["夢","仕事","健康","旅行","筋トレ","ラーメン","貯金","ごほうび","温泉","締切","休日","猫","会議","水","読書","散歩","チョコ","野菜"];
   const COLORS = ["#ffd7a8","#bfe7ff","#c8ffd8","#e8c8ff","#ffd4e5","#fff0b8"];
 
-  const CHARACTERS = [
+  const CHARS = [
     { id:"hide", emoji:"😄", name:"ヒデ", perk:"金色 / 幅広 + スコア10%UP" },
     { id:"cat", emoji:"🐱", name:"ネコ", perk:"ピンク / ゲージ速い + アイテム出やすい" },
     { id:"bear", emoji:"🐻", name:"クマ", perk:"青 / ビッグ長い + 安定" },
     { id:"rabbit", emoji:"🐰", name:"ウサ", perk:"緑 / 球やさしめ + 連射速い" }
   ];
-  let selectedChar = CHARACTERS[1];
 
   const SKILLS = [
-    { type:"cat", emoji:"🐱", name:"猫ラッシュ", desc:"猫が左から飛んできて3ボール化" },
-    { type:"magnet", emoji:"🧲", name:"ぴたっ", desc:"1回だけ吸着、タップで再発射" },
+    { type:"cat", emoji:"🐱", name:"猫ラッシュ", desc:"猫が飛んできて3ボール化" },
+    { type:"magnet", emoji:"🧲", name:"ぴたっ", desc:"1回だけ吸着" },
     { type:"big", emoji:"🧸", name:"ビッグ", desc:"パドル巨大化" }
   ];
 
-  const ITEM_TYPES = [
-    { type:"gauge", emoji:"⚡", label:"ゲージ" },
-    { type:"score", emoji:"💎", label:"スコア" },
-    { type:"heal", emoji:"💖", label:"ライフ" },
-    { type:"big", emoji:"⬌", label:"BIG" },
-    { type:"rapid", emoji:"🔫", label:"連射" },
-    { type:"clone", emoji:"🪞", label:"分身" }
+  const ITEMS = [
+    { type:"gauge", emoji:"⚡" },
+    { type:"score", emoji:"💎" },
+    { type:"heal", emoji:"💖" },
+    { type:"big", emoji:"⬌" },
+    { type:"rapid", emoji:"🔫" },
+    { type:"clone", emoji:"🪞" }
   ];
 
-  const BOSS_TYPES = {
-    beam: {
-      name:"ビームキャット",
-      top:"#ffd4e8",
-      bottom:"#ff4f93",
-      aura:"rgba(255,100,170,.55)",
-      beamGap:1.95,
-      beamWidth:18,
-      attackGap:2.25
-    },
-    zigzag: {
-      name:"ジグザグキャット",
-      top:"#d6e5ff",
-      bottom:"#7265ff",
-      aura:"rgba(130,120,255,.56)",
-      beamGap:1.8,
-      beamWidth:16,
-      attackGap:1.95
-    },
-    warp: {
-      name:"ワープキャット",
-      top:"#d7fff0",
-      bottom:"#37c6ad",
-      aura:"rgba(100,255,220,.48)",
-      beamGap:2.2,
-      beamWidth:20,
-      attackGap:2.35
-    }
+  const BOSS_META = {
+    beam:{ top:"#ffd4e8", bottom:"#ff4f93", aura:"rgba(255,100,170,.55)", beamGap:2.0, beamWidth:18, attackGap:2.2 },
+    zigzag:{ top:"#d6e5ff", bottom:"#7265ff", aura:"rgba(130,120,255,.56)", beamGap:1.85, beamWidth:16, attackGap:1.95 },
+    warp:{ top:"#d7fff0", bottom:"#37c6ad", aura:"rgba(100,255,220,.48)", beamGap:1.8, beamWidth:20, attackGap:1.8 }
   };
 
-  const CANON = [
+  const PLAY_THEME = [
     [62,66,69],[57,61,64],[59,62,66],[54,57,61],
     [55,59,62],[62,66,69],[55,59,62],[57,61,64]
   ];
-
   const CUTE_THEME = [
     [69,73,76],[67,71,74],[66,69,73],[64,67,71],
     [62,66,69],[64,67,71],[66,69,73],[67,71,74]
   ];
-
   const STORY_THEME = [
     [64,67,71],[62,66,69],[60,64,67],[62,65,69],
     [64,67,71],[67,71,74],[69,73,76],[71,74,78]
   ];
-
   const BOSS_THEME = [
     [38,45,50],[36,43,48],[35,42,47],[33,40,45],
     [31,38,43],[30,37,42],[29,36,41],[28,35,40]
   ];
 
-  const CAT_CANDIDATES = [
-    "./cat.png.JPG",
-    "./cat.png.jpg",
-    "./cat.JPG",
-    "./cat.jpg",
-    "./cat.jpeg",
-    "./cat.png"
-  ];
+  const rand = (a,b)=>Math.random()*(b-a)+a;
+  const randint = (a,b)=>Math.floor(rand(a,b+1));
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const midi = m=>440*Math.pow(2,(m-69)/12);
+  const rc = i => ({ r: Math.floor(i / stageData.cols), c: i % stageData.cols });
 
-  let currentSkill = null;
-  let W = 0;
-  let H = 0;
-  const DPR = Math.min(2, window.devicePixelRatio || 1);
-  let field = { x:16, y:150, w:300, h:400 };
-  let view = { x:0, y:0, w:0, h:0 };
+  let W=0, H=0;
+  let view={x:0,y:0,w:0,h:0};
+  let field={x:16,y:170,w:300,h:400};
 
-  let state = "opening";
-  let stage = 1;
-  let score = 0;
-  let lives = 3;
-  let skill = 0;
-  let best = Number(localStorage.getItem("hidecat_fun_best_v15") || 0);
-  let stageMode = "breakout";
-  let stageVariant = 0;
+  let state="opening";
+  let stage=1;
+  let score=0;
+  let best=Number(localStorage.getItem("hidecat_fun_best_v16")||0);
+  let lives=3;
+  let skill=0;
+  let stageMode="breakout";
+  let selectedChar=CHARS[1];
+  let currentSkill=null;
 
-  let pointerX = 0;
-  let shake = 0;
-  let damageFlash = 0;
-  let worldFlash = 0;
-  let lastTime = 0;
-  let sayLockUntil = 0;
-  let speechLockUntil = 0;
+  let pointerX=0;
+  let shake=0;
+  let damageFlash=0;
+  let worldFlash=0;
+  let lastTime=0;
+  let openingTime=0;
+  let storyTime=0;
+  let celebrationTime=0;
+  let sayLockUntil=0;
+  let speechLockUntil=0;
 
-  let openingTime = 0;
-  let storyTime = 0;
-  let celebrationTime = 0;
+  let paddle={x:0,y:0,w:116,h:18};
+  let balls=[], blocks=[], items=[], particles=[], rings=[], stars=[], shots=[];
+  let boss=null;
+  let stageData={rows:0,cols:0};
 
-  let paddle = { x:0, y:0, w:116, h:18 };
-  let balls = [];
-  let blocks = [];
-  let items = [];
-  let particles = [];
-  let stars = [];
-  let rings = [];
-  let playerShots = [];
-  let boss = null;
+  let paddleBoostUntil=0;
+  let magnetUntil=0;
+  let magnetCharges=0;
+  let rapidUntil=0;
+  let rapidCooldown=0;
 
-  let paddleBoostUntil = 0;
-  let magnetUntil = 0;
-  let magnetCharges = 0;
-  let rapidUntil = 0;
-  let rapidShotCooldown = 0;
+  let catDash={active:false,x:-180,y:0,rot:0,until:0,trail:[]};
 
-  let catDash = {
-    active:false,
-    x:-180,
-    y:0,
-    rot:0,
-    until:0,
-    trail:[]
-  };
+  let stats={combo:0,comboTimer:0,maxCombo:0,bosses:0,items:0,damage:0,finalBoss:false};
 
-  let stats = null;
+  let catImg=new Image(), catReady=false;
+  let audioCtx=null, audioPrimed=false, musicStep=0, musicAccum=0, musicKey="";
+  let sceneTimerA=null, sceneTimerB=null;
 
-  let catImg = new Image();
-  let catReady = false;
-
-  let audioCtx = null;
-  let musicStep = 0;
-  let musicAccum = 0;
-  let audioPrimed = false;
-  let musicSceneKey = "";
-
-  function rand(min, max){
-    return Math.random() * (max - min) + min;
-  }
-
-  function randInt(min, max){
-    return Math.floor(rand(min, max + 1));
-  }
-
-  function clamp(v, min, max){
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function viewCenterX(){
-    return view.x + view.w / 2;
-  }
-
-  function resetStats(){
-    stats = {
-      bossesDefeated:0,
-      itemsCollected:0,
-      totalBlocksBroken:0,
-      combo:0,
-      comboTimer:0,
-      maxCombo:0,
-      damageTaken:0,
-      finalFormDefeated:false
+  function currentPerks(){
+    const base=Math.min(5.9,4.05+(stage-1)*0.12);
+    return {
+      paddle:selectedChar.id==="hide"?132:selectedChar.id==="bear"?120:116,
+      skillGain:selectedChar.id==="cat"?1.18:1,
+      itemDrop:selectedChar.id==="cat"?0.12:0,
+      scoreBonus:selectedChar.id==="hide"?1.10:1,
+      bigDuration:selectedChar.id==="bear"?1.55:1,
+      bigWidth:selectedChar.id==="bear"?18:0,
+      launch:selectedChar.id==="rabbit"?base-0.22:base,
+      rapid:selectedChar.id==="rabbit"?0.80:1,
+      control:selectedChar.id==="rabbit"?1.12:1
     };
-  }
-
-  function getStageBaseSpeed(){
-    return Math.min(5.9, 4.05 + (stage - 1) * 0.12);
   }
 
   function paddleTheme(){
-    if(selectedChar.id === "hide"){
-      return { top:"#fff3a5", bottom:"#ffbd52", accent:"#ffdf63" };
-    }
-    if(selectedChar.id === "cat"){
-      return { top:"#ffd4ea", bottom:"#ff7fb6", accent:"#ff63ad" };
-    }
-    if(selectedChar.id === "bear"){
-      return { top:"#d7ebff", bottom:"#72b6ff", accent:"#7ca9ff" };
-    }
-    return { top:"#dbffd9", bottom:"#7de188", accent:"#7fe38f" };
+    if(selectedChar.id==="hide") return {top:"#fff3a5",bottom:"#ffbd52",accent:"#ffdf63"};
+    if(selectedChar.id==="cat") return {top:"#ffd4ea",bottom:"#ff7fb6",accent:"#ff63ad"};
+    if(selectedChar.id==="bear") return {top:"#d7ebff",bottom:"#72b6ff",accent:"#7ca9ff"};
+    return {top:"#dbffd9",bottom:"#7de188",accent:"#7fe38f"};
   }
 
-  function currentPerks(){
-    const base = getStageBaseSpeed();
-    return {
-      basePaddle:
-        selectedChar.id === "hide" ? 132 :
-        selectedChar.id === "bear" ? 120 :
-        116,
-      skillGainMult:
-        selectedChar.id === "cat" ? 1.18 : 1.0,
-      itemDropBonus:
-        selectedChar.id === "cat" ? 0.12 : 0,
-      scoreBonus:
-        selectedChar.id === "hide" ? 1.10 : 1.0,
-      bigDurationMult:
-        selectedChar.id === "bear" ? 1.55 : 1.0,
-      bigWidthBonus:
-        selectedChar.id === "bear" ? 18 : 0,
-      launchSpeed:
-        selectedChar.id === "rabbit" ? base - 0.22 : base,
-      rapidCooldownMult:
-        selectedChar.id === "rabbit" ? 0.80 : 1.0,
-      controlMult:
-        selectedChar.id === "rabbit" ? 1.12 : 1.0
-    };
-  }
-
-  function currentMusicMode(){
-    if(state === "opening" || state === "title") return "cute";
-    if(state === "story") return "story";
-    if(state === "celebration") return "celebrate";
-    if(state === "playing" && stageMode === "boss") return "boss";
-    if(state === "playing") return "play";
-    return "none";
-  }
-
-  function resetMusicForScene(){
-    const key = `${state}:${stageMode}:${stage}`;
-    if(key !== musicSceneKey){
-      musicSceneKey = key;
-      musicStep = 0;
-      musicAccum = 0;
-    }
-  }
-
-  function comboTempoFactor(){
-    if(!stats) return 1;
-    if(stats.combo >= 8) return 1.22;
-    if(stats.combo >= 4) return 1.10;
+  function comboTempo(){
+    if(stats.combo>=8) return 1.22;
+    if(stats.combo>=4) return 1.10;
     return 1;
   }
 
-  function addScore(points){
-    score += Math.round(points * currentPerks().scoreBonus);
-  }
+  function isBossStage(s){ return BOSS_STAGES.has(s); }
 
-  function registerCombo(){
-    stats.combo += 1;
-    stats.comboTimer = 1.7;
-    stats.maxCombo = Math.max(stats.maxCombo, stats.combo);
-    if(stats.combo >= 4 && stats.combo % 4 === 0){
-      showMessage(`${stats.combo} COMBO!`, 420);
+  function sceneCatsHtml(count=8){
+    const photo = catReady ? `<img src="${catImg.src}" alt="kuma">` : "";
+    let html = `<div class="movieCats">`;
+    for(let i=0;i<count;i++){
+      const x = 6 + (i % 4) * 22 + (i % 2) * 10;
+      const y = 6 + Math.floor(i / 4) * 58;
+      const rx = 100 - x;
+      const ry = 100 - y;
+      html += catReady
+        ? `<div class="movieCat" style="left:${x}%;top:${y}%;animation-delay:${i*0.12}s">${photo}</div>`
+        : `<div class="movieCat fallback" style="left:${x}%;top:${y}%;animation-delay:${i*0.12}s">🐱</div>`;
+      if(i < count / 2){
+        html += catReady
+          ? `<div class="movieCat" style="right:${rx}%;bottom:${ry}%;animation-delay:${i*0.18}s">${photo}</div>`
+          : `<div class="movieCat fallback" style="right:${rx}%;bottom:${ry}%;animation-delay:${i*0.18}s">🐱</div>`;
+      }
     }
+    return html + `</div>`;
   }
 
-  function resetCombo(){
-    stats.combo = 0;
-    stats.comboTimer = 0;
+  function mainPhotoHtml(){
+    return catReady ? `<img src="${catImg.src}" alt="kuma">` : `🐱`;
   }
 
-  function loadCat(index = 0){
-    if(index >= CAT_CANDIDATES.length){
-      catReady = false;
-      return;
-    }
-    const img = new Image();
-    img.onload = () => {
-      catImg = img;
-      catReady = true;
-      catBadgeImg.src = img.src;
-      catSkillImg.src = img.src;
-      catBadgeImg.style.display = "block";
-      catSkillImg.style.display = "block";
-      catBadgeFallback.style.display = "none";
-      catSkillFallback.style.display = "none";
-      if(state === "title") renderTitle();
-    };
-    img.onerror = () => loadCat(index + 1);
-    img.src = CAT_CANDIDATES[index];
+  function clearSceneTimers(){
+    clearTimeout(sceneTimerA);
+    clearTimeout(sceneTimerB);
+    sceneTimerA = sceneTimerB = null;
   }
 
   function unlockAudio(){
-    if(!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if(audioCtx.state === "suspended") audioCtx.resume();
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+    audioPrimed = true;
   }
 
-  function midiToFreq(m){
-    return 440 * Math.pow(2, (m - 69) / 12);
-  }
-
-  function playTone(time, freq, dur, type="triangle", vol=0.03){
+  function tone(t, f, d, type="triangle", v=0.03){
     if(!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = type;
-    osc.frequency.setValueAtTime(freq, time);
-    gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    osc.frequency.setValueAtTime(f, t);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.linearRampToValueAtTime(v, t + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + d);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.start(time);
-    osc.stop(time + dur + 0.03);
+    osc.start(t);
+    osc.stop(t + d + 0.03);
   }
 
-  function playTap(freq=520){
-    if(!audioCtx) return;
-    playTone(audioCtx.currentTime, freq, 0.08, "square", 0.02);
-  }
-
+  function playTap(freq=520){ if(audioCtx) tone(audioCtx.currentTime, freq, 0.08, "square", 0.02); }
   function playDamage(){
     if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 170, 0.16, "sawtooth", 0.035);
-    playTone(t + 0.05, 125, 0.22, "sawtooth", 0.03);
+    const t=audioCtx.currentTime;
+    tone(t,170,0.16,"sawtooth",0.035);
+    tone(t+0.05,125,0.22,"sawtooth",0.03);
   }
-
   function playExplosion(){
     if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 110, 0.20, "sawtooth", 0.055);
-    playTone(t + 0.01, 80, 0.28, "triangle", 0.05);
-    playTone(t + 0.02, 52, 0.34, "sawtooth", 0.04);
+    const t=audioCtx.currentTime;
+    tone(t,110,0.20,"sawtooth",0.055);
+    tone(t+0.01,80,0.28,"triangle",0.05);
+    tone(t+0.02,52,0.34,"sawtooth",0.04);
   }
-
   function playMeow(){
     if(!audioCtx) return;
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sawtooth";
+    const now=audioCtx.currentTime;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type="sawtooth";
     osc.frequency.setValueAtTime(680, now);
     osc.frequency.exponentialRampToValueAtTime(430, now + 0.16);
     osc.frequency.exponentialRampToValueAtTime(520, now + 0.30);
@@ -933,44 +770,28 @@
     osc.start(now);
     osc.stop(now + 0.35);
   }
-
   function playPaddleNyah(){
     if(!audioCtx) return;
-    const now = audioCtx.currentTime;
+    const now=audioCtx.currentTime;
+    const o1=audioCtx.createOscillator(), o2=audioCtx.createOscillator();
+    const g1=audioCtx.createGain(), g2=audioCtx.createGain();
+    o1.type="triangle";
+    o2.type="sine";
+    o1.frequency.setValueAtTime(980, now);
+    o1.frequency.exponentialRampToValueAtTime(720, now + 0.06);
+    o1.frequency.exponentialRampToValueAtTime(820, now + 0.12);
+    o2.frequency.setValueAtTime(1480, now);
+    o2.frequency.exponentialRampToValueAtTime(1080, now + 0.08);
+    g1.gain.setValueAtTime(0.0001, now);
+    g1.gain.linearRampToValueAtTime(0.032, now + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
+    g2.gain.setValueAtTime(0.0001, now);
+    g2.gain.linearRampToValueAtTime(0.012, now + 0.01);
+    g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+    o1.connect(g1); o2.connect(g2); g1.connect(audioCtx.destination); g2.connect(audioCtx.destination);
+    o1.start(now); o2.start(now); o1.stop(now + 0.18); o2.stop(now + 0.15);
 
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    const gain2 = audioCtx.createGain();
-
-    osc1.type = "triangle";
-    osc1.frequency.setValueAtTime(980, now);
-    osc1.frequency.exponentialRampToValueAtTime(720, now + 0.06);
-    osc1.frequency.exponentialRampToValueAtTime(820, now + 0.12);
-
-    osc2.type = "sine";
-    osc2.frequency.setValueAtTime(1480, now);
-    osc2.frequency.exponentialRampToValueAtTime(1080, now + 0.08);
-
-    gain1.gain.setValueAtTime(0.0001, now);
-    gain1.gain.linearRampToValueAtTime(0.032, now + 0.01);
-    gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
-
-    gain2.gain.setValueAtTime(0.0001, now);
-    gain2.gain.linearRampToValueAtTime(0.012, now + 0.01);
-    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
-
-    osc1.connect(gain1);
-    osc2.connect(gain2);
-    gain1.connect(audioCtx.destination);
-    gain2.connect(audioCtx.destination);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 0.18);
-    osc2.stop(now + 0.15);
-
-    if("speechSynthesis" in window && performance.now() > speechLockUntil){
+    if("speechSynthesis" in window && performance.now()>speechLockUntil){
       speechLockUntil = performance.now() + 120;
       try{
         speechSynthesis.cancel();
@@ -983,1065 +804,920 @@
       }catch(e){}
     }
   }
-
   function playBeamCharge(){
     if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 180, 0.18, "sawtooth", 0.04);
-    playTone(t + 0.04, 240, 0.18, "sawtooth", 0.035);
-    playTone(t + 0.08, 360, 0.26, "triangle", 0.04);
-    playTone(t + 0.12, 540, 0.22, "square", 0.025);
+    const t=audioCtx.currentTime;
+    tone(t,180,0.18,"sawtooth",0.04);
+    tone(t+0.04,240,0.18,"sawtooth",0.035);
+    tone(t+0.08,360,0.26,"triangle",0.04);
   }
-
   function playBeamFire(){
     if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 1040, 0.08, "square", 0.045);
-    playTone(t + 0.01, 720, 0.14, "sawtooth", 0.05);
-    playTone(t + 0.04, 260, 0.38, "triangle", 0.045);
-    playTone(t + 0.05, 140, 0.44, "sawtooth", 0.038);
+    const t=audioCtx.currentTime;
+    tone(t,1040,0.08,"square",0.045);
+    tone(t+0.01,720,0.14,"sawtooth",0.05);
+    tone(t+0.04,260,0.38,"triangle",0.045);
   }
-
-  function playBossOrb(){
-    if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 330, 0.10, "square", 0.03);
-    playTone(t + 0.02, 240, 0.16, "triangle", 0.022);
-  }
-
-  function playBossPaw(){
-    if(!audioCtx) return;
-    const t = audioCtx.currentTime;
-    playTone(t, 120, 0.10, "sawtooth", 0.03);
-    playTone(t + 0.03, 90, 0.14, "triangle", 0.026);
-  }
+  function playBossOrb(){ if(audioCtx){ const t=audioCtx.currentTime; tone(t,330,0.10,"square",0.03); tone(t+0.02,240,0.16,"triangle",0.022);} }
+  function playBossPaw(){ if(audioCtx){ const t=audioCtx.currentTime; tone(t,120,0.10,"sawtooth",0.03); tone(t+0.03,90,0.14,"triangle",0.026);} }
 
   function averageBallSpeed(){
-    if(!balls.length) return currentPerks().launchSpeed;
-    let sum = 0;
-    let count = 0;
-    for(const b of balls){
-      if(b.stuck) continue;
-      sum += Math.hypot(b.vx, b.vy);
-      count++;
-    }
-    return sum / Math.max(1, count);
+    const moving = balls.filter(b=>!b.stuck);
+    if(!moving.length) return currentPerks().launch;
+    return moving.reduce((s,b)=>s+Math.hypot(b.vx,b.vy),0)/moving.length;
   }
 
-  function tickCuteTheme(chords, lively = 1){
+  function currentMusicMode(){
+    if(state==="opening"||state==="title") return "cute";
+    if(state==="story") return "story";
+    if(state==="celebration") return "celebrate";
+    if(state==="playing"&&stageMode==="boss") return "boss";
+    if(state==="playing") return "play";
+    return "none";
+  }
+
+  function resetMusicIfSceneChanged(){
+    const key=`${state}:${stageMode}:${stage}`;
+    if(key!==musicKey){
+      musicKey=key;
+      musicStep=0;
+      musicAccum=0;
+    }
+  }
+
+  function tickCute(chords, lively=1){
     const chord = chords[Math.floor(musicStep / 8) % chords.length];
     const step = musicStep % 8;
     const t = audioCtx.currentTime + 0.01;
-
-    const arp = [0,1,2,1,2,1,0,1];
-    const note = chord[arp[step]] + 12;
-    playTone(t, midiToFreq(note), 0.12, "square", 0.011 * lively);
-    playTone(t + 0.015, midiToFreq(note + 12), 0.07, "sine", 0.006 * lively);
-
-    if(step === 0 || step === 4){
-      playTone(t, midiToFreq(chord[0] - 12), 0.22, "triangle", 0.020 * lively);
-      playTone(t + 0.02, midiToFreq(chord[1]), 0.16, "sine", 0.010 * lively);
+    const arp=[0,1,2,1,2,1,0,1];
+    const note=chord[arp[step]]+12;
+    tone(t, midi(note), 0.12, "square", 0.011*lively);
+    tone(t+0.015, midi(note+12), 0.07, "sine", 0.006*lively);
+    if(step===0 || step===4){
+      tone(t, midi(chord[0]-12), 0.22, "triangle", 0.020*lively);
+      tone(t+0.02, midi(chord[1]), 0.16, "sine", 0.010*lively);
     }
-
-    if(step === 2 || step === 6){
-      playTone(t, 2200, 0.03, "square", 0.004 * lively);
-    }
-
-    if(step === 7){
-      playTone(t + 0.02, midiToFreq(chord[2] + 19), 0.11, "triangle", 0.007 * lively);
-    }
+    if(step===2 || step===6) tone(t, 2200, 0.03, "square", 0.004*lively);
+    if(step===7) tone(t+0.02, midi(chord[2]+19), 0.11, "triangle", 0.007*lively);
   }
 
-  function tickMusicStep(){
-    if(!audioCtx) return;
-    const mode = currentMusicMode();
-    if(mode === "none") return;
+  function tickMusic(){
+    if(!audioCtx || !audioPrimed) return;
+    const mode=currentMusicMode();
+    if(mode==="none") return;
 
-    if(mode === "cute"){
-      tickCuteTheme(CUTE_THEME, 1.15);
-    } else if(mode === "story"){
-      tickCuteTheme(STORY_THEME, 0.95);
-    } else if(mode === "celebrate"){
-      tickCuteTheme(CUTE_THEME, 1.35);
-    } else if(mode === "boss"){
-      const chord = BOSS_THEME[Math.floor(musicStep / 8) % BOSS_THEME.length];
-      const step = musicStep % 8;
-      const t = audioCtx.currentTime + 0.01;
-      const low = chord[0];
-      const mid = chord[1];
-      const high = chord[2];
-
-      if(step === 0 || step === 4){
-        playTone(t, midiToFreq(low - 24), 0.46, "sawtooth", 0.050);
-        playTone(t + 0.01, midiToFreq(low - 12), 0.36, "sawtooth", 0.040);
-        playTone(t + 0.03, midiToFreq(low), 0.24, "triangle", 0.026);
+    if(mode==="cute") tickCute(CUTE_THEME,1.15);
+    else if(mode==="story") tickCute(STORY_THEME,0.95);
+    else if(mode==="celebrate") tickCute(CUTE_THEME,1.35);
+    else if(mode==="play"){
+      const chord=PLAY_THEME[Math.floor(musicStep/8)%PLAY_THEME.length];
+      const step=musicStep%8;
+      const t=audioCtx.currentTime+0.01;
+      const arp=[0,1,2,1,2,1,0,1];
+      const note=chord[arp[step]]+12;
+      tone(t,midi(note),0.13,"square",0.009);
+      tone(t+0.015,midi(note+12),0.07,"sine",0.005);
+      if(step===0 || step===4){
+        tone(t,midi(chord[0]-24),0.26,"sine",0.032);
+        tone(t,midi(chord[1]),0.18,"triangle",0.008);
       }
-
-      if(step === 1 || step === 5){
-        playTone(t, midiToFreq(high + 12), 0.12, "square", 0.014);
-        playTone(t + 0.01, midiToFreq(high + 18), 0.08, "square", 0.010);
+      if(step===2 || step===6) tone(t,2600,0.025,"square",0.0038);
+    } else if(mode==="boss"){
+      const chord=BOSS_THEME[Math.floor(musicStep/8)%BOSS_THEME.length];
+      const step=musicStep%8;
+      const t=audioCtx.currentTime+0.01;
+      const [low,mid,high]=chord;
+      if(step===0 || step===4){
+        tone(t,midi(low-24),0.46,"sawtooth",0.05);
+        tone(t+0.01,midi(low-12),0.36,"sawtooth",0.04);
+        tone(t+0.03,midi(low),0.24,"triangle",0.026);
       }
-
-      if(step === 2 || step === 6){
-        playTone(t, midiToFreq(mid), 0.22, "triangle", 0.022);
-        playTone(t + 0.01, midiToFreq(high), 0.20, "square", 0.014);
-        playTone(t + 0.02, midiToFreq(high + 7), 0.18, "sine", 0.008);
+      if(step===1 || step===5){
+        tone(t,midi(high+12),0.12,"square",0.014);
+        tone(t+0.01,midi(high+18),0.08,"square",0.010);
       }
-
-      if(step === 3 || step === 7){
-        playTone(t, 90, 0.12, "sawtooth", 0.032);
-        playTone(t + 0.02, 130, 0.08, "triangle", 0.018);
-        playTone(t + 0.05, 66, 0.20, "sawtooth", 0.025);
+      if(step===2 || step===6){
+        tone(t,midi(mid),0.22,"triangle",0.022);
+        tone(t+0.01,midi(high),0.20,"square",0.014);
       }
-
-      if(step === 7){
-        playTone(t + 0.03, midiToFreq(high + 19), 0.20, "sine", 0.010);
-        playTone(t + 0.04, midiToFreq(high + 24), 0.12, "square", 0.010);
-      }
-    } else {
-      const chord = CANON[Math.floor(musicStep / 8) % CANON.length];
-      const step = musicStep % 8;
-      const t = audioCtx.currentTime + 0.01;
-      const arp = [0,1,2,1,2,1,0,1];
-      const note = chord[arp[step]] + 12;
-
-      playTone(t, midiToFreq(note), 0.13, "square", 0.009);
-      playTone(t + 0.015, midiToFreq(note + 12), 0.07, "sine", 0.005);
-
-      if(step === 0 || step === 4){
-        playTone(t, midiToFreq(chord[0] - 24), 0.26, "sine", 0.032);
-        playTone(t, midiToFreq(chord[1]), 0.18, "triangle", 0.008);
-      }
-
-      if(step === 2 || step === 6){
-        playTone(t, 2600, 0.025, "square", 0.0038);
+      if(step===3 || step===7){
+        tone(t,90,0.12,"sawtooth",0.032);
+        tone(t+0.02,130,0.08,"triangle",0.018);
       }
     }
-
     musicStep++;
   }
 
   function updateMusic(dt){
     if(!audioCtx || !audioPrimed) return;
-    const mode = currentMusicMode();
-    if(mode === "none") return;
+    const mode=currentMusicMode();
+    if(mode==="none") return;
 
-    let interval = 0.22;
-
-    if(mode === "cute") interval = 0.17;
-    else if(mode === "story") interval = 0.20;
-    else if(mode === "celebrate") interval = 0.15;
-    else if(mode === "boss"){
-      const speed = averageBallSpeed();
-      interval = Math.max(0.17, Math.min(0.30, 0.26 - (speed - 5.2) * 0.008));
-      interval /= comboTempoFactor();
-    } else if(mode === "play"){
-      const speed = averageBallSpeed();
-      interval = Math.max(0.16, Math.min(0.26, 0.24 - (speed - 6.0) * 0.01));
-      interval /= comboTempoFactor();
+    let interval=0.22;
+    if(mode==="cute") interval=0.17;
+    else if(mode==="story") interval=0.20;
+    else if(mode==="celebrate") interval=0.15;
+    else if(mode==="play"){
+      interval=Math.max(0.16, Math.min(0.26, 0.24 - (averageBallSpeed() - 6.0)*0.01));
+      interval/=comboTempo();
+    } else if(mode==="boss"){
+      interval=Math.max(0.17, Math.min(0.30, 0.26 - (averageBallSpeed() - 5.2)*0.008));
+      interval/=comboTempo();
     }
-
     musicAccum += dt;
     while(musicAccum >= interval){
       musicAccum -= interval;
-      tickMusicStep();
+      tickMusic();
     }
   }
 
-  function resetMusic(){
-    musicStep = 0;
-    musicAccum = 0;
+  function addRing(x,y,color="#fff",maxR=44,line=4){ rings.push({x,y,r:8,maxR,line,life:1,color}); }
+  function spark(x,y,emoji="✨",count=10){
+    for(let i=0;i<count;i++){
+      const a=Math.random()*Math.PI*2, s=Math.random()*3.6+1.2;
+      particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-0.5,life:1,emoji});
+    }
+  }
+  function burst(x,y,emoji="✨",count=8){
+    spark(x,y,emoji,count);
+    addRing(x,y,"rgba(255,255,255,.9)",34+count*2,3);
   }
 
   function showMessage(text, ms=700){
-    message.textContent = text;
-    message.style.opacity = "1";
-    message.style.transform = "translateX(-50%) scale(1.12)";
-    clearTimeout(showMessage._timer);
-    clearTimeout(showMessage._timer2);
-    showMessage._timer2 = setTimeout(() => {
-      message.style.transform = "translateX(-50%) scale(1)";
-    }, 80);
-    showMessage._timer = setTimeout(() => {
-      message.style.opacity = "0";
-    }, ms);
+    ui.message.textContent=text;
+    ui.message.style.opacity="1";
+    ui.message.style.transform="translateX(-50%) scale(1.12)";
+    clearTimeout(showMessage.t1);
+    clearTimeout(showMessage.t2);
+    showMessage.t2=setTimeout(()=>ui.message.style.transform="translateX(-50%) scale(1)",80);
+    showMessage.t1=setTimeout(()=>ui.message.style.opacity="0",ms);
   }
 
   function say(text, ms=850){
-    catTalk.textContent = text;
-    sayLockUntil = performance.now() + ms;
-    clearTimeout(say._timer);
-    say._timer = setTimeout(() => {
-      catTalk.textContent = "にゃっ";
-    }, ms);
-  }
-
-  function addRing(x, y, color="#fff", maxR=44, line=4){
-    rings.push({ x, y, r:8, maxR, line, life:1, color });
-  }
-
-  function sparkle(x, y, emoji="✨", count=10){
-    for(let i=0; i<count; i++){
-      const a = Math.random() * Math.PI * 2;
-      const s = Math.random() * 3.6 + 1.2;
-      particles.push({
-        x, y,
-        vx: Math.cos(a) * s,
-        vy: Math.sin(a) * s - 0.5,
-        life: 1,
-        emoji
-      });
-    }
-  }
-
-  function burst(x, y, emoji="✨", count=8){
-    sparkle(x, y, emoji, count);
-    addRing(x, y, "rgba(255,255,255,.9)", 34 + count * 2, 3);
+    ui.catTalk.textContent=text;
+    sayLockUntil=performance.now()+ms;
+    clearTimeout(say.t);
+    say.t=setTimeout(()=>ui.catTalk.textContent="にゃっ",ms);
   }
 
   function updateCatReaction(){
-    if(performance.now() < sayLockUntil) return;
-
-    let text = "にゃっ";
-    let glow = "0 10px 24px rgba(255,90,165,.22)";
-    let scale = 1;
-
-    if(state === "title"){
-      text = "えらんでにゃ";
-      glow = "0 12px 28px rgba(255,99,173,.40)";
-      scale = 1.05;
-    } else if(state === "opening"){
-      text = "みてにゃ";
-    } else if(state === "story"){
-      text = "がんばるにゃ";
-      glow = "0 12px 26px rgba(255,216,77,.35)";
-    } else if(state === "celebration"){
-      text = "やったにゃ!";
-      glow = "0 14px 30px rgba(126,255,211,.58)";
-      scale = 1.08;
-    } else if(state !== "playing"){
-      text = "おつかれにゃ";
-    } else if(stageMode === "boss"){
-      text = "こわいにゃ";
-      glow = "0 12px 28px rgba(255,216,77,.55)";
-      scale = 1.06;
-    } else if(score >= 1200){
-      text = "強いにゃ!";
-      glow = "0 12px 26px rgba(126,255,211,.5)";
-      scale = 1.04;
-    } else if(score >= 500){
-      text = "いい感じにゃ";
-    } else if(score >= 150){
-      text = "やるにゃ";
-    }
-
-    catTalk.textContent = text;
-    catBadge.style.boxShadow = glow;
-    catBadge.style.transform = `translateX(-50%) scale(${scale})`;
-  }
-
-  function saveBest(){
-    if(score > best){
-      best = score;
-      localStorage.setItem("hidecat_fun_best_v15", String(best));
-    }
-  }
-
-  function pickRandomSkill(){
-    currentSkill = SKILLS[Math.floor(Math.random() * SKILLS.length)];
-  }
-
-  function updateSkillUI(){
-    const ready = state === "playing" && skill >= 100 && currentSkill;
-    if(ready){
-      skillEmojiEl.textContent = currentSkill.emoji;
-      skillNameEl.textContent = currentSkill.name;
-      skillDescEl.textContent = currentSkill.desc;
-    } else if(skill >= 100 && !currentSkill){
-      skillEmojiEl.textContent = "❔";
-      skillNameEl.textContent = "準備中";
-      skillDescEl.textContent = "少しまってね";
-    } else {
-      skillEmojiEl.textContent = "❔";
-      skillNameEl.textContent = "チャージ中";
-      skillDescEl.textContent = "ゲージをためてね";
-    }
-    skillButton.classList.toggle("disabled", !ready);
+    if(performance.now()<sayLockUntil) return;
+    let text="にゃっ", glow="0 10px 24px rgba(255,90,165,.22)", scale=1;
+    if(state==="opening"){ text="みてにゃ"; }
+    else if(state==="story"){ text="がんばるにゃ"; glow="0 12px 26px rgba(255,216,77,.35)"; }
+    else if(state==="title"){ text="えらんでにゃ"; glow="0 12px 28px rgba(255,99,173,.40)"; scale=1.05; }
+    else if(state==="celebration"){ text="やったにゃ!"; glow="0 14px 30px rgba(126,255,211,.58)"; scale=1.08; }
+    else if(state!=="playing"){ text="おつかれにゃ"; }
+    else if(stageMode==="boss"){ text="こわいにゃ"; glow="0 12px 28px rgba(255,216,77,.55)"; scale=1.06; }
+    else if(score>=1200){ text="強いにゃ!"; glow="0 12px 26px rgba(126,255,211,.5)"; scale=1.04; }
+    else if(score>=500){ text="いい感じにゃ"; }
+    else if(score>=150){ text="やるにゃ"; }
+    ui.catTalk.textContent=text;
+    ui.catBadge.style.boxShadow=glow;
+    ui.catBadge.style.transform=`translateX(-50%) scale(${scale})`;
   }
 
   function updateComboUI(){
-    const show = state === "playing" && stats && stats.combo >= 3;
-    comboDisplay.classList.toggle("show", show);
-    comboValue.textContent = `x${Math.max(3, stats ? stats.combo : 3)}`;
-
+    const show = state==="playing" && stats.combo>=3;
+    ui.combo.classList.toggle("show", show);
+    ui.comboValue.textContent=`x${Math.max(3,stats.combo)}`;
     if(show){
-      const scale =
-        stats.combo >= 8 ? 1.14 :
-        stats.combo >= 5 ? 1.08 :
-        1.0;
-      comboDisplay.style.transform = `translateY(0) scale(${scale})`;
+      const s = stats.combo>=8 ? 1.14 : stats.combo>=5 ? 1.08 : 1;
+      ui.combo.style.transform=`translateY(0) scale(${s})`;
     }
   }
 
-  function addSkill(amount){
-    const before = skill;
-    const gain = amount * currentPerks().skillGainMult;
-    skill = clamp(skill + gain, 0, 100);
-    if(before < 100 && skill >= 100 && !currentSkill){
-      pickRandomSkill();
-      showMessage(currentSkill.name + "!", 620);
-      say("きたにゃ!", 650);
-      worldFlash = Math.max(worldFlash, 0.14);
+  function updateSkillUI(){
+    const ready=state==="playing" && skill>=100 && currentSkill;
+    if(ready){
+      ui.skillEmoji.textContent=currentSkill.emoji;
+      ui.skillName.textContent=currentSkill.name;
+      ui.skillDesc.textContent=currentSkill.desc;
+    } else if(skill>=100 && !currentSkill){
+      ui.skillEmoji.textContent="❔";
+      ui.skillName.textContent="準備中";
+      ui.skillDesc.textContent="少しまってね";
+    } else {
+      ui.skillEmoji.textContent="❔";
+      ui.skillName.textContent="チャージ中";
+      ui.skillDesc.textContent="ゲージをためてね";
+    }
+    ui.skillButton.classList.toggle("disabled", !ready);
+  }
+
+  function addSkill(v){
+    const before=skill;
+    skill=clamp(skill + v*currentPerks().skillGain, 0, 100);
+    if(before<100 && skill>=100 && !currentSkill){
+      currentSkill=SKILLS[Math.floor(Math.random()*SKILLS.length)];
+      showMessage(currentSkill.name+"!",620);
+      say("きたにゃ!",650);
+      worldFlash=Math.max(worldFlash,0.14);
     }
   }
+
+  function registerCombo(){
+    stats.combo++;
+    stats.comboTimer=1.7;
+    stats.maxCombo=Math.max(stats.maxCombo,stats.combo);
+    if(stats.combo>=4 && stats.combo%4===0) showMessage(`${stats.combo} COMBO!`,420);
+  }
+  function resetCombo(){ stats.combo=0; stats.comboTimer=0; }
 
   function updateHud(){
-    scoreText.textContent = score;
-    lifeText.textContent = lives;
-    stageText.textContent = `${stage} / ${MAX_STAGE}`;
-    bestText.textContent = best;
-    skillFill.style.width = `${clamp(skill, 0, 100)}%`;
-    const activeSkillVisual =
+    ui.score.textContent=score;
+    ui.life.textContent=lives;
+    ui.stage.textContent=`${stage} / ${MAX_STAGE}`;
+    ui.best.textContent=best;
+    ui.skillFill.style.width=`${skill}%`;
+    ui.catSkillBadge.classList.toggle("show",
       catDash.active ||
-      performance.now() < magnetUntil ||
-      performance.now() < paddleBoostUntil ||
-      performance.now() < rapidUntil;
-    catSkillBadge.classList.toggle("show", activeSkillVisual);
+      performance.now()<magnetUntil ||
+      performance.now()<paddleBoostUntil ||
+      performance.now()<rapidUntil
+    );
     updateComboUI();
     updateCatReaction();
     updateSkillUI();
   }
 
-  function computeViewRect(){
-    const margin = Math.max(8, Math.min(24, W * 0.03));
-    const usable = W - margin * 2;
-    let portraitW = usable;
+  function loadCat(i=0){
+    if(i>=CAT_FILES.length){ catReady=false; return; }
+    const img=new Image();
+    img.onload=()=>{
+      catImg=img;
+      catReady=true;
+      ui.catBadgeImg.src=img.src;
+      ui.catSkillImg.src=img.src;
+      ui.catBadgeImg.style.display="block";
+      ui.catSkillImg.style.display="block";
+      ui.catBadgeFallback.style.display="none";
+      ui.catSkillFallback.style.display="none";
+      if(state==="title") showTitle();
+    };
+    img.onerror=()=>loadCat(i+1);
+    img.src=CAT_FILES[i];
+  }
 
-    if(W > H * 0.9){
-      portraitW = Math.min(usable, Math.max(360, Math.min(520, H * 0.62)));
+  function saveBestIfNeeded(){
+    if(score>best){
+      best=score;
+      localStorage.setItem("hidecat_fun_best_v16", String(best));
+    }
+  }
+
+  function computeView(){
+    const margin=Math.max(8,Math.min(24,W*0.03));
+    const usable=W-margin*2;
+    let portraitW=usable;
+    if(W > H*0.9){
+      portraitW = Math.min(usable, Math.max(360, Math.min(520, H*0.62)));
     } else if(W > 540){
       portraitW = Math.min(usable, 520);
     }
-
-    view.w = portraitW;
-    view.h = H;
-    view.x = Math.floor((W - view.w) / 2);
-    view.y = 0;
+    view.w=portraitW;
+    view.h=H;
+    view.x=Math.floor((W-view.w)/2);
+    view.y=0;
   }
 
-  function applyResponsiveUI(){
-    const left = view.x + 10;
-    const right = W - (view.x + view.w) + 10;
+  function layoutUI(){
+    const left=view.x+10;
+    const right=W-(view.x+view.w)+10;
+    ui.hud.style.left=`${left}px`;
+    ui.hud.style.right=`${right}px`;
+    ui.skillsArea.style.left=`${view.x+14}px`;
+    ui.skillsArea.style.right=`${W-(view.x+view.w)+14}px`;
+    ui.catBadge.style.left=`${view.x+view.w/2}px`;
+    ui.catTalk.style.left=`${view.x+view.w/2}px`;
+    ui.catSkillBadge.style.left=`${view.x+14}px`;
+    ui.combo.style.right=`${W-(view.x+view.w)+14}px`;
 
-    hud.style.left = `${left}px`;
-    hud.style.right = `${right}px`;
+    const hudRect=ui.hud.getBoundingClientRect();
+    const badgeRect=ui.catBadge.getBoundingClientRect();
+    const talkRect=ui.catTalk.getBoundingClientRect();
+    const skillsRect=ui.skillsArea.getBoundingClientRect();
+    const appRect=ui.app.getBoundingClientRect();
 
-    skillsArea.style.left = `${view.x + 14}px`;
-    skillsArea.style.right = `${W - (view.x + view.w) + 14}px`;
-
-    catBadge.style.left = `${viewCenterX()}px`;
-    catTalk.style.left = `${viewCenterX()}px`;
-    message.style.left = `${viewCenterX()}px`;
-
-    catSkillBadge.style.left = `${view.x + 14}px`;
-    comboDisplay.style.right = `${W - (view.x + view.w) + 14}px`;
-  }
-
-  function layoutField(){
-    const hudRect = hud.getBoundingClientRect();
-    const badgeRect = catBadge.getBoundingClientRect();
-    const talkRect = catTalk.getBoundingClientRect();
-    const skillsRect = skillsArea.getBoundingClientRect();
-    const appRect = app.getBoundingClientRect();
-
-    const topSafe = Math.max(
+    const topSafe=Math.max(
       hudRect.bottom - appRect.top,
       badgeRect.bottom - appRect.top,
       talkRect.bottom - appRect.top
-    ) + 18;
+    ) + 12;
 
-    const bottomSafe = (skillsRect.top - appRect.top) - 24;
+    ui.combo.style.top=`${topSafe}px`;
 
-    field.x = view.x + 14;
-    field.y = Math.max(140, topSafe);
-    field.w = view.w - 28;
-    field.h = Math.max(300, bottomSafe - field.y);
+    field.x=view.x+14;
+    field.y=Math.max(182, topSafe + 48);
+    field.w=view.w-28;
+    field.h=Math.max(300, (skillsRect.top-appRect.top)-field.y-24);
+
+    ui.message.style.left=`${view.x+view.w/2}px`;
+    ui.message.style.top=`${field.y-48}px`;
   }
 
-  function getItemPool(){
-    if(stage >= 6){
-      return ["gauge","score","big","rapid","clone"];
+  function resize(){
+    W=window.innerWidth;
+    H=window.innerHeight;
+    canvas.width=Math.floor(W*DPR);
+    canvas.height=Math.floor(H*DPR);
+    canvas.style.width=W+"px";
+    canvas.style.height=H+"px";
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    computeView();
+    layoutUI();
+    if(!pointerX) pointerX=view.x+view.w/2;
+    paddle.y=field.y+field.h-24;
+    buildStars();
+  }
+
+  function roundRectPath(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawImageCover(img,x,y,w,h){
+    const ir=img.width/img.height, br=w/h;
+    let dw,dh,dx,dy;
+    if(ir>br){ dh=h; dw=h*ir; dx=x-(dw-w)/2; dy=y; }
+    else { dw=w; dh=w/ir; dx=x; dy=y-(dh-h)/2; }
+    ctx.drawImage(img,dx,dy,dw,dh);
+  }
+
+  function drawSideMats(a,b){
+    if(view.w>=W-4) return;
+    const leftW=view.x, rightX=view.x+view.w, rightW=W-rightX;
+    if(b){
+      const lg=ctx.createLinearGradient(0,0,view.x,0);
+      lg.addColorStop(0,a); lg.addColorStop(1,b);
+      ctx.fillStyle=lg; ctx.fillRect(0,0,leftW,H);
+      const rg=ctx.createLinearGradient(rightX,0,W,0);
+      rg.addColorStop(0,b); rg.addColorStop(1,a);
+      ctx.fillStyle=rg; ctx.fillRect(rightX,0,rightW,H);
+    } else {
+      ctx.fillStyle=a;
+      ctx.fillRect(0,0,leftW,H);
+      ctx.fillRect(rightX,0,rightW,H);
     }
-    return ["gauge","score","heal","big","rapid","clone"];
   }
 
-  function getBombCount(stageNum, available){
-    const desired = Math.max(0, Math.min(4, Math.floor((stageNum - 1) / 2)));
-    return Math.min(desired, Math.max(0, available));
+  function drawBackground(){
+    let g;
+    if(stageMode==="boss"){
+      g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,"#180d1f");
+      g.addColorStop(.35,"#2a1433");
+      g.addColorStop(.65,"#2f1239");
+      g.addColorStop(1,"#09070f");
+    } else {
+      g=ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,"#ffd8ea");
+      g.addColorStop(.52,"#f3bad5");
+      g.addColorStop(1,"#ea96bd");
+    }
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,W,H);
+
+    if(view.w < W-4){
+      ctx.fillStyle=stageMode==="boss" ? "rgba(0,0,0,.42)" : "rgba(255,255,255,.18)";
+      ctx.fillRect(0,0,view.x,H);
+      ctx.fillRect(view.x+view.w,0,W-(view.x+view.w),H);
+    }
+
+    for(const s of stars){
+      ctx.globalAlpha=stageMode==="boss" ? s.a*1.2 : s.a;
+      ctx.fillStyle=stageMode==="boss" ? "#d8d9ff" : "#fff";
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,stageMode==="boss" ? s.r*1.1 : s.r,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    if(stageMode==="boss"){
+      const vg=ctx.createRadialGradient(view.x+view.w/2,H/2,120,view.x+view.w/2,H/2,Math.max(view.w,H)*0.78);
+      vg.addColorStop(0,"rgba(0,0,0,0)");
+      vg.addColorStop(1,"rgba(0,0,0,.50)");
+      ctx.fillStyle=vg;
+      ctx.fillRect(0,0,W,H);
+    }
+
+    if(catReady){
+      ctx.save();
+      ctx.globalAlpha=stageMode==="boss" ? 0.16 : 0.28;
+      roundRectPath(field.x,field.y,field.w,field.h,26);
+      ctx.clip();
+      drawImageCover(catImg,field.x,field.y,field.w,field.h);
+      ctx.restore();
+    }
+
+    ctx.strokeStyle=stageMode==="boss" ? "rgba(255,255,255,.38)" : "rgba(255,255,255,.58)";
+    ctx.lineWidth=2;
+    roundRectPath(field.x,field.y,field.w,field.h,26);
+    ctx.stroke();
+
+    const warn=getFallWarning();
+    if(warn>0){
+      const pulse=0.45 + 0.55*(0.5+0.5*Math.sin(performance.now()/120));
+      const alpha=warn*pulse*0.48;
+      const bandH=22+warn*10;
+      const y=field.y+field.h-bandH;
+      const grad=ctx.createLinearGradient(0,y,0,y+bandH);
+      grad.addColorStop(0,`rgba(255,70,90,0)`);
+      grad.addColorStop(1,`rgba(255,40,70,${alpha})`);
+      ctx.fillStyle=grad;
+      ctx.fillRect(field.x+6,y,field.w-12,bandH);
+      ctx.strokeStyle=`rgba(255,120,140,${Math.min(.85,alpha+.15)})`;
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.moveTo(field.x+10,field.y+field.h-4);
+      ctx.lineTo(field.x+field.w-10,field.y+field.h-4);
+      ctx.stroke();
+    }
+
+    if(worldFlash>0){
+      ctx.fillStyle=`rgba(255,255,255,${worldFlash*0.22})`;
+      ctx.fillRect(0,0,W,H);
+    }
+    if(damageFlash>0){
+      ctx.fillStyle=`rgba(255,80,90,${0.22*damageFlash})`;
+      ctx.fillRect(0,0,W,H);
+    }
   }
 
-  function createBall(vx = null){
-    const launchSpeed = currentPerks().launchSpeed;
+  function drawIdleBackground(){
+    const prev=stageMode;
+    stageMode="breakout";
+    drawBackground();
+    stageMode=prev;
+  }
+
+  function buildStars(){
+    stars=[];
+    for(let i=0;i<68;i++){
+      stars.push({
+        x:Math.random()*W,
+        y:Math.random()*H,
+        r:Math.random()*2+0.5,
+        a:Math.random()*0.6+0.1
+      });
+    }
+  }
+
+  function getFallWarning(){
+    if(state!=="playing" || !balls.length) return 0;
+    const threshold=field.y+field.h*0.66;
+    let m=0;
+    for(const b of balls){
+      if(b.stuck) continue;
+      const over=clamp((b.y-threshold)/(field.y+field.h-threshold),0,1);
+      if(over>m) m=over;
+    }
+    return m;
+  }
+
+  function createBall(vx=null){
+    const sp=currentPerks().launch;
     return {
-      x: field.x + field.w / 2,
-      y: field.y + field.h - 92,
-      vx: vx ?? (Math.random() > 0.5 ? launchSpeed * 0.52 : -launchSpeed * 0.52),
-      vy: -launchSpeed,
-      r: 9,
+      x:field.x+field.w/2,
+      y:field.y+field.h-92,
+      vx:vx ?? (Math.random()>0.5 ? sp*0.52 : -sp*0.52),
+      vy:-sp,
+      r:9,
       trail:[],
       stuck:false,
       stuckOffsetX:0
     };
   }
 
+  function resetBalls(single=false){
+    balls=[createBall()];
+    if(single){
+      balls=[createBall(0)];
+      balls[0].vx=currentPerks().launch*0.32;
+      balls[0].vy=-currentPerks().launch;
+    }
+  }
+
+  function getItemPool(){
+    return stage>=6
+      ? ["gauge","score","big","rapid","clone"]
+      : ["gauge","score","heal","big","rapid","clone"];
+  }
+
+  function spawnItem(x,y){
+    const chance=0.46+currentPerks().itemDrop;
+    if(Math.random()>chance) return;
+    const pool=getItemPool();
+    const type=pool[Math.floor(Math.random()*pool.length)];
+    const meta=ITEMS.find(v=>v.type===type);
+    items.push({
+      x,y,
+      vx:(Math.random()-0.5)*1.1,
+      vy:1.8+Math.random()*0.7,
+      r:14,
+      type,
+      emoji:meta.emoji
+    });
+  }
+
+  function applyItem(type){
+    worldFlash=Math.max(worldFlash,0.12);
+    stats.items++;
+    if(type==="gauge"){ addSkill(26); showMessage("ゲージUP!",480); }
+    if(type==="score"){ addScore(220); showMessage("+220",380); }
+    if(type==="heal"){ lives=Math.min(5,lives+1); say("たすかったにゃ",520); showMessage("LIFE+",440); }
+    if(type==="big"){ paddleBoostUntil=performance.now()+5200*currentPerks().bigDuration; showMessage("BIG!",450); }
+    if(type==="rapid"){ rapidUntil=performance.now()+6200; rapidCooldown=0; showMessage("RAPID!",500); say("どどどっ!",500); }
+    if(type==="clone"){ cloneBalls(); showMessage("分身!",500); say("ふえたにゃ!",520); }
+    burst(paddle.x+paddle.w/2,paddle.y-8,"✨",14);
+    addRing(paddle.x+paddle.w/2,paddle.y-8,"rgba(255,255,190,.9)",56,4);
+  }
+
   function cloneBalls(){
-    if(stageMode === "boss"){
+    if(stageMode==="boss"){
       if(boss){
-        boss.hp = Math.max(0, boss.hp - 2);
-        boss.flash = 1;
+        boss.hp=Math.max(0,boss.hp-2);
+        boss.flash=1;
         registerCombo();
-        burst(boss.x + boss.w/2, boss.y + boss.h/2, "⭐", 12);
-        if(stage === MAX_STAGE && Math.random() < 0.14){
-          spawnItem(boss.x + boss.w/2, boss.y + boss.h/2);
-        }
-        if(boss.hp <= 0){
+        burst(boss.x+boss.w/2,boss.y+boss.h/2,"⭐",12);
+        if(stage===10 && Math.random()<0.14) spawnItem(boss.x+boss.w/2,boss.y+boss.h/2);
+        if(boss.hp<=0){
           addScore(120);
-          stats.bossesDefeated += 1;
-          if(boss.secondForm) stats.finalFormDefeated = true;
-          boss = null;
+          stats.bosses++;
+          if(stage===10) stats.finalBoss=true;
+          boss=null;
           goNextStage();
         }
       }
       return;
     }
-
-    const active = balls.filter(b => !b.stuck);
+    const active=balls.filter(b=>!b.stuck);
     if(!active.length) return;
-    const base = active[0];
-    while(balls.length < 3){
-      const angle = balls.length === 1 ? -0.72 : 0.72;
-      const speed = Math.max(currentPerks().launchSpeed, Math.hypot(base.vx, base.vy));
+    const base=active[0];
+    while(balls.length<3){
+      const angle=balls.length===1 ? -0.72 : 0.72;
+      const sp=Math.max(currentPerks().launch,Math.hypot(base.vx,base.vy));
       balls.push({
-        x: base.x,
-        y: base.y,
-        vx: Math.sin(angle) * speed,
-        vy: -Math.cos(angle) * speed,
-        r: 9,
-        trail:[],
-        stuck:false,
-        stuckOffsetX:0
+        x:base.x,y:base.y,
+        vx:Math.sin(angle)*sp,
+        vy:-Math.cos(angle)*sp,
+        r:9,trail:[],stuck:false,stuckOffsetX:0
       });
     }
   }
 
-  function resetBalls(single=false){
-    balls = [createBall()];
-    if(single){
-      balls = [createBall(0)];
-      balls[0].vx = currentPerks().launchSpeed * 0.32;
-      balls[0].vy = -currentPerks().launchSpeed;
-    }
+  function blockScore(b){
+    if(b.type==="bomb") return 16;
+    return b.maxHp>=3 ? 14 : b.maxHp===2 ? 12 : 10;
   }
 
-  function stagePattern(variant, r, c, rows, cols){
-    const centerR = (rows - 1) / 2;
-    const centerC = (cols - 1) / 2;
-    const dr = Math.abs(r - centerR);
-    const dc = Math.abs(c - centerC);
+  function addScore(v){ score += Math.round(v*currentPerks().scoreBonus); }
 
-    switch(variant){
-      case 0: return true;
-      case 1: return (r + c) % 2 === 0 || r < 2;
-      case 2: return !(r >= 1 && r <= rows - 2 && c === Math.floor(cols/2));
-      case 3: return c <= (r % cols);
-      case 4: return dr + dc <= 2.6;
-      case 5: return (r % 2 === 0 ? c < cols - 1 : c > 0);
-      case 6: return r === 0 || r === rows - 1 || c === 0 || c === cols - 1 || (dr <= 0.5 && dc <= 1.5);
-      case 7: return c !== Math.floor(cols/2) || r === 0 || r === rows - 1;
-      case 8: return r < 2 || c === 0 || c === cols - 1 || (r + c) % 2 === 0;
-      case 9: return c === Math.floor(cols/2) || r === Math.floor(rows/2) || (r % 2 === 0 && c !== 0 && c !== cols - 1);
-      default: return true;
-    }
+  function pointRectDistance(px,py,b){
+    const nx=Math.max(b.x,Math.min(px,b.x+b.w));
+    const ny=Math.max(b.y,Math.min(py,b.y+b.h));
+    return Math.hypot(px-nx,py-ny);
   }
 
-  function buildHardWallSet(rows, cols, stageNum){
-    const set = new Set();
-    const add = (r, c) => {
-      if(r >= 0 && r < rows && c >= 0 && c < cols){
-        set.add(r * cols + c);
-      }
-    };
-
-    const p = (stageNum + stageVariant) % 8;
-
-    if(stageNum >= 3){
-      if(p === 0){
-        for(let r=1; r<rows-1; r++) add(r, Math.floor(cols/2));
-      } else if(p === 1){
-        for(let r=0; r<rows; r++){
-          add(r, 1);
-          add(r, cols - 2);
-        }
-      } else if(p === 2){
-        for(let r=0; r<rows; r++){
-          add(r, r % cols);
-          add(r, cols - 1 - (r % cols));
-        }
-      } else if(p === 3){
-        for(let c=0; c<cols; c++) add(1, c);
-        for(let c=0; c<cols; c++) add(rows - 2, c);
-      } else if(p === 4){
-        for(let r=0; r<rows; r++){
-          if(r % 2 === 0) add(r, 0);
-          else add(r, cols - 1);
-        }
-        add(Math.floor(rows / 2), Math.floor(cols / 2));
-      } else if(p === 5){
-        for(let r=1; r<rows-1; r++){
-          add(r, 0);
-          add(r, cols - 1);
-          if(r % 2 === 0) add(r, Math.floor(cols / 2));
-        }
-      } else if(p === 6){
-        for(let c=0; c<cols; c += 2){
-          add(2, c);
-          add(rows - 3, c);
-        }
-      } else {
-        for(let r=1; r<rows-1; r++){
-          add(r, (r + stageNum) % cols);
-        }
-      }
-    }
-
-    if(stageNum >= 7){
-      add(0, 1);
-      add(0, cols - 2);
-      add(rows - 1, 1);
-      add(rows - 1, cols - 2);
-    }
-
-    return set;
-  }
-
-  function createStageBlocks(stageNum){
-    boss = null;
-    blocks = [];
-    items = [];
-    playerShots = [];
-    stageVariant = randInt(0, 9);
-
-    const cols = 5;
-    const rows = randInt(5, 7);
-    const gapX = 8;
-    const gapY = 9;
-    const innerPad = 10;
-    const bw = (field.w - innerPad * 2 - gapX * (cols - 1)) / cols;
-    const bh = 26;
-
-    const strong2Count = Math.min(3 + Math.floor(stageNum / 2), 10);
-    const strong3Count = Math.min(Math.floor(stageNum / 2), 7);
-    const hardWallSet = buildHardWallSet(rows, cols, stageNum);
-
-    let candidateIndices = [];
-    let idx = 0;
-    for(let r=0; r<rows; r++){
-      for(let c=0; c<cols; c++){
-        if(stagePattern(stageVariant, r, c, rows, cols)) candidateIndices.push(idx);
-        idx++;
-      }
-    }
-
-    for(let i=candidateIndices.length - 1; i>0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [candidateIndices[i], candidateIndices[j]] = [candidateIndices[j], candidateIndices[i]];
-    }
-
-    const extraWalls = new Set([...hardWallSet].slice(0, Math.min(hardWallSet.size, stageNum >= 6 ? 9 : 6)));
-    const nonWallCandidates = candidateIndices.filter(v => !extraWalls.has(v));
-    const bombCount = getBombCount(stageNum, nonWallCandidates.length);
-    const bombSet = new Set(nonWallCandidates.slice(0, bombCount));
-    const strong3Set = new Set(nonWallCandidates.slice(bombCount, bombCount + strong3Count));
-    const strong2Set = new Set(nonWallCandidates.slice(bombCount + strong3Count, bombCount + strong3Count + strong2Count));
-
-    idx = 0;
-    const wordShift = stageNum * 5 + randInt(0, WORDS.length - 1);
-
-    for(let r=0; r<rows; r++){
-      for(let c=0; c<cols; c++){
-        if(!stagePattern(stageVariant, r, c, rows, cols)){
-          idx++;
-          continue;
-        }
-
-        let hp = 1;
-        let label = WORDS[(idx + wordShift) % WORDS.length];
-        let color = COLORS[(idx + stageNum + stageVariant) % COLORS.length];
-        let bomb = false;
-
-        if(extraWalls.has(idx)){
-          hp = Infinity;
-          label = "壁";
-          color = "#b88aa3";
-        } else if(bombSet.has(idx)){
-          hp = 1;
-          label = "💣";
-          color = "#ffb24d";
-          bomb = true;
-        } else if(strong3Set.has(idx) && stageNum >= 3){
-          hp = 3;
-        } else if(strong2Set.has(idx) && stageNum >= 2){
-          hp = 2;
-        }
-
-        blocks.push({
-          x: field.x + innerPad + c * (bw + gapX),
-          y: field.y + 16 + r * (bh + gapY),
-          w: bw,
-          h: bh,
-          label,
-          color,
-          hp,
-          maxHp: hp,
-          alive:true,
-          bomb
-        });
-
-        idx++;
-      }
-    }
-  }
-
-  function chooseBossType(exclude = null){
-    const keys = Object.keys(BOSS_TYPES).filter(k => k !== exclude);
-    return keys[Math.floor(Math.random() * keys.length)];
-  }
-
-  function applyBossType(targetBoss, type, stageNum, keepPosition = false){
-    const meta = BOSS_TYPES[type];
-    const prevY = targetBoss.y;
-    targetBoss.type = type;
-    targetBoss.meta = meta;
-    targetBoss.baseY = field.y + 12;
-
-    if(!keepPosition){
-      targetBoss.y = targetBoss.baseY;
-    } else if(type !== "zigzag"){
-      targetBoss.y += (targetBoss.baseY - prevY) * 0.7;
-    }
-
-    targetBoss.vx =
-      (type === "zigzag" ? 2.05 :
-      type === "warp" ? 1.25 : 1.58) + stageNum * 0.04;
-    targetBoss.beamGap = meta.beamGap - (stageNum === MAX_STAGE ? 0.10 : 0);
-    targetBoss.beamWidth = meta.beamWidth;
-    targetBoss.attackGap = meta.attackGap - (stageNum === MAX_STAGE ? 0.15 : 0);
-    targetBoss.teleportTimer = type === "warp" ? 1.9 : 0;
-    targetBoss.moveT = 0;
-  }
-
-  function createBoss(stageNum){
-    blocks = [];
-    items = [];
-    playerShots = [];
-
-    const maxHp = stageNum === MAX_STAGE ? 28 : 18;
-    boss = {
-      x: field.x + field.w/2 - 52,
-      y: field.y + 12,
-      w: 104,
-      h: 78,
-      hp: maxHp,
-      maxHp,
-      flash: 0,
-      beamTimer: 0,
-      beam:null,
-      bob:0,
-      secondForm:false,
-      type:"",
-      meta:null,
-      baseY:field.y + 12,
-      vx:1.5,
-      moveT:0,
-      teleportTimer:0,
-      beamGap:2.1,
-      beamWidth:18,
-      attackGap:2.1,
-      attackTimer:0,
-      projectiles:[],
-      markers:[]
-    };
-
-    applyBossType(boss, chooseBossType(), stageNum);
-  }
-
-  function buildStars(){
-    stars = [];
-    for(let i=0; i<74; i++){
-      stars.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: Math.random() * 2 + 0.5,
-        a: Math.random() * 0.6 + 0.1
-      });
-    }
-  }
-
-  function startCatDash(){
-    const now = performance.now();
-    catDash.active = true;
-    catDash.x = field.x - 120;
-    catDash.y = field.y + field.h * 0.55;
-    catDash.rot = -0.25;
-    catDash.until = now + 1200;
-    catDash.trail = [];
-  }
-
-  function spawnItem(x, y){
-    const chance = 0.48 + currentPerks().itemDropBonus;
-    if(Math.random() > chance) return;
-
-    const pool = getItemPool();
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    const data = ITEM_TYPES.find(v => v.type === pick);
-
-    items.push({
-      x, y,
-      vx:(Math.random() - 0.5) * 1.1,
-      vy:1.8 + Math.random() * 0.7,
-      r:14,
-      type:data.type,
-      emoji:data.emoji,
-      label:data.label
-    });
-  }
-
-  function applyItem(type){
-    worldFlash = Math.max(worldFlash, 0.12);
-    stats.itemsCollected += 1;
-
-    if(type === "gauge"){
-      addSkill(26);
-      showMessage("ゲージUP!", 480);
-    }
-    if(type === "score"){
-      addScore(220);
-      showMessage("+220", 380);
-    }
-    if(type === "heal"){
-      lives = Math.min(5, lives + 1);
-      say("たすかったにゃ", 520);
-      showMessage("LIFE+", 440);
-    }
-    if(type === "big"){
-      paddleBoostUntil = performance.now() + 5200 * currentPerks().bigDurationMult;
-      showMessage("BIG!", 450);
-    }
-    if(type === "rapid"){
-      rapidUntil = performance.now() + 6200;
-      rapidShotCooldown = 0;
-      showMessage("RAPID!", 500);
-      say("どどどっ!", 500);
-    }
-    if(type === "clone"){
-      cloneBalls();
-      showMessage("分身!", 500);
-      say("ふえたにゃ!", 520);
-    }
-
-    burst(paddle.x + paddle.w/2, paddle.y - 8, "✨", 14);
-    addRing(paddle.x + paddle.w/2, paddle.y - 8, "rgba(255,255,190,.9)", 56, 4);
-    updateHud();
-  }
-
-  function blockScore(block){
-    if(block.bomb) return 16;
-    return block.maxHp >= 3 ? 14 : block.maxHp === 2 ? 12 : 10;
-  }
-
-  function pointRectDistance(px, py, rect){
-    const nx = Math.max(rect.x, Math.min(px, rect.x + rect.w));
-    const ny = Math.max(rect.y, Math.min(py, rect.y + rect.h));
-    return Math.hypot(px - nx, py - ny);
-  }
-
-  function destroyBlock(block, byExplosion=false){
-    if(!block.alive || !Number.isFinite(block.hp)) return;
-
-    block.alive = false;
-    stats.totalBlocksBroken += 1;
-
-    const cx = block.x + block.w / 2;
-    const cy = block.y + block.h / 2;
-
-    if(block.bomb && !byExplosion){
-      triggerBombExplosion(block);
+  function destroyBlock(b, byExplosion=false){
+    if(!b.alive || b.type==="wall") return;
+    b.alive=false;
+    const mx=b.x+b.w/2, my=b.y+b.h/2;
+    if(b.type==="bomb" && !byExplosion){
+      triggerBomb(b);
     } else {
-      burst(cx, cy, byExplosion ? "💥" : (block.bomb ? "💥" : "💫"), byExplosion ? 10 : 12);
-      if(byExplosion){
-        addRing(cx, cy, "rgba(255,180,90,.95)", 66, 4);
-      }
+      burst(mx,my,byExplosion?"💥":"💫",byExplosion?10:12);
+      if(byExplosion) addRing(mx,my,"rgba(255,180,90,.95)",66,4);
     }
-
-    spawnItem(cx, cy);
+    spawnItem(mx,my);
   }
 
-  function triggerBombExplosion(source){
-    const cx = source.x + source.w / 2;
-    const cy = source.y + source.h / 2;
-
+  function triggerBomb(source){
+    const mx=source.x+source.w/2, my=source.y+source.h/2;
     playExplosion();
-    worldFlash = Math.max(worldFlash, 0.24);
-    shake = Math.max(shake, 10);
-    burst(cx, cy, "💥", 18);
-    addRing(cx, cy, "rgba(255,182,90,.98)", 88, 6);
+    worldFlash=Math.max(worldFlash,0.24);
+    shake=Math.max(shake,10);
+    burst(mx,my,"💥",18);
+    addRing(mx,my,"rgba(255,182,90,.98)",88,6);
 
-    for(const target of blocks){
-      if(target === source || !target.alive || !Number.isFinite(target.hp)) continue;
-      if(pointRectDistance(cx, cy, target) <= 60){
+    for(const t of blocks){
+      if(!t.alive || t===source || t.type==="wall") continue;
+      if(pointRectDistance(mx,my,t)<=60){
         registerCombo();
-        addScore(Math.max(5, Math.round(blockScore(target) * 0.75)));
+        addScore(Math.max(5,Math.round(blockScore(t)*0.75)));
         addSkill(4);
-        destroyBlock(target, true);
+        destroyBlock(t,true);
       }
     }
   }
 
   function useSkill(){
-    if(state !== "playing" || skill < 100 || !currentSkill) return;
-    const type = currentSkill.type;
+    if(state!=="playing" || skill<100 || !currentSkill) return;
+    const type=currentSkill.type;
+    skill=0;
+    currentSkill=null;
 
-    skill = 0;
-    currentSkill = null;
-
-    if(type === "cat"){
-      startCatDash();
+    if(type==="cat"){
+      catDash.active=true;
+      catDash.x=field.x-120;
+      catDash.y=field.y+field.h*0.55;
+      catDash.rot=-0.25;
+      catDash.until=performance.now()+1200;
+      catDash.trail=[];
       playMeow();
-      say("にゃーー!", 600);
-      showMessage("猫ラッシュ!", 800);
-      worldFlash = Math.max(worldFlash, 0.18);
+      say("にゃーー!",600);
+      showMessage("猫ラッシュ!",800);
+      worldFlash=Math.max(worldFlash,0.18);
 
-      if(stageMode === "boss"){
+      if(stageMode==="boss"){
         if(boss){
-          boss.hp = Math.max(0, boss.hp - 5);
-          boss.flash = 1;
+          boss.hp=Math.max(0,boss.hp-5);
+          boss.flash=1;
           registerCombo();
-          burst(boss.x + boss.w/2, boss.y + boss.h/2, "🐾", 18);
-          addRing(boss.x + boss.w/2, boss.y + boss.h/2, "rgba(255,230,160,.95)", 78, 5);
-          if(stage === MAX_STAGE && Math.random() < 0.16){
-            spawnItem(boss.x + rand(16, boss.w - 16), boss.y + boss.h * 0.45);
+          burst(boss.x+boss.w/2,boss.y+boss.h/2,"🐾",18);
+          addRing(boss.x+boss.w/2,boss.y+boss.h/2,"rgba(255,230,160,.95)",78,5);
+          if(stage===10 && Math.random()<0.16){
+            spawnItem(boss.x+rand(16,boss.w-16), boss.y+boss.h*0.45);
           }
-          if(boss.hp <= 0){
+          if(boss.hp<=0){
             addScore(120);
-            stats.bossesDefeated += 1;
-            if(boss.secondForm) stats.finalFormDefeated = true;
-            boss = null;
-            updateHud();
+            stats.bosses++;
+            if(stage===10) stats.finalBoss=true;
+            boss=null;
             goNextStage();
             return;
           }
         }
       } else {
-        const base = balls.find(b => !b.stuck) || balls[0] || createBall();
-        while(balls.length < 3){
-          const extra = createBall(balls.length === 1 ? -4.8 : 4.8);
-          extra.x = base.x;
-          extra.y = base.y;
-          extra.vy = -Math.abs(base.vy || currentPerks().launchSpeed);
+        const base=balls.find(b=>!b.stuck)||balls[0]||createBall();
+        while(balls.length<3){
+          const extra=createBall(balls.length===1?-4.8:4.8);
+          extra.x=base.x; extra.y=base.y; extra.vy=-Math.abs(base.vy||currentPerks().launch);
           balls.push(extra);
         }
       }
     }
 
-    if(type === "magnet"){
-      magnetUntil = performance.now() + 6000;
-      magnetCharges = 1;
+    if(type==="magnet"){
+      magnetUntil=performance.now()+6000;
+      magnetCharges=1;
       playTap(700);
-      say("ぴたっ!", 520);
-      showMessage("1回だけ吸着!", 700);
-      addRing(paddle.x + paddle.w/2, paddle.y - 6, "rgba(160,160,255,.95)", 60, 5);
+      say("ぴたっ!",520);
+      showMessage("1回だけ吸着!",700);
+      addRing(paddle.x+paddle.w/2,paddle.y-6,"rgba(160,160,255,.95)",60,5);
     }
 
-    if(type === "big"){
-      paddleBoostUntil = performance.now() + 8000 * currentPerks().bigDurationMult;
+    if(type==="big"){
+      paddleBoostUntil=performance.now()+8000*currentPerks().bigDuration;
       playTap(300);
-      say("どーん!", 520);
-      showMessage("BIG PAD!", 700);
-      addRing(paddle.x + paddle.w/2, paddle.y - 6, "rgba(255,214,112,.95)", 68, 5);
+      say("どーん!",520);
+      showMessage("BIG PAD!",700);
+      addRing(paddle.x+paddle.w/2,paddle.y-6,"rgba(255,214,112,.95)",68,5);
     }
-
-    updateHud();
   }
 
-  function stageKind(stageNum){
-    if(stageNum % 5 === 0 || stageNum === MAX_STAGE) return "boss";
-    return "breakout";
+  function stagePattern(variant,r,c,rows,cols){
+    const centerR=(rows-1)/2, centerC=(cols-1)/2;
+    const dr=Math.abs(r-centerR), dc=Math.abs(c-centerC);
+    switch(variant){
+      case 0:return true;
+      case 1:return (r+c)%2===0 || r<2;
+      case 2:return !(r>=1 && r<=rows-2 && c===Math.floor(cols/2));
+      case 3:return c <= (r%cols);
+      case 4:return dr+dc <= 2.6;
+      case 5:return (r%2===0 ? c<cols-1 : c>0);
+      case 6:return r===0 || r===rows-1 || c===0 || c===cols-1 || (dr<=0.5 && dc<=1.5);
+      case 7:return c!==Math.floor(cols/2) || r===0 || r===rows-1;
+      case 8:return r<2 || c===0 || c===cols-1 || (r+c)%2===0;
+      default:return c===Math.floor(cols/2) || r===Math.floor(rows/2) || (r%2===0 && c!==0 && c!==cols-1);
+    }
+  }
+
+  function buildBreakoutStage(){
+    blocks=[]; items=[]; shots=[]; boss=null;
+    const cols=5, rows=randint(5,7);
+    stageData={rows,cols};
+    const gapX=8, gapY=9, pad=10;
+    const bw=(field.w-pad*2-gapX*(cols-1))/cols;
+    const bh=26;
+    const variant=randint(0,9);
+
+    const cells=[];
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        if(stagePattern(variant,r,c,rows,cols)){
+          cells.push({r,c,index:r*cols+c});
+        }
+      }
+    }
+
+    const byRow=Array.from({length:rows},()=>0);
+    const byCol=Array.from({length:cols},()=>0);
+    cells.forEach(v=>{ byRow[v.r]++; byCol[v.c]++; });
+
+    const wallTarget = stage<=2 ? 0 : stage<=4 ? 1 : stage<=7 ? 2 : 3;
+    const wallSet=new Set();
+
+    function hasCell(r,c){ return cells.some(v=>v.r===r && v.c===c); }
+    function isWall(r,c){ return wallSet.has(r*cols+c); }
+
+    function runTooLong(r,c){
+      const h =
+        (isWall(r,c-1)?1:0) +
+        (isWall(r,c-2)?1:0);
+      const h2 =
+        (isWall(r,c+1)?1:0) +
+        (isWall(r,c+2)?1:0);
+      const hv = (isWall(r,c-1)?1:0) + (isWall(r,c+1)?1:0);
+      const v =
+        (isWall(r-1,c)?1:0) +
+        (isWall(r-2,c)?1:0);
+      const v2 =
+        (isWall(r+1,c)?1:0) +
+        (isWall(r+2,c)?1:0);
+      const vv = (isWall(r-1,c)?1:0) + (isWall(r+1,c)?1:0);
+      return h===2 || h2===2 || hv===2 || v===2 || v2===2 || vv===2;
+    }
+
+    function rowWouldSeal(r){
+      const cellCount = byRow[r];
+      let walls=0;
+      for(let c=0;c<cols;c++){
+        if(hasCell(r,c) && (isWall(r,c))) walls++;
+      }
+      return walls+1 >= cellCount;
+    }
+
+    function colWouldSeal(c){
+      const cellCount = byCol[c];
+      let walls=0;
+      for(let r=0;r<rows;r++){
+        if(hasCell(r,c) && (isWall(r,c))) walls++;
+      }
+      return walls+1 >= cellCount;
+    }
+
+    const candidates=[...cells].sort(()=>Math.random()-0.5);
+    for(const cell of candidates){
+      if(wallSet.size>=wallTarget) break;
+      if(rowWouldSeal(cell.r) || colWouldSeal(cell.c)) continue;
+      if(runTooLong(cell.r,cell.c)) continue;
+      wallSet.add(cell.index);
+    }
+
+    const nonWalls=cells.filter(v=>!wallSet.has(v.index));
+    if(nonWalls.length===0 && wallSet.size){
+      const first=[...wallSet][0];
+      wallSet.delete(first);
+    }
+
+    const aliveFinite = cells.filter(v=>!wallSet.has(v.index));
+    const shuffled=[...aliveFinite].sort(()=>Math.random()-0.5);
+    const bombTarget=Math.min(stage<=2?0:Math.floor((stage-1)/3),2);
+    const bombSet=new Set(shuffled.slice(0,bombTarget).map(v=>v.index));
+    const remain=shuffled.filter(v=>!bombSet.has(v.index));
+    const hp3Set=new Set(remain.slice(0,Math.min(Math.floor(stage/2),4)).map(v=>v.index));
+    const hp2Set=new Set(remain.slice(Math.min(Math.floor(stage/2),4), Math.min(Math.floor(stage/2),4)+Math.min(2+Math.floor(stage/2),6)).map(v=>v.index));
+
+    for(const cell of cells){
+      const x=field.x+pad+cell.c*(bw+gapX);
+      const y=field.y+16+cell.r*(bh+gapY);
+      let type="normal", hp=1, label=WORDS[(cell.index+stage*5)%WORDS.length], color=COLORS[(cell.index+stage)%COLORS.length];
+
+      if(wallSet.has(cell.index)){
+        type="wall"; hp=Infinity; label="壁"; color="#b88aa3";
+      } else if(bombSet.has(cell.index)){
+        type="bomb"; hp=1; label="💣"; color="#ffb24d";
+      } else if(hp3Set.has(cell.index)){
+        hp=3;
+      } else if(hp2Set.has(cell.index)){
+        hp=2;
+      }
+
+      blocks.push({x,y,w:bw,h:bh,type,hp,maxHp:hp,label,color,alive:true,row:cell.r,col:cell.c});
+    }
+
+    if(!blocks.some(b=>b.alive && b.type!=="wall")){
+      const center=blocks.find(b=>b.type==="wall");
+      if(center){
+        center.type="normal";
+        center.hp=1;
+        center.maxHp=1;
+        center.label="猫";
+        center.color=COLORS[0];
+      }
+    }
+  }
+
+  function createBoss(){
+    blocks=[]; items=[]; shots=[];
+    const kind = stage===3 ? "beam" : stage===6 ? "zigzag" : "warp";
+    boss={
+      x:field.x+field.w/2-52,
+      y:field.y+12,
+      w:104,h:78,
+      hp:stage===10?30:stage===6?20:16,
+      maxHp:stage===10?30:stage===6?20:16,
+      type:kind,
+      meta:BOSS_META[kind],
+      flash:0,bob:0,vx:kind==="zigzag"?2.1:1.55,
+      beam:null, beamTimer:0, attackTimer:0, markers:[], projectiles:[],
+      teleportTimer:1.9, secondForm:false
+    };
   }
 
   function loadStage(s){
-    catDash.active = false;
-    magnetUntil = 0;
-    magnetCharges = 0;
-    rapidUntil = 0;
-    rapidShotCooldown = 0;
-    items = [];
-    playerShots = [];
     resetCombo();
+    items=[]; shots=[];
+    catDash.active=false;
+    magnetUntil=0; magnetCharges=0;
+    rapidUntil=0; rapidCooldown=0;
+    stageMode=isBossStage(s) ? "boss" : "breakout";
 
-    stageMode = stageKind(s);
-    if(stageMode === "boss"){
+    if(stageMode==="boss"){
       resetBalls(true);
-      createBoss(s);
-      showMessage(s === MAX_STAGE ? "FINAL BOSS" : `BOSS ${s}`, 900);
-      say("ボスにゃ!", 700);
+      createBoss();
+      showMessage(s===10 ? "FINAL BOSS" : `BOSS ${s}`,900);
+      say("ボスにゃ!",700);
     } else {
-      resetBalls();
-      createStageBlocks(s);
-      showMessage(`STAGE ${s}`, 700);
-      say(s === 1 ? "ランダムにゃ!" : "いくにゃ!", 520);
+      resetBalls(false);
+      buildBreakoutStage();
+      showMessage(`STAGE ${s}`,700);
+      say(s===1 ? "ランダムにゃ!" : "いくにゃ!",520);
     }
 
-    resetMusic();
-    paddle.x = field.x + field.w / 2 - paddle.w / 2;
-    paddle.y = field.y + field.h - 24;
+    musicStep=0;
+    musicAccum=0;
+
+    paddle.x=field.x+field.w/2-paddle.w/2;
+    paddle.y=field.y+field.h-24;
     updateHud();
   }
 
-  function startGameNow(){
+  function startGame(){
     unlockAudio();
-    audioPrimed = true;
-    resetMusic();
-
-    state = "playing";
-    stage = 1;
-    score = 0;
-    lives = 3;
-    skill = 0;
-    currentSkill = null;
-    pointerX = field.x + field.w / 2;
-    shake = 0;
-    damageFlash = 0;
-    worldFlash = 0;
-    particles = [];
-    items = [];
-    playerShots = [];
-    rings = [];
-    catDash.active = false;
-    paddleBoostUntil = 0;
-    magnetUntil = 0;
-    magnetCharges = 0;
-    rapidUntil = 0;
-    rapidShotCooldown = 0;
-    resetStats();
-
-    paddle.w = currentPerks().basePaddle;
-    paddle.h = 18;
-    paddle.x = field.x + field.w / 2 - paddle.w / 2;
-    paddle.y = field.y + field.h - 24;
-
+    clearSceneTimers();
+    state="playing";
+    stage=1;
+    score=0;
+    lives=3;
+    skill=0;
+    currentSkill=null;
+    pointerX=view.x+view.w/2;
+    shake=0;
+    damageFlash=0;
+    worldFlash=0;
+    particles=[]; items=[]; shots=[]; rings=[];
+    paddleBoostUntil=0; magnetUntil=0; magnetCharges=0; rapidUntil=0; rapidCooldown=0;
+    catDash.active=false;
+    stats={combo:0,comboTimer:0,maxCombo:0,bosses:0,items:0,damage:0,finalBoss:false};
+    paddle.w=currentPerks().paddle;
+    paddle.h=18;
+    overlay.classList.add("hidden");
     loadStage(stage);
-    overlay.classList.add("hidden");
   }
 
-  function beginStoryMovie(){
-    overlay.classList.add("hidden");
-    storyTime = 0;
-    state = "story";
-    resetMusic();
-    say("がんばるにゃ", 1000);
+  function rankOf(clear){
+    let value=score + lives*160 + stats.maxCombo*20 + stats.items*18 + stats.bosses*90 - stats.damage*50;
+    if(clear) value+=320;
+    if(stats.finalBoss) value+=140;
+    return value>=2600 ? "S" : value>=1900 ? "A" : value>=1250 ? "B" : "C";
   }
 
-  function calculateRank(clear){
-    let value = score;
-    value += lives * 160;
-    value += stats.maxCombo * 20;
-    value += stats.itemsCollected * 18;
-    value += stats.bossesDefeated * 90;
-    value -= stats.damageTaken * 50;
-    if(clear) value += 320;
-    if(stats.finalFormDefeated) value += 140;
-
-    if(value >= 2600) return "S";
-    if(value >= 1900) return "A";
-    if(value >= 1250) return "B";
-    return "C";
-  }
-
-  function buildAchievements(clear){
-    const list = [];
-    if(clear) list.push("10面制覇");
-    if(clear && stats.damageTaken === 0) list.push("ノーダメ");
-    if(stats.bossesDefeated >= 2) list.push("ボスハンター");
-    if(stats.finalFormDefeated) list.push("真ボス突破");
-    if(stats.itemsCollected >= 8) list.push("アイテムマスター");
-    if(stats.maxCombo >= 12) list.push("コンボ職人");
-    if(clear && lives === 5) list.push("フルライフ");
-    if(selectedChar.id === "cat" && clear) list.push("ネコ推し完走");
-    if(selectedChar.id === "hide" && score >= 1800) list.push("高得点職人");
-    return list;
-  }
-
-  function showClearCard(){
-    state = "clear";
-    saveBest();
+  function showResult(clear){
+    state=clear?"clear":"gameover";
+    saveBestIfNeeded();
     updateHud();
-
-    const rank = calculateRank(true);
-    const achievements = buildAchievements(true);
-
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
         <div class="bigCat">🐱</div>
-        <div class="title">10面クリア！</div>
-        <div class="rankBadge">${rank}</div>
+        <div class="title">${clear?"10面クリア！":"ざんねん…"}</div>
+        <div class="rankBadge">${rankOf(clear)}</div>
         <div class="sub">
           SCORE: <b>${score}</b><br>
           BEST: <b>${best}</b><br>
           STAGE: <b>${stage}</b><br>
           COMBO MAX: <b>${stats.maxCombo}</b>
         </div>
-        ${achievements.length ? `<div class="achWrap">${achievements.map(v => `<span class="achChip">${v}</span>`).join("")}</div>` : ""}
         <button class="btn" id="restartBtn">もういっかい！</button>
       </div>
     `;
-    document.getElementById("restartBtn").onclick = renderTitle;
-  }
-
-  function showGameOverCard(){
-    state = "gameover";
-    saveBest();
-    updateHud();
-
-    const rank = calculateRank(false);
-    const achievements = buildAchievements(false);
-
-    overlay.classList.remove("hidden");
-    overlay.innerHTML = `
-      <div class="card">
-        <div class="bigCat">🐱</div>
-        <div class="title">ざんねん…</div>
-        <div class="rankBadge">${rank}</div>
-        <div class="sub">
-          SCORE: <b>${score}</b><br>
-          BEST: <b>${best}</b><br>
-          STAGE: <b>${stage}</b><br>
-          COMBO MAX: <b>${stats.maxCombo}</b>
-        </div>
-        ${achievements.length ? `<div class="achWrap">${achievements.map(v => `<span class="achChip">${v}</span>`).join("")}</div>` : ""}
-        <button class="btn" id="restartBtn">もういっかい！</button>
-      </div>
-    `;
-    document.getElementById("restartBtn").onclick = renderTitle;
+    $("restartBtn").onclick=showTitle;
   }
 
   function goNextStage(){
-    if(stage >= MAX_STAGE){
-      state = "celebration";
-      celebrationTime = 0;
-      resetMusic();
-      saveBest();
+    if(stage>=MAX_STAGE){
+      state="celebration";
+      celebrationTime=0;
+      saveBestIfNeeded();
       overlay.classList.add("hidden");
+      musicStep=0; musicAccum=0;
       return;
     }
     stage++;
@@ -2051,1115 +1727,241 @@
 
   function loseLife(){
     lives--;
-    stats.damageTaken += 1;
+    stats.damage++;
     resetCombo();
-    damageFlash = 1;
-    shake = 12;
+    damageFlash=1;
+    shake=12;
     playDamage();
     updateHud();
 
-    if(lives <= 0){
-      showGameOverCard();
+    if(lives<=0){
+      showResult(false);
       return;
     }
 
-    resetBalls(stageMode === "boss");
-    playerShots = [];
+    resetBalls(stageMode==="boss");
+    shots=[];
     if(boss){
-      boss.beam = null;
-      boss.markers = [];
-      boss.projectiles = [];
+      boss.beam=null;
+      boss.markers=[];
+      boss.projectiles=[];
     }
-    showMessage("もういっかい!", 700);
-    say("ふにゃ…", 520);
+    showMessage("もういっかい!",700);
+    say("ふにゃ…",520);
   }
 
-  function renderTitle(){
-    state = "title";
-    stageMode = "breakout";
-    resetMusic();
+  function renderMovieCard(title, sub, mainEmoji="🐱"){
+    overlay.classList.remove("hidden");
+    overlay.innerHTML = `
+      <div class="movieWrap">
+        <div class="movieFrame">
+          ${sceneCatsHtml(8)}
+          <div class="movieMainPhoto">${mainPhotoHtml() || mainEmoji}</div>
+          <div class="movieTitle">${title}</div>
+          <div class="movieSub">${sub}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function showOpening(){
+    clearSceneTimers();
+    state="opening";
+    openingTime=0;
+    renderMovieCard("ヒデちゃん&クマちゃん","かわいい毎日……<br>でも今日は、なにかが起きる…");
+    sceneTimerA=setTimeout(()=>showTitle(),3200);
+  }
+
+  function showStory(){
+    clearSceneTimers();
+    state="story";
+    storyTime=0;
+    renderMovieCard("ちょっと悲しそう…","でも、ここから本気！<br>クマちゃんと一緒に取り戻そう！");
+    sceneTimerA=setTimeout(()=>{
+      renderMovieCard("頑張るぞ！","タップで開始 / そのままでも始まる");
+    },1200);
+    sceneTimerB=setTimeout(()=>startGame(),3000);
+  }
+
+  function showTitle(){
+    clearSceneTimers();
+    state="title";
     overlay.classList.remove("hidden");
     overlay.innerHTML = `
       <div class="card">
-        <div class="titlePhoto">
-          ${catReady ? `<img src="${catImg.src}" alt="kuma">` : selectedChar.emoji}
-        </div>
+        <div class="titlePhoto">${mainPhotoHtml()}</div>
         <div class="title">ヒデちゃん&クマちゃん<br>ブロック崩し DX</div>
         <div class="sub">
-          にゃんにゃん全開でいくよ！<br>
-          タップでぴたっ再発射 / SKILLで発動<br>
-          10面クリアを目指そう
+          3面・6面・10面がボス面<br>
+          タップで再発射 / SKILLで必殺技
         </div>
         <div class="charGrid">
-          ${CHARACTERS.map((c, i) => `
-            <button class="charBtn ${selectedChar.id === c.id ? 'selected' : ''}" data-i="${i}">
+          ${CHARS.map((c,i)=>`
+            <button class="charBtn ${selectedChar.id===c.id?"selected":""}" data-i="${i}">
               <div class="emoji">${c.emoji}</div>
               <div class="name">${c.name}</div>
               <div class="skill">${c.perk}</div>
             </button>
           `).join("")}
         </div>
-        <button class="btn" id="startBtn2">テンションMAXでスタート！</button>
+        <button class="btn" id="startBtn">テンションMAXでスタート！</button>
       </div>
     `;
-    overlay.querySelectorAll(".charBtn").forEach(btn => {
-      btn.onclick = () => {
-        const i = Number(btn.dataset.i);
-        selectedChar = CHARACTERS[i];
-        say(i === 2 ? "クマでいくにゃ!" : i === 1 ? "主役にゃ!" : "いくにゃ!", 520);
+    overlay.querySelectorAll(".charBtn").forEach(btn=>{
+      btn.onclick=()=>{
+        selectedChar=CHARS[Number(btn.dataset.i)];
         playTap(880);
-        renderTitle();
+        say(selectedChar.id==="bear" ? "クマでいくにゃ!" : selectedChar.id==="cat" ? "主役にゃ!" : "いくにゃ!", 520);
+        showTitle();
       };
     });
-    document.getElementById("startBtn2").onclick = beginStoryMovie;
+    $("startBtn").onclick=showStory;
   }
 
-  function resize(){
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-    canvas.style.width = `${W}px`;
-    canvas.style.height = `${H}px`;
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-
-    computeViewRect();
-    applyResponsiveUI();
-    layoutField();
-
-    if(!pointerX) pointerX = viewCenterX();
-    paddle.y = field.y + field.h - 24;
-    buildStars();
+  function buildBreakoutPathCheck(){
+    return blocks.some(b=>b.alive && b.type!=="wall");
   }
 
-  function roundRectPath(x,y,w,h,r){
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.arcTo(x+w, y, x+w, y+h, r);
-    ctx.arcTo(x+w, y+h, x, y+h, r);
-    ctx.arcTo(x, y+h, x, y, r);
-    ctx.arcTo(x, y, x+w, y, r);
-    ctx.closePath();
+  function startRapidShot(){
+    const px=paddle.x+paddle.w/2+rand(-paddle.w*0.24,paddle.w*0.24);
+    shots.push({x:px,y:paddle.y-4,vy:-10.5});
+    playTap(980);
   }
 
-  function drawImageCover(img, x, y, w, h){
-    const ir = img.width / img.height;
-    const br = w / h;
-    let dw, dh, dx, dy;
-    if(ir > br){
-      dh = h;
-      dw = h * ir;
-      dx = x - (dw - w) / 2;
-      dy = y;
-    } else {
-      dw = w;
-      dh = w / ir;
-      dx = x;
-      dy = y - (dh - h) / 2;
-    }
-    ctx.drawImage(img, dx, dy, dw, dh);
-  }
-
-  function drawSideMats(styleA, styleB){
-    if(view.w >= W - 4) return;
-    const leftW = view.x;
-    const rightX = view.x + view.w;
-    const rightW = W - rightX;
-
-    if(styleB){
-      const lg = ctx.createLinearGradient(0, 0, view.x, 0);
-      lg.addColorStop(0, styleA);
-      lg.addColorStop(1, styleB);
-      ctx.fillStyle = lg;
-      ctx.fillRect(0, 0, leftW, H);
-
-      const rg = ctx.createLinearGradient(rightX, 0, W, 0);
-      rg.addColorStop(0, styleB);
-      rg.addColorStop(1, styleA);
-      ctx.fillStyle = rg;
-      ctx.fillRect(rightX, 0, rightW, H);
-    } else {
-      ctx.fillStyle = styleA;
-      ctx.fillRect(0, 0, leftW, H);
-      ctx.fillRect(rightX, 0, rightW, H);
-    }
-  }
-
-  function drawCatSticker(x, y, size, rot=0, alpha=1, photoBias=0.75){
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-
-    if(catReady && Math.random() < photoBias){
-      ctx.beginPath();
-      ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(catImg, -size / 2, -size / 2, size, size);
-    } else {
-      ctx.font = `${Math.floor(size)}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#fff";
-      ctx.fillText("🐱", 0, 0);
-    }
-    ctx.restore();
-  }
-
-  function drawCatOrbit(count, centerX, centerY, radiusX, radiusY, sizeBase, time, alpha=0.92){
-    for(let i=0; i<count; i++){
-      const a = (i / count) * Math.PI * 2 + time;
-      const x = centerX + Math.cos(a) * radiusX;
-      const y = centerY + Math.sin(a * 1.15) * radiusY;
-      drawCatSticker(x, y, sizeBase + Math.sin(a * 3) * 4, a * 0.2, alpha, 0.9);
-    }
-  }
-
-  function drawTitleCats(time){
-    for(let i=0; i<8; i++){
-      const side = i % 2 === 0 ? -1 : 1;
-      const row = Math.floor(i / 2);
-      const x = viewCenterX() + side * (view.w * 0.34);
-      const y = H * (0.16 + row * 0.15) + Math.sin(time * 2 + i) * 10;
-      drawCatSticker(x, y, 34 + (i % 3) * 4, Math.sin(time * 1.5 + i) * 0.18, 0.86, 0.85);
-    }
-  }
-
-  function getFallWarningStrength(){
-    if(!balls.length || state !== "playing") return 0;
-    const threshold = field.y + field.h * 0.66;
-    let maxStrength = 0;
-    for(const ball of balls){
-      if(ball.stuck) continue;
-      const over = clamp((ball.y - threshold) / (field.y + field.h - threshold), 0, 1);
-      if(over > maxStrength) maxStrength = over;
-    }
-    return maxStrength;
-  }
-
-  function drawBackground(){
-    let g;
-    if(stageMode === "boss"){
-      g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0, "#180d1f");
-      g.addColorStop(.35, "#2a1433");
-      g.addColorStop(.65, "#2f1239");
-      g.addColorStop(1, "#09070f");
-    } else {
-      g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0, "#ffd8ea");
-      g.addColorStop(.52, "#f3bad5");
-      g.addColorStop(1, "#ea96bd");
-    }
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-
-    if(view.w < W - 4){
-      ctx.fillStyle = stageMode === "boss" ? "rgba(0,0,0,.42)" : "rgba(255,255,255,.18)";
-      ctx.fillRect(0, 0, view.x, H);
-      ctx.fillRect(view.x + view.w, 0, W - (view.x + view.w), H);
-    }
-
-    for(const s of stars){
-      ctx.globalAlpha = stageMode === "boss" ? s.a * 1.2 : s.a;
-      ctx.fillStyle = stageMode === "boss" ? "#d8d9ff" : "#ffffff";
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, stageMode === "boss" ? s.r * 1.1 : s.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    if(stageMode === "boss"){
-      const vignette = ctx.createRadialGradient(viewCenterX(), H/2, 120, viewCenterX(), H/2, Math.max(view.w,H)*0.78);
-      vignette.addColorStop(0, "rgba(0,0,0,0)");
-      vignette.addColorStop(1, "rgba(0,0,0,.50)");
-      ctx.fillStyle = vignette;
-      ctx.fillRect(0,0,W,H);
-    }
-
-    if(catReady){
-      ctx.save();
-      ctx.globalAlpha = stageMode === "boss" ? 0.16 : 0.28;
-      roundRectPath(field.x, field.y, field.w, field.h, 26);
-      ctx.clip();
-      drawImageCover(catImg, field.x, field.y, field.w, field.h);
-      ctx.restore();
-    }
-
-    ctx.strokeStyle = stageMode === "boss" ? "rgba(255,255,255,.38)" : "rgba(255,255,255,.58)";
-    ctx.lineWidth = 2;
-    roundRectPath(field.x, field.y, field.w, field.h, 26);
-    ctx.stroke();
-
-    const warn = getFallWarningStrength();
-    if(warn > 0){
-      const pulse = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(performance.now() / 120));
-      const alpha = warn * pulse * 0.48;
-      const bandH = 22 + warn * 10;
-      const y = field.y + field.h - bandH;
-      const grad = ctx.createLinearGradient(0, y, 0, y + bandH);
-      grad.addColorStop(0, `rgba(255,70,90,0)`);
-      grad.addColorStop(1, `rgba(255,40,70,${alpha})`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(field.x + 6, y, field.w - 12, bandH);
-      ctx.strokeStyle = `rgba(255,120,140,${Math.min(.85, alpha + .15)})`;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(field.x + 10, field.y + field.h - 4);
-      ctx.lineTo(field.x + field.w - 10, field.y + field.h - 4);
-      ctx.stroke();
-    }
-
-    if(worldFlash > 0){
-      ctx.fillStyle = `rgba(255,255,255,${worldFlash * 0.22})`;
-      ctx.fillRect(0,0,W,H);
-    }
-
-    if(damageFlash > 0){
-      ctx.fillStyle = `rgba(255,80,90,${0.22 * damageFlash})`;
-      ctx.fillRect(0,0,W,H);
-    }
-  }
-
-  function drawBlocks(){
-    for(const b of blocks){
-      if(!b.alive) continue;
-
-      if(b.bomb){
-        const pulse = 0.72 + 0.28 * (0.5 + 0.5 * Math.sin(performance.now() / 120 + b.x * 0.03));
-        ctx.save();
-        ctx.shadowColor = `rgba(255,145,60,${0.45 * pulse})`;
-        ctx.shadowBlur = 18 * pulse;
-
-        roundRectPath(b.x, b.y, b.w, b.h, 10);
-        ctx.fillStyle = `rgba(255,${120 + Math.floor(40 * pulse)},70,1)`;
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,.70)";
-        ctx.stroke();
-
-        ctx.restore();
-
-        ctx.fillStyle = "#fff7dd";
-        ctx.font = "bold 18px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("💣", b.x + b.w/2, b.y + b.h/2 + 1);
-        continue;
-      }
-
-      roundRectPath(b.x, b.y, b.w, b.h, 10);
-      ctx.fillStyle = b.color;
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.45)";
-      ctx.stroke();
-
-      ctx.fillStyle = "#6f2858";
-      ctx.font = "bold 14px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 + 1);
-
-      if(Number.isFinite(b.hp) && b.hp > 1){
-        ctx.fillStyle = "#7c2b59";
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillText(String(b.hp), b.x + b.w - 10, b.y + 10);
-      }
-
-      if(!Number.isFinite(b.hp)){
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillText("∞", b.x + b.w - 10, b.y + 10);
-      }
-    }
-  }
-
-  function drawBoss(){
+  function performBossAttack(){
     if(!boss) return;
-
-    const meta = boss.meta || BOSS_TYPES.beam;
-    const cx = boss.x + boss.w/2;
-    const cy = boss.y + boss.h/2 + Math.sin(boss.bob) * 2;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-
-    ctx.shadowColor = meta.aura;
-    ctx.shadowBlur = 22;
-
-    ctx.fillStyle = boss.flash > 0.1 ? "#fff0a8" : meta.bottom;
-    ctx.beginPath();
-    ctx.moveTo(-30, -10);
-    ctx.lineTo(-16, -40);
-    ctx.lineTo(-2, -12);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.moveTo(30, -10);
-    ctx.lineTo(16, -40);
-    ctx.lineTo(2, -12);
-    ctx.closePath();
-    ctx.fill();
-
-    const grad = ctx.createLinearGradient(0, -boss.h/2, 0, boss.h/2);
-    grad.addColorStop(0, boss.flash > 0.1 ? "#fff0a8" : meta.top);
-    grad.addColorStop(1, boss.flash > 0.1 ? "#ffd34d" : meta.bottom);
-    roundRectPath(-boss.w/2, -boss.h/2, boss.w, boss.h, 22);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.82)";
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-
-    if(catReady){
-      ctx.save();
-      roundRectPath(-38, -26, 76, 52, 18);
-      ctx.clip();
-      ctx.drawImage(catImg, -38, -26, 76, 52);
-      ctx.restore();
-    } else {
-      ctx.font = "52px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#6f2858";
-      ctx.fillText("😾", 0, 2);
-    }
-
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(-18, -6, 6, 0, Math.PI * 2);
-    ctx.arc(18, -6, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#6f2858";
-    ctx.beginPath();
-    ctx.arc(-18, -6, 2.3, 0, Math.PI * 2);
-    ctx.arc(18, -6, 2.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#6f2858";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(-6, 10); ctx.lineTo(-26, 6);
-    ctx.moveTo(-6, 13); ctx.lineTo(-26, 16);
-    ctx.moveTo(6, 10); ctx.lineTo(26, 6);
-    ctx.moveTo(6, 13); ctx.lineTo(26, 16);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, 6); ctx.lineTo(-4, 12); ctx.lineTo(4, 12); ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-10, 18);
-    ctx.quadraticCurveTo(0, 24, 10, 18);
-    ctx.stroke();
-
-    if(boss.secondForm){
-      ctx.strokeStyle = "#fff6a8";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(0, 0, 54, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    const barW = field.w - 24;
-    roundRectPath(field.x + 12, field.y + 8, barW, 12, 8);
-    ctx.fillStyle = "rgba(255,255,255,.2)";
-    ctx.fill();
-    roundRectPath(field.x + 12, field.y + 8, barW * Math.max(0, boss.hp / boss.maxHp), 12, 8);
-    ctx.fillStyle = meta.bottom;
-    ctx.fill();
-
-    if(boss.beam){
-      const beamX = boss.beam.x;
-      const beamW = boss.beamWidth || 18;
-      if(boss.beam.state === "charge"){
-        ctx.strokeStyle = "rgba(255,255,255,.9)";
-        ctx.lineWidth = 3;
-        ctx.setLineDash([8,8]);
-        ctx.beginPath();
-        ctx.moveTo(beamX, boss.y + boss.h - 6);
-        ctx.lineTo(beamX, field.y + field.h);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        ctx.fillStyle = "rgba(255,180,220,.15)";
-        ctx.fillRect(beamX - beamW, boss.y + boss.h - 6, beamW * 2, field.y + field.h - (boss.y + boss.h - 6));
-      } else {
-        const gradB = ctx.createLinearGradient(beamX, boss.y, beamX, field.y + field.h);
-        gradB.addColorStop(0, "rgba(255,255,255,1)");
-        gradB.addColorStop(.12, "rgba(255,190,230,.98)");
-        gradB.addColorStop(.34, meta.bottom);
-        gradB.addColorStop(1, "rgba(255,122,170,.12)");
-        ctx.fillStyle = gradB;
-        ctx.fillRect(beamX - beamW/2, boss.y + boss.h - 6, beamW, field.y + field.h - (boss.y + boss.h - 6));
-
-        ctx.fillStyle = "rgba(255,255,255,.25)";
-        ctx.fillRect(beamX - beamW, boss.y + boss.h - 6, beamW * 2, field.y + field.h - (boss.y + boss.h - 6));
-      }
-    }
-
-    drawBossExtras();
-  }
-
-  function drawBossExtras(){
-    if(!boss) return;
-
-    for(const m of boss.markers){
-      ctx.strokeStyle = "rgba(255,255,255,.88)";
-      ctx.lineWidth = 3;
-      ctx.setLineDash([6,6]);
-      ctx.beginPath();
-      ctx.arc(m.x, paddle.y - 10, 18 + (1 - m.timer / m.max) * 8, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    for(const p of boss.projectiles){
-      if(p.type === "orb"){
-        const g = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, p.r);
-        g.addColorStop(0, "#fff");
-        g.addColorStop(.4, "#ffb9d9");
-        g.addColorStop(1, "rgba(255,96,170,.2)");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      } else if(p.type === "paw"){
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.fillStyle = "rgba(255,214,230,.95)";
-        ctx.beginPath();
-        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath(); ctx.arc(-p.r * 0.55, -p.r * 0.65, p.r * 0.36, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(-p.r * 0.18, -p.r * 0.88, p.r * 0.32, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(p.r * 0.18, -p.r * 0.88, p.r * 0.32, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(p.r * 0.55, -p.r * 0.65, p.r * 0.36, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-      }
-    }
-  }
-
-  function drawPaddle(){
-    const theme = paddleTheme();
-    const g = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x, paddle.y + paddle.h);
-    g.addColorStop(0, theme.top);
-    g.addColorStop(1, theme.bottom);
-    roundRectPath(paddle.x, paddle.y, paddle.w, paddle.h, 12);
-    ctx.fillStyle = g;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.7)";
-    ctx.stroke();
-
-    ctx.fillStyle = theme.accent;
-    ctx.globalAlpha = 0.26;
-    roundRectPath(paddle.x + 8, paddle.y + 3, paddle.w - 16, 5, 8);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    ctx.fillStyle = "#6f2858";
-    ctx.font = "22px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(selectedChar.emoji, paddle.x + paddle.w/2, paddle.y - 8);
-  }
-
-  function drawBalls(){
-    for(const ball of balls){
-      for(let i=0; i<ball.trail.length; i++){
-        const t = ball.trail[i];
-        ctx.globalAlpha = (i + 1) / ball.trail.length * 0.16;
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(t.x, t.y, ball.r * (i + 1) / ball.trail.length, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#9fd7ff";
-      ctx.beginPath();
-      ctx.arc(ball.x - 2, ball.y - 2, ball.r * 0.55, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function drawItems(){
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    for(const item of items){
-      ctx.fillStyle = "rgba(255,255,255,.92)";
-      ctx.beginPath();
-      ctx.arc(item.x, item.y, item.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255,99,173,.45)";
-      ctx.stroke();
-      ctx.font = "18px sans-serif";
-      ctx.fillText(item.emoji, item.x, item.y + 1);
-    }
-  }
-
-  function drawPlayerShots(){
-    for(const s of playerShots){
-      const grad = ctx.createLinearGradient(s.x, s.y, s.x, s.y + 20);
-      grad.addColorStop(0, "rgba(255,255,255,.95)");
-      grad.addColorStop(1, "rgba(255,122,190,.05)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(s.x - 2.8, s.y - 16, 5.6, 20);
-      ctx.fillStyle = "#fff2a3";
-      ctx.beginPath();
-      ctx.arc(s.x, s.y - 16, 3.4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  function drawRings(){
-    for(const r of rings){
-      ctx.globalAlpha = r.life;
-      ctx.strokeStyle = r.color;
-      ctx.lineWidth = r.line;
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  function drawParticles(){
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    for(const p of particles){
-      ctx.globalAlpha = Math.max(0, p.life);
-      ctx.font = "18px sans-serif";
-      ctx.fillText(p.emoji, p.x, p.y);
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  function drawCatDash(){
-    if(!catDash.active) return;
-
-    ctx.save();
-    ctx.fillStyle = "rgba(255,255,255,.10)";
-    ctx.fillRect(0,0,W,H);
-
-    ctx.fillStyle = "#ffd84d";
-    ctx.font = "900 34px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("猫ラッシュ!", viewCenterX(), field.y + field.h * 0.32);
-
-    for(let i=0; i<catDash.trail.length; i++){
-      const t = catDash.trail[i];
-      const a = (i + 1) / catDash.trail.length * 0.18;
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.translate(t.x, t.y);
-      ctx.rotate(t.rot);
-
-      if(catReady){
-        ctx.beginPath();
-        ctx.arc(0, 0, 34, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(catImg, -34, -34, 68, 68);
-      } else {
-        ctx.font = "56px sans-serif";
-        ctx.fillText("🐱", 0, 0);
-      }
-      ctx.restore();
-    }
-
-    ctx.save();
-    ctx.translate(catDash.x, catDash.y);
-    ctx.rotate(catDash.rot);
-
-    ctx.fillStyle = "rgba(255,216,77,.35)";
-    for(let i=0; i<5; i++){
-      ctx.beginPath();
-      ctx.arc(
-        Math.cos(i * 1.25) * 42,
-        Math.sin(i * 1.25) * 20,
-        4 + (i % 2) * 2,
-        0,
-        Math.PI * 2
-      );
-      ctx.fill();
-    }
-
-    if(catReady){
-      ctx.beginPath();
-      ctx.arc(0, 0, 42, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(catImg, -42, -42, 84, 84);
-    } else {
-      ctx.font = "72px sans-serif";
-      ctx.fillText("🐱", 0, 0);
-    }
-
-    ctx.restore();
-    ctx.restore();
-  }
-
-  function drawOpeningMovie(){
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#241235");
-    g.addColorStop(.45, "#55306b");
-    g.addColorStop(1, "#ff83bc");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(15,8,20,.70)", "rgba(255,120,180,.16)");
-
-    for(const s of stars){
-      ctx.globalAlpha = s.a * 1.45;
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    const t = openingTime;
-    const cx = viewCenterX();
-
-    drawCatOrbit(7, cx, H * 0.22, Math.min(120, view.w * 0.26), 26, 34, t * 0.7, 0.82);
-    drawCatOrbit(6, cx, H * 0.74, Math.min(150, view.w * 0.30), 24, 28, -t * 0.9, 0.76);
-
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    if(t < 2.4){
-      ctx.fillStyle = "rgba(255,255,255,.95)";
-      ctx.font = "900 22px sans-serif";
-      ctx.fillText("ある日…", cx, H * 0.20);
-
-      if(catReady){
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, H * 0.48, 72, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(catImg, cx - 72, H * 0.48 - 72, 144, 144);
-        ctx.restore();
-      } else {
-        ctx.font = "100px sans-serif";
-        ctx.fillText("🐱", cx, H * 0.50);
-      }
-
-      ctx.font = "900 16px sans-serif";
-      ctx.fillStyle = "#ffe78b";
-      ctx.fillText(audioPrimed ? "クマちゃんがきらきら…" : "最初のタップで音ON", cx, H * 0.68);
-    } else if(t < 5.2){
-      ctx.fillStyle = "#fff6c8";
-      ctx.font = "900 18px sans-serif";
-      ctx.fillText("ヒデちゃんとクマちゃんの", cx, H * 0.18);
-      ctx.fillText("かわいい毎日…", cx, H * 0.24);
-
-      ctx.font = "82px sans-serif";
-      ctx.fillText("😄", cx - view.w * 0.16, H * 0.54);
-
-      if(catReady){
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.54, 48, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 48, H * 0.54 - 48, 96, 96);
-        ctx.restore();
-      } else {
-        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.54);
-      }
-
-      for(let i=0; i<8; i++){
-        const x = cx + Math.sin(t * 1.4 + i) * Math.min(120, view.w * 0.26);
-        const y = H * 0.72 + Math.cos(t * 1.6 + i * 1.4) * 26;
-        ctx.font = "22px sans-serif";
-        ctx.fillText(i % 2 ? "🐾" : "✨", x, y);
-      }
-    } else if(t < 7.8){
-      ctx.fillStyle = "#ffd84d";
-      ctx.font = "900 18px sans-serif";
-      ctx.fillText("そこへ…", cx, H * 0.18);
-      ctx.fillText("わるい猫ボスが現れた！", cx, H * 0.24);
-
-      ctx.save();
-      ctx.translate(cx, H * 0.54);
-      ctx.scale(1.25, 1.25);
-      ctx.fillStyle = "rgba(255,255,255,.10)";
-      ctx.beginPath();
-      ctx.arc(0, 0, 76, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.font = "102px sans-serif";
-      ctx.fillStyle = "#fff";
-      ctx.fillText("😾", 0, 0);
-      ctx.restore();
-
-      for(let i=0; i<10; i++){
-        const a = (i / 10) * Math.PI * 2 + t * 2.2;
-        const x = cx + Math.cos(a) * Math.min(140, view.w * 0.32);
-        const y = H * 0.54 + Math.sin(a) * 90;
-        ctx.font = "24px sans-serif";
-        ctx.fillText(i % 2 ? "⚡" : "💥", x, y);
-      }
-    } else {
-      ctx.fillStyle = "#fff";
-      ctx.font = "900 30px sans-serif";
-      ctx.fillText("ヒデちゃん&クマちゃん", cx, H * 0.32);
-      ctx.fillText("ブロック崩し DX", cx, H * 0.40);
-
-      ctx.font = "900 18px sans-serif";
-      ctx.fillStyle = "#ffe78b";
-      ctx.fillText(audioPrimed ? "タップでスキップ" : "最初のタップで音ON", cx, H * 0.72);
-    }
-  }
-
-  function drawStoryMovie(){
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#31183c");
-    g.addColorStop(.55, "#734a8b");
-    g.addColorStop(1, "#ff9bc9");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(18,10,24,.62)", "rgba(255,170,210,.12)");
-
-    const cx = viewCenterX();
-    drawCatOrbit(6, cx, H * 0.18, Math.min(130, view.w * 0.26), 20, 24, storyTime * 1.2, 0.68);
-
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    if(storyTime < 1.6){
-      ctx.fillStyle = "#fff6c8";
-      ctx.font = "900 18px sans-serif";
-      ctx.fillText("ヒデちゃんとクマちゃん…", cx, H * 0.22);
-      ctx.fillText("ちょっと悲しそう…", cx, H * 0.28);
-
-      ctx.font = "88px sans-serif";
-      ctx.fillText("🥺", cx - view.w * 0.16, H * 0.54);
-
-      if(catReady){
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.54, 50, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 50, H * 0.54 - 50, 100, 100);
-        ctx.restore();
-      } else {
-        ctx.font = "88px sans-serif";
-        ctx.fillText("😿", cx + view.w * 0.16, H * 0.54);
-      }
-
-      ctx.font = "24px sans-serif";
-      ctx.fillText("…", cx, H * 0.72);
-    } else {
-      ctx.fillStyle = "#ffd84d";
-      ctx.font = "900 30px sans-serif";
-      ctx.fillText("頑張るぞ！", cx, H * 0.22);
-
-      ctx.font = "96px sans-serif";
-      ctx.fillText("😤", cx - view.w * 0.16, H * 0.54);
-
-      if(catReady){
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx + view.w * 0.16, H * 0.54, 50, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(catImg, cx + view.w * 0.16 - 50, H * 0.54 - 50, 100, 100);
-        ctx.restore();
-      } else {
-        ctx.fillText("🐱", cx + view.w * 0.16, H * 0.54);
-      }
-
-      for(let i=0; i<10; i++){
-        const x = cx + Math.sin(storyTime * 3 + i) * Math.min(130, view.w * 0.28);
-        const y = H * 0.72 + Math.cos(storyTime * 4 + i) * 26;
-        ctx.font = "22px sans-serif";
-        ctx.fillText(i % 2 ? "✨" : "🐾", x, y);
-      }
-
-      ctx.font = "900 16px sans-serif";
-      ctx.fillStyle = "#fff";
-      ctx.fillText("タップで開始", cx, H * 0.82);
-    }
-  }
-
-  function drawCelebrationMovie(){
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#130b1d");
-    g.addColorStop(1, "#4c2556");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-    drawSideMats("rgba(0,0,0,.45)", "rgba(130,255,220,.12)");
-
-    const t = celebrationTime;
-    for(let i=0; i<18; i++){
-      const x = view.x + (i / 18) * view.w;
-      const h = 80 + Math.sin(t * 2 + i) * 40;
-      ctx.fillStyle = `rgba(${120 + (i * 7) % 120},${80 + (i * 13) % 150},255,.14)`;
-      ctx.fillRect(x, H - h, view.w / 18 + 4, h);
-    }
-
-    for(let i=0; i<stars.length; i++){
-      const s = stars[i];
-      ctx.globalAlpha = s.a * 1.4;
-      ctx.fillStyle = i % 3 === 0 ? "#ffd84d" : i % 3 === 1 ? "#fff" : "#8bffdf";
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r + 0.6, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    const cxBase = viewCenterX();
-    const cx = cxBase + Math.sin(t * 2.2) * Math.min(70, view.w * 0.16);
-    const cy = H * 0.56 + Math.sin(t * 8) * 12;
-    const arm = Math.sin(t * 8) * 18;
-    const leg = Math.cos(t * 10) * 18;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 8;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(-16, 10);
-    ctx.lineTo(-36, 34 + arm);
-    ctx.moveTo(16, 10);
-    ctx.lineTo(36, 34 - arm);
-    ctx.moveTo(-10, 56);
-    ctx.lineTo(-26, 86 + leg);
-    ctx.moveTo(10, 56);
-    ctx.lineTo(28, 86 - leg);
-    ctx.stroke();
-
-    if(catReady){
-      ctx.beginPath();
-      ctx.arc(0, 0, 50, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(catImg, -50, -50, 100, 100);
-    } else {
-      ctx.font = "96px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("🐱", 0, 0);
-    }
-    ctx.restore();
-
-    drawCatOrbit(8, cxBase, H * 0.50, Math.min(150, view.w * 0.32), 96, 28, t * 1.5, 0.80);
-
-    ctx.fillStyle = "#ffd84d";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = "900 28px sans-serif";
-    ctx.fillText("クリア！", cxBase, H * 0.18);
-    ctx.font = "900 18px sans-serif";
-    ctx.fillStyle = "#fff";
-    ctx.fillText("AIダンスでお祝い中…", cxBase, H * 0.26);
-    ctx.fillText("タップで結果へ", cxBase, H * 0.82);
-
-    for(let i=0; i<12; i++){
-      const a = (i / 12) * Math.PI * 2 + t * 1.6;
-      const px = cxBase + Math.cos(a) * Math.min(150, view.w * 0.32);
-      const py = H * 0.48 + Math.sin(a) * 100;
-      ctx.font = "24px sans-serif";
-      ctx.fillText(i % 2 ? "✨" : "🎉", px, py);
-    }
-  }
-
-  function performBossSubAttack(){
-    if(!boss) return;
-
-    const cx = boss.x + boss.w/2;
-
-    if(boss.type === "beam"){
-      boss.projectiles.push({
-        type:"orb",
-        x: cx,
-        y: boss.y + boss.h - 6,
-        vx: rand(-1.3, 1.3),
-        vy: 3.8 + stage * 0.08,
-        r: 12
-      });
+    const cx=boss.x+boss.w/2;
+    if(boss.type==="beam"){
+      boss.projectiles.push({type:"orb",x:cx,y:boss.y+boss.h-6,vx:rand(-1.3,1.3),vy:3.8+stage*0.08,r:12});
       playBossOrb();
-    } else if(boss.type === "zigzag"){
-      boss.markers.push({
-        x: clamp(paddle.x + paddle.w/2 + rand(-30, 30), field.x + 24, field.x + field.w - 24),
-        timer: 0.65,
-        max: 0.65
-      });
+    } else if(boss.type==="zigzag"){
+      boss.markers.push({x:clamp(paddle.x+paddle.w/2+rand(-30,30),field.x+24,field.x+field.w-24),timer:0.65,max:0.65});
       playBossPaw();
-    } else if(boss.type === "warp"){
-      boss.projectiles.push({
-        type:"orb",
-        x: cx,
-        y: boss.y + boss.h - 6,
-        vx: rand(-1.8, 1.8),
-        vy: 3.5 + stage * 0.10,
-        r: 11
-      });
-      if(Math.random() < 0.55){
-        boss.markers.push({
-          x: clamp(paddle.x + paddle.w/2, field.x + 24, field.x + field.w - 24),
-          timer: 0.55,
-          max: 0.55
-        });
+    } else {
+      boss.projectiles.push({type:"orb",x:cx,y:boss.y+boss.h-6,vx:rand(-1.8,1.8),vy:3.8+stage*0.10,r:11});
+      if(Math.random()<0.55){
+        boss.markers.push({x:clamp(paddle.x+paddle.w/2,field.x+24,field.x+field.w-24),timer:0.55,max:0.55});
       }
       playBossOrb();
     }
-
     if(boss.secondForm){
-      if(Math.random() < 0.7){
-        boss.projectiles.push({
-          type:"orb",
-          x: cx + rand(-18, 18),
-          y: boss.y + boss.h - 6,
-          vx: rand(-2.0, 2.0),
-          vy: 4.3 + stage * 0.12,
-          r: 12
-        });
-      }
-      if(Math.random() < 0.55){
-        boss.markers.push({
-          x: clamp(paddle.x + paddle.w/2 + rand(-40, 40), field.x + 24, field.x + field.w - 24),
-          timer: 0.50,
-          max: 0.50
-        });
+      if(Math.random()<0.6){
+        boss.projectiles.push({type:"orb",x:cx+rand(-18,18),y:boss.y+boss.h-6,vx:rand(-2.0,2.0),vy:4.4+stage*0.12,r:12});
       }
     }
   }
 
   function updateBoss(dt){
     if(!boss) return;
+    boss.bob += dt*4.5;
 
-    boss.bob += dt * 4.5;
-    boss.moveT += dt;
-
-    if(stage === MAX_STAGE && !boss.secondForm && boss.hp <= boss.maxHp * 0.5){
-      boss.secondForm = true;
-      const prev = boss.type;
-      applyBossType(boss, chooseBossType(prev), stage, true);
-      boss.beamGap *= 0.84;
-      boss.attackGap *= 0.82;
-      worldFlash = Math.max(worldFlash, 0.2);
-      shake = Math.max(shake, 8);
-      showMessage("FINAL MODE!", 820);
-      say("本気にゃ!", 650);
+    if(stage===10 && !boss.secondForm && boss.hp<=boss.maxHp*0.5){
+      boss.secondForm=true;
+      boss.beamTimer=0;
+      boss.attackTimer=0;
+      boss.meta.beamGap*=0.85;
+      boss.meta.attackGap*=0.84;
+      worldFlash=Math.max(worldFlash,0.2);
+      shake=Math.max(shake,8);
+      showMessage("FINAL MODE!",820);
+      say("本気にゃ!",650);
       playBeamCharge();
     }
 
-    if(boss.type === "beam"){
-      boss.x += boss.vx * dt * 60;
-      boss.y += (boss.baseY - boss.y) * 0.08;
-    } else if(boss.type === "zigzag"){
-      boss.x += boss.vx * dt * 60;
-      boss.y = boss.baseY + Math.sin(boss.moveT * 2.7) * 18;
-    } else if(boss.type === "warp"){
-      boss.x += boss.vx * dt * 60;
-      boss.y += (boss.baseY - boss.y) * 0.08;
+    if(boss.type==="beam"){
+      boss.x += boss.vx*dt*60;
+    } else if(boss.type==="zigzag"){
+      boss.x += boss.vx*dt*60;
+      boss.y = field.y+12 + Math.sin(performance.now()/180)*18;
+    } else {
+      boss.x += boss.vx*dt*60;
       boss.teleportTimer -= dt;
-      if(boss.teleportTimer <= 0){
-        boss.teleportTimer = boss.secondForm ? 1.25 : 1.9;
-        burst(boss.x + boss.w/2, boss.y + boss.h/2, "💨", 10);
-        boss.x = clamp(field.x + 20 + rand(0, field.w - boss.w - 40), field.x + 12, field.x + field.w - boss.w - 12);
-        burst(boss.x + boss.w/2, boss.y + boss.h/2, "✨", 12);
-        addRing(boss.x + boss.w/2, boss.y + boss.h/2, "rgba(180,255,220,.9)", 74, 4);
+      if(boss.teleportTimer<=0){
+        boss.teleportTimer = boss.secondForm ? 1.1 : 1.75;
+        burst(boss.x+boss.w/2,boss.y+boss.h/2,"💨",10);
+        boss.x = clamp(field.x+20+rand(0,field.w-boss.w-40), field.x+12, field.x+field.w-boss.w-12);
+        burst(boss.x+boss.w/2,boss.y+boss.h/2,"✨",12);
+        addRing(boss.x+boss.w/2,boss.y+boss.h/2,"rgba(180,255,220,.9)",74,4);
       }
     }
 
-    if(boss.x < field.x + 12 || boss.x + boss.w > field.x + field.w - 12){
-      boss.vx *= -1;
-      boss.x = Math.max(field.x + 12, Math.min(field.x + field.w - boss.w - 12, boss.x));
+    if(boss.x<field.x+12 || boss.x+boss.w>field.x+field.w-12){
+      boss.vx*=-1;
+      boss.x=clamp(boss.x, field.x+12, field.x+field.w-boss.w-12);
     }
 
-    boss.flash *= 0.88;
-
+    boss.flash*=0.88;
     boss.beamTimer += dt;
-    if(!boss.beam && boss.beamTimer >= boss.beamGap){
-      boss.beamTimer = 0;
-      boss.beam = {
-        x: boss.x + boss.w/2,
-        state:"charge",
-        timer: boss.secondForm ? 0.44 : 0.55,
-        hit:false
-      };
+    if(!boss.beam && boss.beamTimer >= boss.meta.beamGap){
+      boss.beamTimer=0;
+      boss.beam={x:boss.x+boss.w/2,state:"charge",timer:boss.secondForm?0.42:0.55,hit:false};
       playBeamCharge();
-      showMessage("WARNING", 420);
+      showMessage("WARNING",420);
     }
 
     boss.attackTimer += dt;
-    if(boss.attackTimer >= boss.attackGap){
-      boss.attackTimer = 0;
-      performBossSubAttack();
+    if(boss.attackTimer >= boss.meta.attackGap){
+      boss.attackTimer=0;
+      performBossAttack();
     }
 
-    for(let i=boss.markers.length - 1; i>=0; i--){
-      const m = boss.markers[i];
+    for(let i=boss.markers.length-1;i>=0;i--){
+      const m=boss.markers[i];
       m.timer -= dt;
-      if(m.timer <= 0){
+      if(m.timer<=0){
         boss.projectiles.push({
           type:"paw",
-          x: m.x,
-          y: field.y - 20,
-          vx: 0,
-          vy: boss.secondForm ? 7.8 : 6.6,
-          r: boss.secondForm ? 18 : 16
+          x:m.x,y:field.y-20,vx:0,
+          vy:boss.secondForm?7.8:6.6,
+          r:boss.secondForm?18:16
         });
         playBossPaw();
-        boss.markers.splice(i, 1);
+        boss.markers.splice(i,1);
       }
     }
 
-    for(let i=boss.projectiles.length - 1; i>=0; i--){
-      const p = boss.projectiles[i];
-      p.x += p.vx * dt * 60;
-      p.y += p.vy * dt * 60;
+    for(let i=boss.projectiles.length-1;i>=0;i--){
+      const p=boss.projectiles[i];
+      p.x += p.vx*dt*60;
+      p.y += p.vy*dt*60;
+      if(p.type==="orb") p.vx*=1.002;
 
-      if(p.type === "orb"){
-        p.vx *= 1.002;
-      }
-
-      if(p.y > field.y + field.h + 50 || p.x < field.x - 50 || p.x > field.x + field.w + 50){
-        boss.projectiles.splice(i, 1);
+      if(p.y>field.y+field.h+50 || p.x<field.x-50 || p.x>field.x+field.w+50){
+        boss.projectiles.splice(i,1);
         continue;
       }
 
       const hitPaddle =
-        p.x + p.r > paddle.x &&
-        p.x - p.r < paddle.x + paddle.w &&
-        p.y + p.r > paddle.y &&
-        p.y - p.r < paddle.y + paddle.h;
-
+        p.x+p.r>paddle.x && p.x-p.r<paddle.x+paddle.w &&
+        p.y+p.r>paddle.y && p.y-p.r<paddle.y+paddle.h;
       if(hitPaddle){
-        burst(p.x, p.y, p.type === "paw" ? "💥" : "⚡", 10);
-        boss.projectiles.splice(i, 1);
+        burst(p.x,p.y,p.type==="paw"?"💥":"⚡",10);
+        boss.projectiles.splice(i,1);
         loseLife();
         return;
       }
     }
 
     if(boss.beam){
-      boss.beam.x = boss.x + boss.w/2;
+      boss.beam.x = boss.x+boss.w/2;
       boss.beam.timer -= dt;
-
-      if(boss.beam.state === "charge" && boss.beam.timer <= 0){
-        boss.beam.state = "fire";
-        boss.beam.timer = boss.secondForm ? 0.56 : 0.46;
+      if(boss.beam.state==="charge" && boss.beam.timer<=0){
+        boss.beam.state="fire";
+        boss.beam.timer=boss.secondForm?0.56:0.46;
         playBeamFire();
-        worldFlash = Math.max(worldFlash, 0.18);
-        shake = Math.max(shake, 7);
-      } else if(boss.beam.state === "fire" && boss.beam.timer <= 0){
-        boss.beam = null;
+        worldFlash=Math.max(worldFlash,0.18);
+        shake=Math.max(shake,7);
+      } else if(boss.beam.state==="fire" && boss.beam.timer<=0){
+        boss.beam=null;
       }
 
-      if(boss.beam && boss.beam.state === "fire"){
-        const bx = boss.beam.x;
-        const beamW = boss.beamWidth || 18;
-        const paddleHit = bx + beamW/2 >= paddle.x && bx - beamW/2 <= paddle.x + paddle.w;
+      if(boss.beam && boss.beam.state==="fire"){
+        const bx=boss.beam.x, bw=boss.meta.beamWidth||18;
+        const paddleHit=bx+bw/2>=paddle.x && bx-bw/2<=paddle.x+paddle.w;
         if(paddleHit && !boss.beam.hit){
-          boss.beam.hit = true;
-          burst(bx, paddle.y, "💥", 10);
-          addRing(bx, paddle.y, "rgba(255,120,160,.95)", 70, 5);
+          boss.beam.hit=true;
+          burst(bx,paddle.y,"💥",10);
+          addRing(bx,paddle.y,"rgba(255,120,160,.95)",70,5);
           loseLife();
           return;
         }
@@ -3167,158 +1969,502 @@
     }
   }
 
-  function handlePaddleHit(ball, now){
-    playTap(620);
-    playPaddleNyah();
-    say("ニヤッ!", 360);
+  function drawBoss(){
+    if(!boss) return;
+    const meta=boss.meta;
+    const cxp=boss.x+boss.w/2;
+    const cyp=boss.y+boss.h/2+Math.sin(boss.bob)*2;
 
-    const comboPower =
-      !stats ? 0 :
-      stats.combo >= 8 ? 1 :
-      stats.combo >= 4 ? 0.55 :
-      stats.combo >= 1 ? 0.2 : 0;
+    ctx.save();
+    ctx.translate(cxp,cyp);
+    ctx.shadowColor=meta.aura;
+    ctx.shadowBlur=22;
 
-    worldFlash = Math.max(worldFlash, 0.08 + comboPower * 0.08);
-    shake = Math.max(shake, 3.5 + comboPower * 4.5);
+    ctx.fillStyle=boss.flash>0.1 ? "#fff0a8" : meta.bottom;
+    ctx.beginPath(); ctx.moveTo(-30,-10); ctx.lineTo(-16,-40); ctx.lineTo(-2,-12); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(30,-10); ctx.lineTo(16,-40); ctx.lineTo(2,-12); ctx.closePath(); ctx.fill();
 
-    if(magnetCharges > 0 && now < magnetUntil){
-      ball.stuck = true;
-      ball.stuckOffsetX = Math.max(ball.r, Math.min(paddle.w - ball.r, ball.x - paddle.x));
-      magnetCharges--;
-      burst(ball.x, paddle.y, "🧲", 9);
-      updateHud();
-      return true;
+    const grad=ctx.createLinearGradient(0,-boss.h/2,0,boss.h/2);
+    grad.addColorStop(0,boss.flash>0.1 ? "#fff0a8" : meta.top);
+    grad.addColorStop(1,boss.flash>0.1 ? "#ffd34d" : meta.bottom);
+    roundRectPath(-boss.w/2,-boss.h/2,boss.w,boss.h,22);
+    ctx.fillStyle=grad; ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.82)";
+    ctx.stroke();
+    ctx.shadowBlur=0;
+
+    if(catReady){
+      ctx.save();
+      roundRectPath(-38,-26,76,52,18);
+      ctx.clip();
+      ctx.drawImage(catImg,-38,-26,76,52);
+      ctx.restore();
+    } else {
+      ctx.font="52px sans-serif";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillStyle="#6f2858";
+      ctx.fillText("😾",0,2);
     }
 
-    const hit = (ball.x - (paddle.x + paddle.w/2)) / (paddle.w/2);
-    const minSpeed = currentPerks().launchSpeed;
-    const currentSpeed = Math.hypot(ball.vx, ball.vy);
-    const nextSpeed = Math.max(minSpeed, Math.min(currentSpeed * 0.94, minSpeed + 1.1));
+    ctx.fillStyle="#fff";
+    ctx.beginPath();
+    ctx.arc(-18,-6,6,0,Math.PI*2);
+    ctx.arc(18,-6,6,0,Math.PI*2);
+    ctx.fill();
 
-    ball.vx = hit * nextSpeed * 0.92 * currentPerks().controlMult;
-    ball.vy = -Math.sqrt(Math.max(minSpeed * minSpeed * 0.9, nextSpeed * nextSpeed - ball.vx * ball.vx));
+    ctx.fillStyle="#6f2858";
+    ctx.beginPath();
+    ctx.arc(-18,-6,2.3,0,Math.PI*2);
+    ctx.arc(18,-6,2.3,0,Math.PI*2);
+    ctx.fill();
 
-    burst(ball.x, paddle.y, "🐾", 9 + Math.floor(comboPower * 6));
-    addRing(ball.x, paddle.y, "rgba(255,240,180,.95)", 48 + comboPower * 18, 4 + comboPower * 1.5);
-    return false;
+    ctx.strokeStyle="#6f2858";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(-6,10); ctx.lineTo(-26,6);
+    ctx.moveTo(-6,13); ctx.lineTo(-26,16);
+    ctx.moveTo(6,10); ctx.lineTo(26,6);
+    ctx.moveTo(6,13); ctx.lineTo(26,16);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0,6); ctx.lineTo(-4,12); ctx.lineTo(4,12); ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(-10,18);
+    ctx.quadraticCurveTo(0,24,10,18);
+    ctx.stroke();
+
+    if(boss.secondForm){
+      ctx.strokeStyle="#fff6a8";
+      ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.arc(0,0,54,0,Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    const barW=field.w-24;
+    roundRectPath(field.x+12,field.y+8,barW,12,8);
+    ctx.fillStyle="rgba(255,255,255,.2)";
+    ctx.fill();
+    roundRectPath(field.x+12,field.y+8,barW*Math.max(0,boss.hp/boss.maxHp),12,8);
+    ctx.fillStyle=meta.bottom;
+    ctx.fill();
+
+    if(boss.beam){
+      const beamX=boss.beam.x, beamW=meta.beamWidth||18;
+      if(boss.beam.state==="charge"){
+        ctx.strokeStyle="rgba(255,255,255,.9)";
+        ctx.lineWidth=3;
+        ctx.setLineDash([8,8]);
+        ctx.beginPath();
+        ctx.moveTo(beamX,boss.y+boss.h-6);
+        ctx.lineTo(beamX,field.y+field.h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        const bg=ctx.createLinearGradient(beamX,boss.y,beamX,field.y+field.h);
+        bg.addColorStop(0,"rgba(255,255,255,1)");
+        bg.addColorStop(.12,"rgba(255,190,230,.98)");
+        bg.addColorStop(.34,meta.bottom);
+        bg.addColorStop(1,"rgba(255,122,170,.12)");
+        ctx.fillStyle=bg;
+        ctx.fillRect(beamX-beamW/2,boss.y+boss.h-6,beamW,field.y+field.h-(boss.y+boss.h-6));
+      }
+    }
+
+    for(const m of boss.markers){
+      ctx.strokeStyle="rgba(255,255,255,.88)";
+      ctx.lineWidth=3;
+      ctx.setLineDash([6,6]);
+      ctx.beginPath();
+      ctx.arc(m.x,paddle.y-10,18+(1-m.timer/m.max)*8,0,Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    for(const p of boss.projectiles){
+      if(p.type==="orb"){
+        const rg=ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,p.r);
+        rg.addColorStop(0,"#fff");
+        rg.addColorStop(.4,"#ffb9d9");
+        rg.addColorStop(1,"rgba(255,96,170,.2)");
+        ctx.fillStyle=rg;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      } else {
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.fillStyle="rgba(255,214,230,.95)";
+        ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-p.r*.55,-p.r*.65,p.r*.36,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(-p.r*.18,-p.r*.88,p.r*.32,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(p.r*.18,-p.r*.88,p.r*.32,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(p.r*.55,-p.r*.65,p.r*.36,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+    }
   }
 
-  function hitRect(ball, rect){
-    return ball.x + ball.r > rect.x &&
-           ball.x - ball.r < rect.x + rect.w &&
-           ball.y + ball.r > rect.y &&
-           ball.y - ball.r < rect.y + rect.h;
+  function drawBlocks(){
+    for(const b of blocks){
+      if(!b.alive) continue;
+
+      if(b.type==="bomb"){
+        const pulse=0.72+0.28*(0.5+0.5*Math.sin(performance.now()/120 + b.x*0.03));
+        ctx.save();
+        ctx.shadowColor=`rgba(255,145,60,${0.45*pulse})`;
+        ctx.shadowBlur=18*pulse;
+        roundRectPath(b.x,b.y,b.w,b.h,10);
+        ctx.fillStyle=`rgba(255,${120+Math.floor(40*pulse)},70,1)`;
+        ctx.fill();
+        ctx.strokeStyle="rgba(255,255,255,.70)";
+        ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle="#fff7dd";
+        ctx.font="bold 18px sans-serif";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillText("💣",b.x+b.w/2,b.y+b.h/2+1);
+        continue;
+      }
+
+      roundRectPath(b.x,b.y,b.w,b.h,10);
+      ctx.fillStyle=b.color;
+      ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,.45)";
+      ctx.stroke();
+
+      ctx.fillStyle="#6f2858";
+      ctx.font="bold 14px sans-serif";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText(b.label,b.x+b.w/2,b.y+b.h/2+1);
+
+      if(Number.isFinite(b.hp) && b.hp>1){
+        ctx.fillStyle="#7c2b59";
+        ctx.font="bold 10px sans-serif";
+        ctx.fillText(String(b.hp),b.x+b.w-10,b.y+10);
+      }
+      if(b.type==="wall"){
+        ctx.fillStyle="#fff";
+        ctx.font="bold 10px sans-serif";
+        ctx.fillText("∞",b.x+b.w-10,b.y+10);
+      }
+    }
+  }
+
+  function drawPaddle(){
+    const theme=paddleTheme();
+    const grad=ctx.createLinearGradient(paddle.x,paddle.y,paddle.x,paddle.y+paddle.h);
+    grad.addColorStop(0,theme.top);
+    grad.addColorStop(1,theme.bottom);
+    roundRectPath(paddle.x,paddle.y,paddle.w,paddle.h,12);
+    ctx.fillStyle=grad;
+    ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.7)";
+    ctx.stroke();
+    ctx.fillStyle=theme.accent;
+    ctx.globalAlpha=.26;
+    roundRectPath(paddle.x+8,paddle.y+3,paddle.w-16,5,8);
+    ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.fillStyle="#6f2858";
+    ctx.font="22px sans-serif";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(selectedChar.emoji,paddle.x+paddle.w/2,paddle.y-8);
+  }
+
+  function drawBalls(){
+    for(const b of balls){
+      for(let i=0;i<b.trail.length;i++){
+        const t=b.trail[i];
+        ctx.globalAlpha=(i+1)/b.trail.length*0.16;
+        ctx.fillStyle="#fff";
+        ctx.beginPath();
+        ctx.arc(t.x,t.y,b.r*(i+1)/b.trail.length,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.globalAlpha=1;
+      ctx.fillStyle="#fff";
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#9fd7ff";
+      ctx.beginPath(); ctx.arc(b.x-2,b.y-2,b.r*0.55,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  function drawItems(){
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    for(const item of items){
+      ctx.fillStyle="rgba(255,255,255,.92)";
+      ctx.beginPath();
+      ctx.arc(item.x,item.y,item.r,0,Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle="rgba(255,99,173,.45)";
+      ctx.stroke();
+      ctx.font="18px sans-serif";
+      ctx.fillText(item.emoji,item.x,item.y+1);
+    }
+  }
+
+  function drawShots(){
+    for(const s of shots){
+      const grad=ctx.createLinearGradient(s.x,s.y,s.x,s.y+20);
+      grad.addColorStop(0,"rgba(255,255,255,.95)");
+      grad.addColorStop(1,"rgba(255,122,190,.05)");
+      ctx.fillStyle=grad;
+      ctx.fillRect(s.x-2.8,s.y-16,5.6,20);
+      ctx.fillStyle="#fff2a3";
+      ctx.beginPath();
+      ctx.arc(s.x,s.y-16,3.4,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function drawRings(){
+    for(const r of rings){
+      ctx.globalAlpha=r.life;
+      ctx.strokeStyle=r.color;
+      ctx.lineWidth=r.line;
+      ctx.beginPath();
+      ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function drawParticles(){
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    for(const p of particles){
+      ctx.globalAlpha=Math.max(0,p.life);
+      ctx.font="18px sans-serif";
+      ctx.fillText(p.emoji,p.x,p.y);
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function drawCatDash(){
+    if(!catDash.active) return;
+    ctx.save();
+    ctx.fillStyle="rgba(255,255,255,.10)";
+    ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle="#ffd84d";
+    ctx.font="900 34px sans-serif";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText("猫ラッシュ!",view.x+view.w/2,field.y+field.h*0.32);
+
+    for(let i=0;i<catDash.trail.length;i++){
+      const t=catDash.trail[i];
+      const a=(i+1)/catDash.trail.length*0.18;
+      ctx.save();
+      ctx.globalAlpha=a;
+      ctx.translate(t.x,t.y);
+      ctx.rotate(t.rot);
+      if(catReady){
+        ctx.beginPath();
+        ctx.arc(0,0,34,0,Math.PI*2);
+        ctx.clip();
+        ctx.drawImage(catImg,-34,-34,68,68);
+      } else {
+        ctx.font="56px sans-serif";
+        ctx.fillText("🐱",0,0);
+      }
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(catDash.x,catDash.y);
+    ctx.rotate(catDash.rot);
+    ctx.fillStyle="rgba(255,216,77,.35)";
+    for(let i=0;i<5;i++){
+      ctx.beginPath();
+      ctx.arc(Math.cos(i*1.25)*42,Math.sin(i*1.25)*20,4+(i%2)*2,0,Math.PI*2);
+      ctx.fill();
+    }
+    if(catReady){
+      ctx.beginPath();
+      ctx.arc(0,0,42,0,Math.PI*2);
+      ctx.clip();
+      ctx.drawImage(catImg,-42,-42,84,84);
+    } else {
+      ctx.font="72px sans-serif";
+      ctx.fillText("🐱",0,0);
+    }
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function drawCelebration(){
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,"#130b1d");
+    g.addColorStop(1,"#4c2556");
+    ctx.fillStyle=g;
+    ctx.fillRect(0,0,W,H);
+    drawSideMats("rgba(0,0,0,.45)","rgba(130,255,220,.12)");
+
+    for(let i=0;i<18;i++){
+      const x=view.x+(i/18)*view.w;
+      const h=80+Math.sin(celebrationTime*2+i)*40;
+      ctx.fillStyle=`rgba(${120+(i*7)%120},${80+(i*13)%150},255,.14)`;
+      ctx.fillRect(x,H-h,view.w/18+4,h);
+    }
+
+    for(const s of stars){
+      ctx.globalAlpha=s.a*1.4;
+      ctx.fillStyle="#fff";
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r+0.6,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    const cx=view.x+view.w/2 + Math.sin(celebrationTime*2.2)*Math.min(70,view.w*0.16);
+    const cy=H*0.56 + Math.sin(celebrationTime*8)*12;
+    const arm=Math.sin(celebrationTime*8)*18;
+    const leg=Math.cos(celebrationTime*10)*18;
+
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.strokeStyle="#fff";
+    ctx.lineWidth=8;
+    ctx.lineCap="round";
+    ctx.beginPath();
+    ctx.moveTo(-16,10); ctx.lineTo(-36,34+arm);
+    ctx.moveTo(16,10); ctx.lineTo(36,34-arm);
+    ctx.moveTo(-10,56); ctx.lineTo(-26,86+leg);
+    ctx.moveTo(10,56); ctx.lineTo(28,86-leg);
+    ctx.stroke();
+
+    if(catReady){
+      ctx.beginPath();
+      ctx.arc(0,0,50,0,Math.PI*2);
+      ctx.clip();
+      ctx.drawImage(catImg,-50,-50,100,100);
+    } else {
+      ctx.font="96px sans-serif";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText("🐱",0,0);
+    }
+    ctx.restore();
+
+    ctx.fillStyle="#ffd84d";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.font="900 28px sans-serif";
+    ctx.fillText("クリア！",view.x+view.w/2,H*0.18);
+    ctx.font="900 18px sans-serif";
+    ctx.fillStyle="#fff";
+    ctx.fillText("AIダンスでお祝い中…",view.x+view.w/2,H*0.26);
+    ctx.fillText("タップで結果へ",view.x+view.w/2,H*0.82);
   }
 
   function reflectBall(ball, rect){
-    const prevX = ball.x - ball.vx;
-    const prevY = ball.y - ball.vy;
-    const fromLeft = prevX + ball.r <= rect.x;
-    const fromRight = prevX - ball.r >= rect.x + rect.w;
-    const fromTop = prevY + ball.r <= rect.y;
-    const fromBottom = prevY - ball.r >= rect.y + rect.h;
-
-    if(fromLeft || fromRight) ball.vx *= -1;
-    else if(fromTop || fromBottom) ball.vy *= -1;
-    else ball.vy *= -1;
+    const prevX=ball.x-ball.vx, prevY=ball.y-ball.vy;
+    const fromLeft=prevX+ball.r<=rect.x;
+    const fromRight=prevX-ball.r>=rect.x+rect.w;
+    const fromTop=prevY+ball.r<=rect.y;
+    const fromBottom=prevY-ball.r>=rect.y+rect.h;
+    if(fromLeft || fromRight) ball.vx*=-1;
+    else if(fromTop || fromBottom) ball.vy*=-1;
+    else ball.vy*=-1;
   }
 
-  function updateItems(dt){
-    for(let i=items.length - 1; i>=0; i--){
-      const it = items[i];
-      it.x += it.vx * dt * 60;
-      it.y += it.vy * dt * 60;
-      if(it.y - it.r > H){
-        items.splice(i, 1);
-        continue;
-      }
-      const got = it.x + it.r > paddle.x && it.x - it.r < paddle.x + paddle.w && it.y + it.r > paddle.y && it.y - it.r < paddle.y + paddle.h;
-      if(got){
-        burst(it.x, it.y, it.emoji, 10);
-        applyItem(it.type);
-        items.splice(i, 1);
-      }
+  function hitRect(ball, rect){
+    return ball.x+ball.r>rect.x &&
+      ball.x-ball.r<rect.x+rect.w &&
+      ball.y+ball.r>rect.y &&
+      ball.y-ball.r<rect.y+rect.h;
+  }
+
+  function handlePaddleHit(ball, now){
+    playTap(620);
+    playPaddleNyah();
+    say("ニヤッ!",360);
+
+    const power=stats.combo>=8 ? 1 : stats.combo>=4 ? 0.55 : stats.combo>=1 ? 0.2 : 0;
+    worldFlash=Math.max(worldFlash,0.08+power*0.08);
+    shake=Math.max(shake,3.5+power*4.5);
+
+    if(magnetCharges>0 && now<magnetUntil){
+      ball.stuck=true;
+      ball.stuckOffsetX=Math.max(ball.r,Math.min(paddle.w-ball.r,ball.x-paddle.x));
+      magnetCharges--;
+      burst(ball.x,paddle.y,"🧲",9);
+      return true;
     }
+
+    const hit=(ball.x-(paddle.x+paddle.w/2))/(paddle.w/2);
+    const minSpeed=currentPerks().launch;
+    const currentSpeed=Math.hypot(ball.vx,ball.vy);
+    const nextSpeed=Math.max(minSpeed,Math.min(currentSpeed*0.94,minSpeed+1.1));
+    ball.vx=hit*nextSpeed*0.92*currentPerks().control;
+    ball.vy=-Math.sqrt(Math.max(minSpeed*minSpeed*0.9,nextSpeed*nextSpeed-ball.vx*ball.vx));
+
+    burst(ball.x,paddle.y,"🐾",9+Math.floor(power*6));
+    addRing(ball.x,paddle.y,"rgba(255,240,180,.95)",48+power*18,4+power*1.5);
+    return false;
   }
 
-  function spawnPlayerShot(){
-    const px = paddle.x + paddle.w/2 + rand(-paddle.w * 0.24, paddle.w * 0.24);
-    playerShots.push({ x:px, y:paddle.y - 4, vy:-10.5 });
-    playTap(980);
-  }
+  function updateShots(dt){
+    for(let i=shots.length-1;i>=0;i--){
+      const s=shots[i];
+      s.y += s.vy*dt*60;
+      if(s.y<field.y-26){ shots.splice(i,1); continue; }
 
-  function updatePlayerShots(dt){
-    for(let i=playerShots.length - 1; i>=0; i--){
-      const s = playerShots[i];
-      s.y += s.vy * dt * 60;
-
-      if(s.y < field.y - 26){
-        playerShots.splice(i, 1);
-        continue;
-      }
-
-      if(stageMode === "boss" && boss){
-        const rect = { x:boss.x, y:boss.y, w:boss.w, h:boss.h };
-        if(s.x > rect.x && s.x < rect.x + rect.w && s.y > rect.y && s.y < rect.y + rect.h){
-          boss.hp -= 1;
-          boss.flash = 1;
+      if(stageMode==="boss" && boss){
+        const rect={x:boss.x,y:boss.y,w:boss.w,h:boss.h};
+        if(s.x>rect.x && s.x<rect.x+rect.w && s.y>rect.y && s.y<rect.y+rect.h){
+          boss.hp--;
+          boss.flash=1;
           registerCombo();
           addScore(4);
           addSkill(2);
-          burst(s.x, s.y, "💥", 8);
-          worldFlash = Math.max(worldFlash, 0.08);
-          if(stage === MAX_STAGE && Math.random() < 0.08){
-            spawnItem(boss.x + rand(16, boss.w - 16), boss.y + boss.h * 0.45);
-          }
-          playerShots.splice(i, 1);
-
-          if(boss.hp <= 0){
+          burst(s.x,s.y,"💥",8);
+          worldFlash=Math.max(worldFlash,0.08);
+          if(stage===10 && Math.random()<0.08) spawnItem(boss.x+rand(16,boss.w-16),boss.y+boss.h*0.45);
+          shots.splice(i,1);
+          if(boss.hp<=0){
             addScore(120);
-            stats.bossesDefeated += 1;
-            if(boss.secondForm) stats.finalFormDefeated = true;
-            boss = null;
+            stats.bosses++;
+            if(stage===10) stats.finalBoss=true;
+            boss=null;
             goNextStage();
             return;
           }
           continue;
         }
       } else {
-        let hit = false;
+        let hit=false;
         for(const b of blocks){
           if(!b.alive) continue;
-          if(s.x < b.x || s.x > b.x + b.w || s.y < b.y || s.y > b.y + b.h) continue;
-
-          if(!Number.isFinite(b.hp)){
-            burst(s.x, s.y, "💥", 5);
-            playerShots.splice(i, 1);
-            hit = true;
+          if(s.x<b.x || s.x>b.x+b.w || s.y<b.y || s.y>b.y+b.h) continue;
+          if(b.type==="wall"){
+            burst(s.x,s.y,"💥",5);
+            shots.splice(i,1);
+            hit=true;
             break;
           }
-
-          if(b.bomb){
-            registerCombo();
-            addScore(blockScore(b));
-            addSkill(6);
-            destroyBlock(b, false);
-            playerShots.splice(i, 1);
-            updateHud();
-            hit = true;
-            break;
-          }
-
-          b.hp -= 1;
           registerCombo();
           addScore(blockScore(b));
           addSkill(2);
-          burst(s.x, s.y, "✨", 8);
-          worldFlash = Math.max(worldFlash, 0.06);
-
-          if(b.hp <= 0){
-            destroyBlock(b, false);
+          if(b.type==="bomb"){
+            destroyBlock(b,false);
+          } else {
+            b.hp--;
+            burst(s.x,s.y,"✨",8);
+            worldFlash=Math.max(worldFlash,0.06);
+            if(b.hp<=0) destroyBlock(b,false);
           }
-
-          playerShots.splice(i, 1);
-          hit = true;
+          shots.splice(i,1);
+          hit=true;
           break;
         }
         if(hit) continue;
@@ -3326,139 +2472,126 @@
     }
   }
 
+  function updateItems(dt){
+    for(let i=items.length-1;i>=0;i--){
+      const it=items[i];
+      it.x += it.vx*dt*60;
+      it.y += it.vy*dt*60;
+      if(it.y-it.r>H){ items.splice(i,1); continue; }
+      const got = it.x+it.r>paddle.x && it.x-it.r<paddle.x+paddle.w && it.y+it.r>paddle.y && it.y-it.r<paddle.y+paddle.h;
+      if(got){
+        burst(it.x,it.y,it.emoji,10);
+        applyItem(it.type);
+        items.splice(i,1);
+      }
+    }
+  }
+
   function updateParticles(dt){
-    for(let i=particles.length - 1; i>=0; i--){
-      const p = particles[i];
-      p.x += p.vx * dt * 60;
-      p.y += p.vy * dt * 60;
-      p.vy += 0.03 * dt * 60;
-      p.life -= 0.03 * dt * 60;
-      if(p.life <= 0) particles.splice(i, 1);
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      p.x += p.vx*dt*60;
+      p.y += p.vy*dt*60;
+      p.vy += 0.03*dt*60;
+      p.life -= 0.03*dt*60;
+      if(p.life<=0) particles.splice(i,1);
     }
   }
 
   function updateRings(dt){
-    for(let i=rings.length - 1; i>=0; i--){
-      const r = rings[i];
-      r.r += (r.maxR - r.r) * 0.18;
-      r.life -= dt * 2.1;
-      if(r.life <= 0) rings.splice(i, 1);
-    }
-  }
-
-  function updateOpening(dt){
-    openingTime += dt;
-    if(openingTime >= 8.8){
-      renderTitle();
-    }
-  }
-
-  function updateStory(dt){
-    storyTime += dt;
-    if(storyTime >= 3.3){
-      startGameNow();
-    }
-  }
-
-  function updateCelebration(dt){
-    celebrationTime += dt;
-    updateParticles(dt);
-    updateRings(dt);
-    if(Math.random() < 0.12){
-      const px = rand(view.x + view.w * 0.18, view.x + view.w * 0.82);
-      const py = rand(H * 0.2, H * 0.78);
-      particles.push({
-        x:px, y:py,
-        vx:rand(-1.0,1.0),
-        vy:rand(-1.2,0.4),
-        life:1,
-        emoji:Math.random() < 0.5 ? "✨" : "🎉"
-      });
-    }
-    if(celebrationTime >= 5.2){
-      showClearCard();
+    for(let i=rings.length-1;i>=0;i--){
+      const r=rings[i];
+      r.r += (r.maxR-r.r)*0.18;
+      r.life -= dt*2.1;
+      if(r.life<=0) rings.splice(i,1);
     }
   }
 
   function update(dt){
-    resetMusicForScene();
+    resetMusicIfSceneChanged();
 
-    if(state === "opening"){
-      updateOpening(dt);
+    if(state==="opening"){
+      openingTime += dt;
+      if(openingTime>=3.2) showTitle();
       updateMusic(dt);
       updateHud();
       return;
     }
-    if(state === "story"){
-      updateStory(dt);
+    if(state==="story"){
+      storyTime += dt;
       updateMusic(dt);
       updateHud();
       return;
     }
-    if(state === "title"){
+    if(state==="title"){
       updateMusic(dt);
       updateHud();
       return;
     }
-    if(state === "celebration"){
-      updateCelebration(dt);
-      updateMusic(dt);
-      updateHud();
-      return;
-    }
-    if(state !== "playing"){
-      updateHud();
-      return;
-    }
-
-    const now = performance.now();
-
-    if(stats.comboTimer > 0){
-      stats.comboTimer -= dt;
-      if(stats.comboTimer <= 0){
-        resetCombo();
+    if(state==="celebration"){
+      celebrationTime += dt;
+      updateParticles(dt);
+      updateRings(dt);
+      if(Math.random()<0.12){
+        particles.push({
+          x:rand(view.x+view.w*0.18, view.x+view.w*0.82),
+          y:rand(H*0.2,H*0.78),
+          vx:rand(-1,1),
+          vy:rand(-1.2,0.4),
+          life:1,
+          emoji:Math.random()<0.5?"✨":"🎉"
+        });
       }
+      if(celebrationTime>=5.2) showResult(true);
+      updateMusic(dt);
+      updateHud();
+      return;
+    }
+    if(state!=="playing"){
+      updateHud();
+      return;
     }
 
-    const basePaddle = currentPerks().basePaddle;
-    const bigTarget = 170 + currentPerks().bigWidthBonus;
-    if(now < paddleBoostUntil){
-      paddle.w += (bigTarget - paddle.w) * 0.15;
-    } else {
-      paddle.w += (basePaddle - paddle.w) * 0.14;
+    const now=performance.now();
+
+    if(stats.comboTimer>0){
+      stats.comboTimer -= dt;
+      if(stats.comboTimer<=0) resetCombo();
     }
 
-    paddle.x += ((pointerX - paddle.w/2) - paddle.x) * Math.min(1, 0.25 * dt * 60);
-    paddle.x = Math.max(field.x + 8, Math.min(field.x + field.w - paddle.w - 8, paddle.x));
+    const base=currentPerks().paddle;
+    const targetBig=170+currentPerks().bigWidth;
+    if(now<paddleBoostUntil) paddle.w += (targetBig-paddle.w)*0.15;
+    else paddle.w += (base-paddle.w)*0.14;
+
+    paddle.x += ((pointerX-paddle.w/2)-paddle.x) * Math.min(1,0.25*dt*60);
+    paddle.x = clamp(paddle.x, field.x+8, field.x+field.w-paddle.w-8);
 
     if(catDash.active){
-      catDash.trail.push({ x: catDash.x, y: catDash.y, rot: catDash.rot });
-      if(catDash.trail.length > 8) catDash.trail.shift();
-      catDash.x += 26 * dt * 60;
-      catDash.y += Math.sin(now / 90) * 1.8;
-      catDash.rot += 0.045 * dt * 60;
-      if(now > catDash.until){
-        catDash.active = false;
-        catDash.trail = [];
+      catDash.trail.push({x:catDash.x,y:catDash.y,rot:catDash.rot});
+      if(catDash.trail.length>8) catDash.trail.shift();
+      catDash.x += 26*dt*60;
+      catDash.y += Math.sin(now/90)*1.8;
+      catDash.rot += 0.045*dt*60;
+      if(now>catDash.until){ catDash.active=false; catDash.trail=[]; }
+    }
+
+    if(stageMode==="boss") updateBoss(dt);
+    if(state!=="playing") return;
+
+    if(now<rapidUntil){
+      rapidCooldown -= dt;
+      while(rapidCooldown<=0){
+        rapidCooldown += 0.16*currentPerks().rapid;
+        startRapidShot();
       }
     }
 
-    if(stageMode === "boss") updateBoss(dt);
-    if(state !== "playing") return;
+    updateShots(dt);
+    if(state!=="playing") return;
 
-    if(now < rapidUntil){
-      rapidShotCooldown -= dt;
-      while(rapidShotCooldown <= 0){
-        rapidShotCooldown += 0.16 * currentPerks().rapidCooldownMult;
-        spawnPlayerShot();
-      }
-    }
-
-    updatePlayerShots(dt);
-    if(state !== "playing") return;
-
-    for(let i=balls.length - 1; i>=0; i--){
-      const ball = balls[i];
+    for(let i=balls.length-1;i>=0;i--){
+      const ball=balls[i];
 
       if(ball.stuck){
         ball.x = paddle.x + ball.stuckOffsetX;
@@ -3466,196 +2599,148 @@
         continue;
       }
 
-      ball.trail.push({ x:ball.x, y:ball.y });
-      if(ball.trail.length > 6) ball.trail.shift();
+      ball.trail.push({x:ball.x,y:ball.y});
+      if(ball.trail.length>6) ball.trail.shift();
 
-      ball.x += ball.vx * dt * 60;
-      ball.y += ball.vy * dt * 60;
+      ball.x += ball.vx*dt*60;
+      ball.y += ball.vy*dt*60;
 
-      if(ball.x < field.x + ball.r){
-        ball.x = field.x + ball.r;
-        ball.vx *= -1;
-        playTap(360);
-      }
-      if(ball.x > field.x + field.w - ball.r){
-        ball.x = field.x + field.w - ball.r;
-        ball.vx *= -1;
-        playTap(360);
-      }
-      if(ball.y < field.y + ball.r){
-        ball.y = field.y + ball.r;
-        ball.vy *= -1;
-        playTap(420);
+      if(ball.x<field.x+ball.r){ ball.x=field.x+ball.r; ball.vx*=-1; playTap(360); }
+      if(ball.x>field.x+field.w-ball.r){ ball.x=field.x+field.w-ball.r; ball.vx*=-1; playTap(360); }
+      if(ball.y<field.y+ball.r){ ball.y=field.y+ball.r; ball.vy*=-1; playTap(420); }
+
+      if(ball.y+ball.r>paddle.y && ball.y-ball.r<paddle.y+paddle.h && ball.x>paddle.x && ball.x<paddle.x+paddle.w && ball.vy>0){
+        const stuck=handlePaddleHit(ball,now);
+        if(stuck) continue;
       }
 
-      if(
-        ball.y + ball.r > paddle.y &&
-        ball.y - ball.r < paddle.y + paddle.h &&
-        ball.x > paddle.x &&
-        ball.x < paddle.x + paddle.w &&
-        ball.vy > 0
-      ){
-        const stuckNow = handlePaddleHit(ball, now);
-        if(stuckNow) continue;
-      }
-
-      if(stageMode === "boss" && boss){
-        const rect = { x:boss.x, y:boss.y, w:boss.w, h:boss.h };
-        if(hitRect(ball, rect)){
-          boss.hp -= 1;
-          boss.flash = 1;
+      if(stageMode==="boss" && boss){
+        const rect={x:boss.x,y:boss.y,w:boss.w,h:boss.h};
+        if(hitRect(ball,rect)){
+          boss.hp--;
+          boss.flash=1;
           registerCombo();
           addScore(16);
           addSkill(6);
-          burst(ball.x, ball.y, "⭐", 12);
-          worldFlash = Math.max(worldFlash, 0.08);
-          shake = Math.max(shake, 4.8);
+          burst(ball.x,ball.y,"⭐",12);
+          worldFlash=Math.max(worldFlash,0.08);
+          shake=Math.max(shake,4.8);
           playTap(920);
-          reflectBall(ball, rect);
-
-          if(stage === MAX_STAGE && Math.random() < 0.12){
-            spawnItem(boss.x + rand(16, boss.w - 16), boss.y + boss.h * 0.48);
-          }
-
-          if(boss.hp <= 0){
+          reflectBall(ball,rect);
+          if(stage===10 && Math.random()<0.12) spawnItem(boss.x+rand(16,boss.w-16),boss.y+boss.h*0.48);
+          if(boss.hp<=0){
             addScore(120);
-            stats.bossesDefeated += 1;
-            if(boss.secondForm) stats.finalFormDefeated = true;
-            boss = null;
+            stats.bosses++;
+            if(stage===10) stats.finalBoss=true;
+            boss=null;
             goNextStage();
             return;
           }
           updateHud();
         }
 
-        if(boss && boss.beam && boss.beam.state === "fire"){
-          const bx = boss.beam.x;
-          const beamW = boss.beamWidth || 18;
-          if(ball.x + ball.r > bx - beamW/2 && ball.x - ball.r < bx + beamW/2 && ball.y > boss.y + boss.h - 8){
-            ball.vy *= -1;
-            ball.vx *= 0.96;
-            burst(ball.x, ball.y, "⚡", 7);
+        if(boss && boss.beam && boss.beam.state==="fire"){
+          const bx=boss.beam.x, bw=boss.meta.beamWidth||18;
+          if(ball.x+ball.r>bx-bw/2 && ball.x-ball.r<bx+bw/2 && ball.y>boss.y+boss.h-8){
+            ball.vy*=-1;
+            ball.vx*=0.96;
+            burst(ball.x,ball.y,"⚡",7);
           }
         }
       } else {
         for(const b of blocks){
           if(!b.alive) continue;
-          if(!hitRect(ball, b)) continue;
+          if(!hitRect(ball,b)) continue;
 
-          if(!Number.isFinite(b.hp)){
-            reflectBall(ball, b);
-            burst(b.x + b.w/2, b.y + b.h/2, "💥", 6);
-            shake = Math.max(shake, 2.6);
+          if(b.type==="wall"){
+            reflectBall(ball,b);
+            burst(b.x+b.w/2,b.y+b.h/2,"💥",6);
+            shake=Math.max(shake,2.6);
             playTap(280);
             break;
           }
 
-          if(b.bomb){
+          if(b.type==="bomb"){
             registerCombo();
             addScore(blockScore(b));
             addSkill(6);
-            reflectBall(ball, b);
-            destroyBlock(b, false);
+            reflectBall(ball,b);
+            destroyBlock(b,false);
             updateHud();
             break;
           }
 
-          b.hp -= 1;
+          b.hp--;
           registerCombo();
           addScore(blockScore(b));
           addSkill(6);
-          burst(b.x + b.w/2, b.y + b.h/2, "✨", 10);
-          worldFlash = Math.max(worldFlash, 0.06);
-          shake = Math.max(shake, 2.8);
+          burst(b.x+b.w/2,b.y+b.h/2,"✨",10);
+          worldFlash=Math.max(worldFlash,0.06);
+          shake=Math.max(shake,2.8);
 
-          if(b.hp <= 0){
-            destroyBlock(b, false);
+          if(b.hp<=0){
+            destroyBlock(b,false);
             playTap(860);
           } else {
             playTap(560);
           }
 
-          reflectBall(ball, b);
-          if(score % 100 === 0) showMessage("GREAT!", 520);
+          reflectBall(ball,b);
+          if(score%100===0) showMessage("GREAT!",520);
           updateHud();
           break;
         }
       }
 
-      if(ball.y > field.y + field.h + 44){
-        balls.splice(i, 1);
-      }
+      if(ball.y>field.y+field.h+44) balls.splice(i,1);
     }
 
-    if(stageMode === "boss" && balls.length > 1){
-      balls = [balls[0]];
+    if(stageMode==="boss" && balls.length>1){
+      balls=[balls[0]];
     }
 
-    if(balls.length === 0){
+    if(balls.length===0){
       loseLife();
       return;
     }
 
-    if(stageMode === "breakout"){
-      const remainingBreakable = blocks.some(b => b.alive && Number.isFinite(b.hp));
-      if(!remainingBreakable){
-        goNextStage();
-        return;
-      }
+    if(stageMode==="breakout" && !blocks.some(b=>b.alive && b.type!=="wall")){
+      goNextStage();
+      return;
     }
 
     updateItems(dt);
     updateParticles(dt);
     updateRings(dt);
 
-    if(shake > 0.08) shake *= 0.88;
-    else shake = 0;
-
-    if(damageFlash > 0.02) damageFlash *= 0.88;
-    else damageFlash = 0;
-
-    if(worldFlash > 0.01) worldFlash *= 0.86;
-    else worldFlash = 0;
+    if(shake>0.08) shake*=0.88; else shake=0;
+    if(damageFlash>0.02) damageFlash*=0.88; else damageFlash=0;
+    if(worldFlash>0.01) worldFlash*=0.86; else worldFlash=0;
 
     updateMusic(dt);
     updateHud();
   }
 
-  function drawIdleBackground(){
-    const prevMode = stageMode;
-    stageMode = "breakout";
-    drawBackground();
-    drawTitleCats(performance.now() / 900);
-    stageMode = prevMode;
-  }
-
   function draw(){
-    if(state === "opening"){
-      drawOpeningMovie();
+    if(state==="celebration"){
+      drawCelebration();
       return;
     }
-    if(state === "story"){
-      drawStoryMovie();
-      return;
-    }
-    if(state === "celebration"){
-      drawCelebrationMovie();
-      return;
-    }
-    if(state !== "playing"){
+
+    if(state!=="playing"){
       drawIdleBackground();
       return;
     }
 
     ctx.save();
-    if(shake > 0){
-      ctx.translate((Math.random()-0.5) * shake, (Math.random()-0.5) * shake);
+    if(shake>0){
+      ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
     }
     drawBackground();
-    if(stageMode === "boss") drawBoss();
+    if(stageMode==="boss") drawBoss();
     else drawBlocks();
     drawItems();
-    drawPlayerShots();
+    drawShots();
     drawPaddle();
     drawBalls();
     drawRings();
@@ -3665,96 +2750,77 @@
   }
 
   function loop(ts){
-    if(!lastTime) lastTime = ts;
-    const dt = Math.min(0.033, (ts - lastTime) / 1000);
-    lastTime = ts;
+    if(!lastTime) lastTime=ts;
+    const dt=Math.min(0.033,(ts-lastTime)/1000);
+    lastTime=ts;
     update(dt);
     draw();
     requestAnimationFrame(loop);
   }
 
-  function setPointerX(clientX){
-    const rect = canvas.getBoundingClientRect();
-    pointerX = clientX - rect.left;
-  }
-
   function releaseStuckBalls(){
-    let released = false;
-    for(const ball of balls){
-      if(ball.stuck){
-        ball.stuck = false;
-        const hit = (pointerX - (paddle.x + paddle.w/2)) / (paddle.w/2);
-        ball.vx = hit * 5.2 * currentPerks().controlMult;
-        ball.vy = -Math.max(currentPerks().launchSpeed, 4.8);
-        released = true;
+    let released=false;
+    for(const b of balls){
+      if(b.stuck){
+        b.stuck=false;
+        const hit=(pointerX-(paddle.x+paddle.w/2))/(paddle.w/2);
+        b.vx=hit*5.2*currentPerks().control;
+        b.vy=-Math.max(currentPerks().launch,4.8);
+        released=true;
       }
     }
     if(released) playTap(760);
   }
 
-  canvas.addEventListener("pointerdown", e => {
-    setPointerX(e.clientX);
+  canvas.addEventListener("pointerdown", e=>{
+    pointerX=e.clientX-canvas.getBoundingClientRect().left;
 
     if(!audioPrimed){
       unlockAudio();
-      audioPrimed = true;
-      resetMusic();
-      if(state === "opening"){
-        return;
-      }
+      musicStep=0;
+      musicAccum=0;
+      if(state==="opening") return;
     }
 
-    if(state === "opening"){
-      renderTitle();
-      return;
-    }
-    if(state === "story"){
-      startGameNow();
-      return;
-    }
-    if(state === "celebration"){
-      showClearCard();
-      return;
-    }
-    if(state === "playing"){
-      releaseStuckBalls();
-    }
+    if(state==="opening"){ showTitle(); return; }
+    if(state==="story"){ startGame(); return; }
+    if(state==="celebration"){ showResult(true); return; }
+    if(state==="playing"){ releaseStuckBalls(); }
   });
 
-  canvas.addEventListener("pointermove", e => {
-    setPointerX(e.clientX);
+  canvas.addEventListener("pointermove", e=>{
+    pointerX=e.clientX-canvas.getBoundingClientRect().left;
   });
 
-  canvas.addEventListener("touchstart", () => {
+  canvas.addEventListener("touchstart", ()=>{
     if(!audioPrimed){
       unlockAudio();
-      audioPrimed = true;
-      resetMusic();
+      musicStep=0;
+      musicAccum=0;
     }
-  }, {passive:true});
+  }, { passive:true });
 
-  skillButton.addEventListener("click", () => {
+  ui.skillButton.addEventListener("click", ()=>{
     if(!audioPrimed){
       unlockAudio();
-      audioPrimed = true;
-      resetMusic();
+      musicStep=0;
+      musicAccum=0;
     }
     useSkill();
   });
 
-  window.addEventListener("resize", () => {
+  window.addEventListener("resize", ()=>{
     resize();
-    if(state === "playing"){
-      paddle.x = Math.max(field.x + 8, Math.min(field.x + field.w - paddle.w - 8, paddle.x));
-      paddle.y = field.y + field.h - 24;
+    if(state==="playing"){
+      paddle.x=clamp(paddle.x, field.x+8, field.x+field.w-paddle.w-8);
+      paddle.y=field.y+field.h-24;
     }
   });
 
   loadCat();
   resize();
-  resetStats();
   updateHud();
-  overlay.classList.add("hidden");
+  showOpening();
   requestAnimationFrame(loop);
 })();
 </script>
